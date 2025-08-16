@@ -68,16 +68,7 @@ const AppContent = () => (
               />
             }
           />
-          <Route
-            path="/admin"
-            element={
-              <PlaceholderPage
-                title="Admin Dashboard"
-                description="This page will provide administrative controls for managing the platform."
-                suggestedPrompt="Create an admin dashboard with analytics, user management, and drive management"
-              />
-            }
-          />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route
             path="/about"
             element={
