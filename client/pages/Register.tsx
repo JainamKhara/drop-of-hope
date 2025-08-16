@@ -6,8 +6,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, ArrowLeft } from 'lucide-react';
 
+const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
+
 export default function Register() {
-  const { isSignedIn } = useAuth();
+  // Use Clerk auth if available, otherwise use mock auth
+  let isSignedIn, isLoaded;
+
+  if (hasValidClerkKey) {
+    const clerkAuth = useAuth();
+    isSignedIn = clerkAuth.isSignedIn;
+    isLoaded = clerkAuth.isLoaded;
+  } else {
+    const mockAuth = useMockAuth();
+    isSignedIn = mockAuth.isSignedIn;
+    isLoaded = mockAuth.isLoaded;
+  }
+
   const navigate = useNavigate();
 
   // Redirect to dashboard if already signed in
@@ -57,49 +72,53 @@ export default function Register() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="flex justify-center">
-                <SignUp 
-                  routing="path"
-                  path="/register"
-                  redirectUrl="/dashboard"
-                  signInUrl="/login"
-                  appearance={{
-                    elements: {
-                      formButtonPrimary: {
-                        backgroundColor: 'hsl(var(--hope-red))',
-                        '&:hover': {
-                          backgroundColor: 'hsl(var(--hope-red) / 0.9)',
-                        },
-                      },
-                      socialButtonsBlockButton: {
-                        border: '1px solid hsl(var(--border))',
-                        '&:hover': {
+                {hasValidClerkKey ? (
+                  <SignUp
+                    routing="path"
+                    path="/register"
+                    redirectUrl="/dashboard"
+                    signInUrl="/login"
+                    appearance={{
+                      elements: {
+                        formButtonPrimary: {
                           backgroundColor: 'hsl(var(--hope-red))',
-                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: 'hsl(var(--hope-red) / 0.9)',
+                          },
+                        },
+                        socialButtonsBlockButton: {
+                          border: '1px solid hsl(var(--border))',
+                          '&:hover': {
+                            backgroundColor: 'hsl(var(--hope-red))',
+                            color: 'white',
+                          },
+                        },
+                        dividerLine: {
+                          backgroundColor: 'hsl(var(--border))',
+                        },
+                        formFieldInput: {
+                          borderColor: 'hsl(var(--border))',
+                          '&:focus': {
+                            borderColor: 'hsl(var(--hope-red))',
+                            boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
+                          },
+                        },
+                        footerActionLink: {
+                          color: 'hsl(var(--hope-red))',
+                          '&:hover': {
+                            color: 'hsl(var(--hope-red) / 0.8)',
+                          },
                         },
                       },
-                      dividerLine: {
-                        backgroundColor: 'hsl(var(--border))',
+                      layout: {
+                        socialButtonsPlacement: 'top',
+                        socialButtonsVariant: 'blockButton',
                       },
-                      formFieldInput: {
-                        borderColor: 'hsl(var(--border))',
-                        '&:focus': {
-                          borderColor: 'hsl(var(--hope-red))',
-                          boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
-                        },
-                      },
-                      footerActionLink: {
-                        color: 'hsl(var(--hope-red))',
-                        '&:hover': {
-                          color: 'hsl(var(--hope-red) / 0.8)',
-                        },
-                      },
-                    },
-                    layout: {
-                      socialButtonsPlacement: 'top',
-                      socialButtonsVariant: 'blockButton',
-                    },
-                  }}
-                />
+                    }}
+                  />
+                ) : (
+                  <MockSignUp />
+                )}
               </div>
             </CardContent>
           </Card>
