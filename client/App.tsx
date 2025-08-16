@@ -45,16 +45,6 @@ const AppContent = () => (
           <Route path="/book-appointment/:driveId" element={<BookAppointment />} />
           <Route path="/appointments" element={<MyAppointments />} />
           <Route
-            path="/appointments"
-            element={
-              <PlaceholderPage
-                title="My Appointments"
-                description="This page will show upcoming and past donation appointments with calendar integration."
-                suggestedPrompt="Create an appointments page with calendar view and Google Calendar sync"
-              />
-            }
-          />
-          <Route
             path="/profile"
             element={
               <PlaceholderPage
