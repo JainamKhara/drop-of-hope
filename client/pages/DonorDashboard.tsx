@@ -75,7 +75,9 @@ export default function DonorDashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl text-hope-red">Welcome back, John!</CardTitle>
+                    <CardTitle className="text-2xl text-hope-red">
+                      Welcome back, {user?.firstName || user?.fullName || 'Donor'}!
+                    </CardTitle>
                     <p className="text-muted-foreground">Ready to save more lives?</p>
                   </div>
                   <Badge className="bg-hope-red">A+ Donor</Badge>
