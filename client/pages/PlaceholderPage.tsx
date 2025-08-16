@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, ArrowLeft, MessageCircle } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Heart, ArrowLeft, MessageCircle } from "lucide-react";
 
 interface PlaceholderPageProps {
   title: string;
@@ -10,7 +10,11 @@ interface PlaceholderPageProps {
   suggestedPrompt?: string;
 }
 
-export default function PlaceholderPage({ title, description, suggestedPrompt }: PlaceholderPageProps) {
+export default function PlaceholderPage({
+  title,
+  description,
+  suggestedPrompt,
+}: PlaceholderPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
       {/* Header */}
@@ -21,7 +25,9 @@ export default function PlaceholderPage({ title, description, suggestedPrompt }:
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <Button variant="outline" asChild>
               <Link to="/">
@@ -44,13 +50,13 @@ export default function PlaceholderPage({ title, description, suggestedPrompt }:
               <CardTitle className="text-3xl text-hope-red">{title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-lg text-muted-foreground">
-                {description}
-              </p>
-              
+              <p className="text-lg text-muted-foreground">{description}</p>
+
               {suggestedPrompt && (
                 <div className="bg-hope-pink dark:bg-hope-coral p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">Suggested prompt for the developer:</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Suggested prompt for the developer:
+                  </p>
                   <code className="text-sm bg-white dark:bg-card p-2 rounded border">
                     "{suggestedPrompt}"
                   </code>

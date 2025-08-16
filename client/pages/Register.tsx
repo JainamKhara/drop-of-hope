@@ -1,12 +1,13 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { SignUp, useAuth } from '@clerk/clerk-react';
-import { useMockAuth, MockSignUp } from '@/contexts/MockAuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, ArrowLeft } from 'lucide-react';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { SignUp, useAuth } from "@clerk/clerk-react";
+import { useMockAuth, MockSignUp } from "@/contexts/MockAuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Heart, ArrowLeft } from "lucide-react";
 
-const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+const hasValidClerkKey =
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
 
 export default function Register() {
@@ -28,7 +29,7 @@ export default function Register() {
   // Redirect to dashboard if already signed in
   React.useEffect(() => {
     if (isSignedIn) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [isSignedIn, navigate]);
 
@@ -42,7 +43,9 @@ export default function Register() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <Button variant="outline" asChild>
               <Link to="/">
@@ -59,7 +62,9 @@ export default function Register() {
         <div className="max-w-md mx-auto">
           {/* Welcome Message */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-hope-red mb-2">Join Drop of Hope</h1>
+            <h1 className="text-3xl font-bold text-hope-red mb-2">
+              Join Drop of Hope
+            </h1>
             <p className="text-muted-foreground">
               Start your journey as a life-saving donor
             </p>
@@ -68,7 +73,9 @@ export default function Register() {
           {/* Clerk Sign Up Component */}
           <Card className="border-0 shadow-xl">
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl text-hope-red">Create Account</CardTitle>
+              <CardTitle className="text-2xl text-hope-red">
+                Create Account
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="flex justify-center">
@@ -81,38 +88,38 @@ export default function Register() {
                     appearance={{
                       elements: {
                         formButtonPrimary: {
-                          backgroundColor: 'hsl(var(--hope-red))',
-                          '&:hover': {
-                            backgroundColor: 'hsl(var(--hope-red) / 0.9)',
+                          backgroundColor: "hsl(var(--hope-red))",
+                          "&:hover": {
+                            backgroundColor: "hsl(var(--hope-red) / 0.9)",
                           },
                         },
                         socialButtonsBlockButton: {
-                          border: '1px solid hsl(var(--border))',
-                          '&:hover': {
-                            backgroundColor: 'hsl(var(--hope-red))',
-                            color: 'white',
+                          border: "1px solid hsl(var(--border))",
+                          "&:hover": {
+                            backgroundColor: "hsl(var(--hope-red))",
+                            color: "white",
                           },
                         },
                         dividerLine: {
-                          backgroundColor: 'hsl(var(--border))',
+                          backgroundColor: "hsl(var(--border))",
                         },
                         formFieldInput: {
-                          borderColor: 'hsl(var(--border))',
-                          '&:focus': {
-                            borderColor: 'hsl(var(--hope-red))',
-                            boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
+                          borderColor: "hsl(var(--border))",
+                          "&:focus": {
+                            borderColor: "hsl(var(--hope-red))",
+                            boxShadow: "0 0 0 2px hsl(var(--hope-red) / 0.2)",
                           },
                         },
                         footerActionLink: {
-                          color: 'hsl(var(--hope-red))',
-                          '&:hover': {
-                            color: 'hsl(var(--hope-red) / 0.8)',
+                          color: "hsl(var(--hope-red))",
+                          "&:hover": {
+                            color: "hsl(var(--hope-red) / 0.8)",
                           },
                         },
                       },
                       layout: {
-                        socialButtonsPlacement: 'top',
-                        socialButtonsVariant: 'blockButton',
+                        socialButtonsPlacement: "top",
+                        socialButtonsVariant: "blockButton",
                       },
                     }}
                   />
@@ -126,9 +133,9 @@ export default function Register() {
           {/* Additional Info */}
           <div className="mt-8 text-center">
             <p className="text-muted-foreground mb-4">
-              Already have an account?{' '}
-              <Link 
-                to="/login" 
+              Already have an account?{" "}
+              <Link
+                to="/login"
                 className="text-hope-red hover:text-hope-red/80 font-medium"
               >
                 Sign in here
@@ -136,7 +143,9 @@ export default function Register() {
             </p>
 
             <div className="bg-hope-pink dark:bg-hope-coral p-4 rounded-lg mb-4">
-              <h3 className="font-semibold text-hope-red mb-2">Why Join Drop of Hope?</h3>
+              <h3 className="font-semibold text-hope-red mb-2">
+                Why Join Drop of Hope?
+              </h3>
               <ul className="text-sm text-muted-foreground space-y-1 text-left">
                 <li>• Save lives through blood donation</li>
                 <li>• Earn rewards and recognition</li>
@@ -144,15 +153,21 @@ export default function Register() {
                 <li>• Track your donation impact</li>
               </ul>
             </div>
-            
+
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>By creating an account, you agree to our</p>
               <div className="space-x-4">
-                <Link to="/terms" className="hover:text-hope-red transition-colors">
+                <Link
+                  to="/terms"
+                  className="hover:text-hope-red transition-colors"
+                >
                   Terms of Service
                 </Link>
                 <span>•</span>
-                <Link to="/privacy" className="hover:text-hope-red transition-colors">
+                <Link
+                  to="/privacy"
+                  className="hover:text-hope-red transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </div>

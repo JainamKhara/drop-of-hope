@@ -1,12 +1,13 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { SignIn, useAuth } from '@clerk/clerk-react';
-import { useMockAuth, MockSignIn } from '@/contexts/MockAuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, ArrowLeft } from 'lucide-react';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { SignIn, useAuth } from "@clerk/clerk-react";
+import { useMockAuth, MockSignIn } from "@/contexts/MockAuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Heart, ArrowLeft } from "lucide-react";
 
-const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+const hasValidClerkKey =
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
 
 export default function Login() {
@@ -28,7 +29,7 @@ export default function Login() {
   // Redirect to dashboard if already signed in
   React.useEffect(() => {
     if (isSignedIn) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [isSignedIn, navigate]);
 
@@ -42,7 +43,9 @@ export default function Login() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <Button variant="outline" asChild>
               <Link to="/">
@@ -59,7 +62,9 @@ export default function Login() {
         <div className="max-w-md mx-auto">
           {/* Welcome Message */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-hope-red mb-2">Welcome Back</h1>
+            <h1 className="text-3xl font-bold text-hope-red mb-2">
+              Welcome Back
+            </h1>
             <p className="text-muted-foreground">
               Sign in to continue your life-saving journey
             </p>
@@ -81,38 +86,38 @@ export default function Login() {
                     appearance={{
                       elements: {
                         formButtonPrimary: {
-                          backgroundColor: 'hsl(var(--hope-red))',
-                          '&:hover': {
-                            backgroundColor: 'hsl(var(--hope-red) / 0.9)',
+                          backgroundColor: "hsl(var(--hope-red))",
+                          "&:hover": {
+                            backgroundColor: "hsl(var(--hope-red) / 0.9)",
                           },
                         },
                         socialButtonsBlockButton: {
-                          border: '1px solid hsl(var(--border))',
-                          '&:hover': {
-                            backgroundColor: 'hsl(var(--hope-red))',
-                            color: 'white',
+                          border: "1px solid hsl(var(--border))",
+                          "&:hover": {
+                            backgroundColor: "hsl(var(--hope-red))",
+                            color: "white",
                           },
                         },
                         dividerLine: {
-                          backgroundColor: 'hsl(var(--border))',
+                          backgroundColor: "hsl(var(--border))",
                         },
                         formFieldInput: {
-                          borderColor: 'hsl(var(--border))',
-                          '&:focus': {
-                            borderColor: 'hsl(var(--hope-red))',
-                            boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
+                          borderColor: "hsl(var(--border))",
+                          "&:focus": {
+                            borderColor: "hsl(var(--hope-red))",
+                            boxShadow: "0 0 0 2px hsl(var(--hope-red) / 0.2)",
                           },
                         },
                         footerActionLink: {
-                          color: 'hsl(var(--hope-red))',
-                          '&:hover': {
-                            color: 'hsl(var(--hope-red) / 0.8)',
+                          color: "hsl(var(--hope-red))",
+                          "&:hover": {
+                            color: "hsl(var(--hope-red) / 0.8)",
                           },
                         },
                       },
                       layout: {
-                        socialButtonsPlacement: 'top',
-                        socialButtonsVariant: 'blockButton',
+                        socialButtonsPlacement: "top",
+                        socialButtonsVariant: "blockButton",
                       },
                     }}
                   />
@@ -126,23 +131,29 @@ export default function Login() {
           {/* Additional Info */}
           <div className="mt-8 text-center">
             <p className="text-muted-foreground mb-4">
-              Don't have an account?{' '}
-              <Link 
-                to="/register" 
+              Don't have an account?{" "}
+              <Link
+                to="/register"
                 className="text-hope-red hover:text-hope-red/80 font-medium"
               >
                 Sign up here
               </Link>
             </p>
-            
+
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>By signing in, you agree to our</p>
               <div className="space-x-4">
-                <Link to="/terms" className="hover:text-hope-red transition-colors">
+                <Link
+                  to="/terms"
+                  className="hover:text-hope-red transition-colors"
+                >
                   Terms of Service
                 </Link>
                 <span>•</span>
-                <Link to="/privacy" className="hover:text-hope-red transition-colors">
+                <Link
+                  to="/privacy"
+                  className="hover:text-hope-red transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </div>

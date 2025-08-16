@@ -1,14 +1,24 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth, useUser, SignOutButton } from '@clerk/clerk-react';
-import { useMockAuth, MockSignOutButton } from '@/contexts/MockAuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Heart, MapPin, Calendar, User, Award, Bell, Settings, LogOut } from 'lucide-react';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth, useUser, SignOutButton } from "@clerk/clerk-react";
+import { useMockAuth, MockSignOutButton } from "@/contexts/MockAuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Heart,
+  MapPin,
+  Calendar,
+  User,
+  Award,
+  Bell,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
-const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+const hasValidClerkKey =
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
 
 export default function DonorDashboard() {
@@ -33,7 +43,7 @@ export default function DonorDashboard() {
   // Redirect to login if not authenticated
   React.useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [isSignedIn, isLoaded, navigate]);
 
@@ -64,7 +74,9 @@ export default function DonorDashboard() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon">
@@ -103,9 +115,12 @@ export default function DonorDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-2xl text-hope-red">
-                      Welcome back, {user?.firstName || user?.fullName || 'Donor'}!
+                      Welcome back,{" "}
+                      {user?.firstName || user?.fullName || "Donor"}!
                     </CardTitle>
-                    <p className="text-muted-foreground">Ready to save more lives?</p>
+                    <p className="text-muted-foreground">
+                      Ready to save more lives?
+                    </p>
                   </div>
                   <Badge className="bg-hope-red">A+ Donor</Badge>
                 </div>
@@ -114,15 +129,23 @@ export default function DonorDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
                     <div className="text-2xl font-bold text-hope-red">12</div>
-                    <div className="text-sm text-muted-foreground">Total Donations</div>
+                    <div className="text-sm text-muted-foreground">
+                      Total Donations
+                    </div>
                   </div>
                   <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="text-2xl font-bold text-hope-red">1,200</div>
-                    <div className="text-sm text-muted-foreground">Points Earned</div>
+                    <div className="text-2xl font-bold text-hope-red">
+                      1,200
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Points Earned
+                    </div>
                   </div>
                   <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
                     <div className="text-2xl font-bold text-hope-red">36</div>
-                    <div className="text-sm text-muted-foreground">Lives Saved</div>
+                    <div className="text-sm text-muted-foreground">
+                      Lives Saved
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -135,15 +158,30 @@ export default function DonorDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button className="h-auto p-6 bg-hope-red hover:bg-hope-red/90" asChild>
-                    <Link to="/find-drives" className="flex flex-col items-center space-y-2">
+                  <Button
+                    className="h-auto p-6 bg-hope-red hover:bg-hope-red/90"
+                    asChild
+                  >
+                    <Link
+                      to="/find-drives"
+                      className="flex flex-col items-center space-y-2"
+                    >
                       <MapPin className="w-8 h-8" />
                       <span className="text-lg">Find Blood Drives</span>
-                      <span className="text-sm opacity-90">3 drives near you</span>
+                      <span className="text-sm opacity-90">
+                        3 drives near you
+                      </span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="h-auto p-6 border-hope-red text-hope-red hover:bg-hope-red hover:text-white" asChild>
-                    <Link to="/appointments" className="flex flex-col items-center space-y-2">
+                  <Button
+                    variant="outline"
+                    className="h-auto p-6 border-hope-red text-hope-red hover:bg-hope-red hover:text-white"
+                    asChild
+                  >
+                    <Link
+                      to="/appointments"
+                      className="flex flex-col items-center space-y-2"
+                    >
                       <Calendar className="w-8 h-8" />
                       <span className="text-lg">My Appointments</span>
                       <span className="text-sm opacity-70">Next: Dec 15</span>
@@ -166,7 +204,9 @@ export default function DonorDashboard() {
                     </div>
                     <div className="flex-1">
                       <div className="font-medium">Donation Completed</div>
-                      <div className="text-sm text-muted-foreground">Red Cross Center - Nov 28, 2024</div>
+                      <div className="text-sm text-muted-foreground">
+                        Red Cross Center - Nov 28, 2024
+                      </div>
                     </div>
                     <Badge variant="secondary">+100 points</Badge>
                   </div>
@@ -176,7 +216,9 @@ export default function DonorDashboard() {
                     </div>
                     <div className="flex-1">
                       <div className="font-medium">Badge Earned</div>
-                      <div className="text-sm text-muted-foreground">Frequent Donor Badge - Nov 20, 2024</div>
+                      <div className="text-sm text-muted-foreground">
+                        Frequent Donor Badge - Nov 20, 2024
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -204,13 +246,16 @@ export default function DonorDashboard() {
                     />
                   ) : (
                     <div className="w-20 h-20 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                      {user?.firstName?.[0] || user?.fullName?.[0] || 'D'}
+                      {user?.firstName?.[0] || user?.fullName?.[0] || "D"}
                     </div>
                   )}
-                  <h3 className="font-semibold">{user?.fullName || 'Donor'}</h3>
-                  <p className="text-sm text-muted-foreground">Blood Type: A+</p>
+                  <h3 className="font-semibold">{user?.fullName || "Donor"}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Member since {new Date(user?.createdAt || Date.now()).getFullYear()}
+                    Blood Type: A+
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Member since{" "}
+                    {new Date(user?.createdAt || Date.now()).getFullYear()}
                   </p>
                 </div>
                 <Button variant="outline" className="w-full" asChild>
@@ -252,8 +297,12 @@ export default function DonorDashboard() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="font-medium">City Hospital Blood Drive</div>
-                  <div className="text-sm text-muted-foreground">December 15, 2024</div>
-                  <div className="text-sm text-muted-foreground">10:00 AM - 12:00 PM</div>
+                  <div className="text-sm text-muted-foreground">
+                    December 15, 2024
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    10:00 AM - 12:00 PM
+                  </div>
                   <Button variant="outline" size="sm" className="w-full mt-3">
                     View Details
                   </Button>
