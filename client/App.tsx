@@ -24,18 +24,17 @@ const hasValidClerkKey = PUBLISHABLE_KEY && PUBLISHABLE_KEY !== "__CLERK_PUBLISH
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<DonorDashboard />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+const AppContent = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<DonorDashboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
           <Route path="/drives" element={
             <PlaceholderPage
               title="Find Blood Drives"
@@ -111,10 +110,21 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ClerkProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
 );
+
+const App = () => {
+  if (hasValidClerkKey) {
+    return (
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <AppContent />
+      </ClerkProvider>
+    );
+  }
+
+  return <AppContent />;
+};
 
 createRoot(document.getElementById("root")!).render(<App />);
