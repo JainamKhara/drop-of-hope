@@ -57,6 +57,14 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+      {/* Demo Mode Banner */}
+      {!hasValidClerkKey && (
+        <div className="bg-hope-red text-white text-center py-2 text-sm">
+          🚧 Demo Mode: Clerk authentication not configured.
+          <Link to="/login" className="underline ml-1">Try the demo login</Link>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-md dark:bg-card/80">
         <div className="container mx-auto px-4 py-4">
