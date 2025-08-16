@@ -7,9 +7,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, MapPin, Calendar, Users, Award, Shield, Phone, Mail } from 'lucide-react';
 
+const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
+
 export default function Index() {
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  // Use Clerk auth if available, otherwise use mock auth
+  let isSignedIn, user;
+
+  if (hasValidClerkKey) {
+    const clerkAuth = useAuth();
+    const clerkUser = useUser();
+    isSignedIn = clerkAuth.isSignedIn;
+    user = clerkUser.user;
+  } else {
+    const mockAuth = useMockAuth();
+    isSignedIn = mockAuth.isSignedIn;
+    user = mockAuth.user;
+  }
 
   const stats = [
     { label: 'Lives Saved', value: '10,000+', icon: Heart },
