@@ -58,12 +58,25 @@ export default function Index() {
               <Link to="/contact" className="text-foreground hover:text-hope-red transition-colors">Contact</Link>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" asChild>
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button className="bg-hope-red hover:bg-hope-red/90" asChild>
-                <Link to="/register">Donate Now</Link>
-              </Button>
+              {isSignedIn ? (
+                <>
+                  <span className="text-sm text-muted-foreground">
+                    Welcome, {user?.firstName || 'Donor'}!
+                  </span>
+                  <Button className="bg-hope-red hover:bg-hope-red/90" asChild>
+                    <Link to="/dashboard">My Dashboard</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button className="bg-hope-red hover:bg-hope-red/90" asChild>
+                    <Link to="/register">Donate Now</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
