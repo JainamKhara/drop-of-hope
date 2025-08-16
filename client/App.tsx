@@ -24,28 +24,17 @@ if (!PUBLISHABLE_KEY) {
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<DonorDashboard />} />
-          <Route path="/register" element={
-            <PlaceholderPage
-              title="Register as Donor"
-              description="This page will contain the donor registration form with Clerk authentication integration."
-              suggestedPrompt="Create a donor registration form with fields for personal details, blood type, and medical history"
-            />
-          } />
-          <Route path="/login" element={
-            <PlaceholderPage
-              title="Sign In"
-              description="This page will contain the login form with Clerk authentication."
-              suggestedPrompt="Create a login page with Clerk authentication integration"
-            />
-          } />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/drives" element={
             <PlaceholderPage
               title="Find Blood Drives"
@@ -119,9 +108,10 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ClerkProvider>
 );
 
 createRoot(document.getElementById("root")!).render(<App />);
