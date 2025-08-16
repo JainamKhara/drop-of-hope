@@ -125,7 +125,11 @@ const App = () => {
     );
   }
 
-  return <AppContent />;
+  return (
+    <MockAuthProvider>
+      <AppContent />
+    </MockAuthProvider>
+  );
 };
 
 createRoot(document.getElementById("root")!).render(<App />);
