@@ -8,6 +8,34 @@ import { Progress } from '@/components/ui/progress';
 import { Heart, MapPin, Calendar, User, Award, Bell, Settings, LogOut } from 'lucide-react';
 
 export default function DonorDashboard() {
+  const { isSignedIn, isLoaded } = useAuth();
+  const { user } = useUser();
+  const navigate = useNavigate();
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      navigate('/login');
+    }
+  }, [isSignedIn, isLoaded, navigate]);
+
+  // Show loading while checking authentication
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-hope-red rounded-full animate-pulse mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not signed in (will redirect)
+  if (!isSignedIn) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
       {/* Header */}
