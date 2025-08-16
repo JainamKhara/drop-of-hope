@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Rewards from "./pages/Rewards";
 import AdminDashboard from "./pages/AdminDashboard";
 import HospitalPortal from "./pages/HospitalPortal";
+import Community from "./pages/Community";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import PlaceholderPage from "./pages/PlaceholderPage";
