@@ -72,49 +72,53 @@ export default function Login() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="flex justify-center">
-                <SignIn 
-                  routing="path"
-                  path="/login"
-                  redirectUrl="/dashboard"
-                  signUpUrl="/register"
-                  appearance={{
-                    elements: {
-                      formButtonPrimary: {
-                        backgroundColor: 'hsl(var(--hope-red))',
-                        '&:hover': {
-                          backgroundColor: 'hsl(var(--hope-red) / 0.9)',
-                        },
-                      },
-                      socialButtonsBlockButton: {
-                        border: '1px solid hsl(var(--border))',
-                        '&:hover': {
+                {hasValidClerkKey ? (
+                  <SignIn
+                    routing="path"
+                    path="/login"
+                    redirectUrl="/dashboard"
+                    signUpUrl="/register"
+                    appearance={{
+                      elements: {
+                        formButtonPrimary: {
                           backgroundColor: 'hsl(var(--hope-red))',
-                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: 'hsl(var(--hope-red) / 0.9)',
+                          },
+                        },
+                        socialButtonsBlockButton: {
+                          border: '1px solid hsl(var(--border))',
+                          '&:hover': {
+                            backgroundColor: 'hsl(var(--hope-red))',
+                            color: 'white',
+                          },
+                        },
+                        dividerLine: {
+                          backgroundColor: 'hsl(var(--border))',
+                        },
+                        formFieldInput: {
+                          borderColor: 'hsl(var(--border))',
+                          '&:focus': {
+                            borderColor: 'hsl(var(--hope-red))',
+                            boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
+                          },
+                        },
+                        footerActionLink: {
+                          color: 'hsl(var(--hope-red))',
+                          '&:hover': {
+                            color: 'hsl(var(--hope-red) / 0.8)',
+                          },
                         },
                       },
-                      dividerLine: {
-                        backgroundColor: 'hsl(var(--border))',
+                      layout: {
+                        socialButtonsPlacement: 'top',
+                        socialButtonsVariant: 'blockButton',
                       },
-                      formFieldInput: {
-                        borderColor: 'hsl(var(--border))',
-                        '&:focus': {
-                          borderColor: 'hsl(var(--hope-red))',
-                          boxShadow: '0 0 0 2px hsl(var(--hope-red) / 0.2)',
-                        },
-                      },
-                      footerActionLink: {
-                        color: 'hsl(var(--hope-red))',
-                        '&:hover': {
-                          color: 'hsl(var(--hope-red) / 0.8)',
-                        },
-                      },
-                    },
-                    layout: {
-                      socialButtonsPlacement: 'top',
-                      socialButtonsVariant: 'blockButton',
-                    },
-                  }}
-                />
+                    }}
+                  />
+                ) : (
+                  <MockSignIn />
+                )}
               </div>
             </CardContent>
           </Card>
