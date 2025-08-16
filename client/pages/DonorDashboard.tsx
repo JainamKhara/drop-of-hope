@@ -8,9 +8,26 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Heart, MapPin, Calendar, User, Award, Bell, Settings, LogOut } from 'lucide-react';
 
+const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
+
 export default function DonorDashboard() {
-  const { isSignedIn, isLoaded } = useAuth();
-  const { user } = useUser();
+  // Use Clerk auth if available, otherwise use mock auth
+  let isSignedIn, isLoaded, user;
+
+  if (hasValidClerkKey) {
+    const clerkAuth = useAuth();
+    const clerkUser = useUser();
+    isSignedIn = clerkAuth.isSignedIn;
+    isLoaded = clerkAuth.isLoaded;
+    user = clerkUser.user;
+  } else {
+    const mockAuth = useMockAuth();
+    isSignedIn = mockAuth.isSignedIn;
+    isLoaded = mockAuth.isLoaded;
+    user = mockAuth.user;
+  }
+
   const navigate = useNavigate();
 
   // Redirect to login if not authenticated
@@ -56,12 +73,21 @@ export default function DonorDashboard() {
               <Button variant="ghost" size="icon">
                 <Settings className="w-5 h-5" />
               </Button>
-              <SignOutButton>
-                <Button variant="outline" size="sm">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
-              </SignOutButton>
+              {hasValidClerkKey ? (
+                <SignOutButton>
+                  <Button variant="outline" size="sm">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </SignOutButton>
+              ) : (
+                <MockSignOutButton>
+                  <Button variant="outline" size="sm">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </MockSignOutButton>
+              )}
             </div>
           </div>
         </div>
