@@ -81,9 +81,7 @@ export default function DonorDashboard() {
               </span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="w-5 h-5" />
-              </Button>
+              <NotificationCenter />
               <Button variant="ghost" size="icon">
                 <Settings className="w-5 h-5" />
               </Button>
