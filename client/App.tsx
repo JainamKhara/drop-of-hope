@@ -97,16 +97,7 @@ const AppContent = () => (
               />
             }
           />
-          <Route
-            path="/rewards"
-            element={
-              <PlaceholderPage
-                title="Rewards & Achievements"
-                description="This page will show donor rewards, badges, and achievement system."
-                suggestedPrompt="Create a rewards page with gamification elements, badges, and point system"
-              />
-            }
-          />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
