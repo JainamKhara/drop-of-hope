@@ -79,7 +79,7 @@ export default function Index() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-hope-red hover:bg-hope-red/90 text-lg px-8 py-3" asChild>
-              <Link to="/register">Become a Donor</Link>
+              <Link to="/dashboard">Become a Donor</Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-hope-red text-hope-red hover:bg-hope-red hover:text-white" asChild>
               <Link to="/request">Request Blood</Link>
