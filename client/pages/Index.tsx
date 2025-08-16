@@ -393,6 +393,9 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      {/* AI Chatbot */}
+      <ChatbotWidget />
     </div>
   );
 }
