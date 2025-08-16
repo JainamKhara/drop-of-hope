@@ -45,16 +45,7 @@ const AppContent = () => (
           <Route path="/find-drives" element={<BloodDrives />} />
           <Route path="/book-appointment/:driveId" element={<BookAppointment />} />
           <Route path="/appointments" element={<MyAppointments />} />
-          <Route
-            path="/profile"
-            element={
-              <PlaceholderPage
-                title="My Profile"
-                description="This page will allow donors to edit their personal information and view donation history."
-                suggestedPrompt="Create a profile page with editable donor information and donation history"
-              />
-            }
-          />
+          <Route path="/profile" element={<Profile />} />
           <Route
             path="/request"
             element={
