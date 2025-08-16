@@ -6,8 +6,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, ArrowLeft } from 'lucide-react';
 
+const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
+
 export default function Login() {
-  const { isSignedIn } = useAuth();
+  // Use Clerk auth if available, otherwise use mock auth
+  let isSignedIn, isLoaded;
+
+  if (hasValidClerkKey) {
+    const clerkAuth = useAuth();
+    isSignedIn = clerkAuth.isSignedIn;
+    isLoaded = clerkAuth.isLoaded;
+  } else {
+    const mockAuth = useMockAuth();
+    isSignedIn = mockAuth.isSignedIn;
+    isLoaded = mockAuth.isLoaded;
+  }
+
   const navigate = useNavigate();
 
   // Redirect to dashboard if already signed in
