@@ -95,12 +95,25 @@ export default function Index() {
             Connect donors with those in need. Save lives through the power of community and technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-hope-red hover:bg-hope-red/90 text-lg px-8 py-3" asChild>
-              <Link to="/dashboard">Become a Donor</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-hope-red text-hope-red hover:bg-hope-red hover:text-white" asChild>
-              <Link to="/request">Request Blood</Link>
-            </Button>
+            {isSignedIn ? (
+              <>
+                <Button size="lg" className="bg-hope-red hover:bg-hope-red/90 text-lg px-8 py-3" asChild>
+                  <Link to="/dashboard">Go to Dashboard</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-hope-red text-hope-red hover:bg-hope-red hover:text-white" asChild>
+                  <Link to="/drives">Find Blood Drives</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="lg" className="bg-hope-red hover:bg-hope-red/90 text-lg px-8 py-3" asChild>
+                  <Link to="/register">Become a Donor</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-hope-red text-hope-red hover:bg-hope-red hover:text-white" asChild>
+                  <Link to="/request">Request Blood</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>
