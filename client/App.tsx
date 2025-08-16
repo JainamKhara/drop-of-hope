@@ -19,9 +19,8 @@ import NotFound from "./pages/NotFound";
 // Import your publishable key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
+// Check if we have a valid Clerk key (not the placeholder)
+const hasValidClerkKey = PUBLISHABLE_KEY && PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
 
 const queryClient = new QueryClient();
 
