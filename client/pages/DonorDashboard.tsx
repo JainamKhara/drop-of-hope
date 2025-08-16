@@ -313,6 +313,9 @@ export default function DonorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* AI Chatbot */}
+      <ChatbotWidget />
     </div>
   );
 }
