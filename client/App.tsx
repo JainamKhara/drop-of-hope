@@ -61,6 +61,7 @@ const AppContent = () => (
             }
           />
           <Route path="/hospital-portal" element={<HospitalPortal />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route
             path="/about"
