@@ -107,6 +107,8 @@ const App = () => (
               suggestedPrompt="Create a rewards page with gamification elements, badges, and point system"
             />
           } />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
