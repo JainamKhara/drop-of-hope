@@ -38,26 +38,8 @@ const AppContent = () => (
           <Route path="/dashboard" element={<DonorDashboard />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/drives"
-            element={
-              <PlaceholderPage
-                title="Find Blood Drives"
-                description="This page will show a map view of nearby blood donation drives with filtering options."
-                suggestedPrompt="Create a blood drives page with map integration and filtering by location, date, and blood type"
-              />
-            }
-          />
-          <Route
-            path="/find-drives"
-            element={
-              <PlaceholderPage
-                title="Find Blood Drives"
-                description="This page will show a map view of nearby blood donation drives with filtering options."
-                suggestedPrompt="Create a blood drives page with map integration and filtering by location, date, and blood type"
-              />
-            }
-          />
+          <Route path="/drives" element={<BloodDrives />} />
+          <Route path="/find-drives" element={<BloodDrives />} />
           <Route
             path="/appointments"
             element={
