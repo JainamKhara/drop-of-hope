@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SignIn, useAuth } from '@clerk/clerk-react';
+import { useMockAuth, MockSignIn } from '@/contexts/MockAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, ArrowLeft } from 'lucide-react';
