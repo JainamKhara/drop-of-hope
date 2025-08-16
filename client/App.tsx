@@ -13,6 +13,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import DonorDashboard from "./pages/DonorDashboard";
 import BloodDrives from "./pages/BloodDrives";
+import BookAppointment from "./pages/BookAppointment";
+import MyAppointments from "./pages/MyAppointments";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import PlaceholderPage from "./pages/PlaceholderPage";
