@@ -1,101 +1,126 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Heart, MapPin, Calendar as CalendarIcon, Clock, Users, Search, Filter, ArrowLeft, Navigation } from 'lucide-react';
-import { format } from 'date-fns';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Heart,
+  MapPin,
+  Calendar as CalendarIcon,
+  Clock,
+  Users,
+  Search,
+  Filter,
+  ArrowLeft,
+  Navigation,
+} from "lucide-react";
+import { format } from "date-fns";
 
 // Mock data for blood drives
 const mockBloodDrives = [
   {
     id: 1,
-    name: 'Red Cross Downtown Drive',
-    organizer: 'American Red Cross',
-    location: 'Downtown Community Center',
-    address: '123 Main St, Downtown',
-    date: '2024-12-15',
-    time: '10:00 AM - 4:00 PM',
-    bloodTypes: ['O+', 'O-', 'A+', 'B+'],
+    name: "Red Cross Downtown Drive",
+    organizer: "American Red Cross",
+    location: "Downtown Community Center",
+    address: "123 Main St, Downtown",
+    date: "2024-12-15",
+    time: "10:00 AM - 4:00 PM",
+    bloodTypes: ["O+", "O-", "A+", "B+"],
     capacity: 50,
     registered: 32,
-    distance: '0.5 miles',
-    coordinates: { lat: 40.7128, lng: -74.0060 },
-    description: 'Annual holiday blood drive to help save lives during the holiday season.',
-    requirements: ['Valid ID', 'Age 17+', 'Weight 110+ lbs'],
-    contact: 'contact@redcross.org'
+    distance: "0.5 miles",
+    coordinates: { lat: 40.7128, lng: -74.006 },
+    description:
+      "Annual holiday blood drive to help save lives during the holiday season.",
+    requirements: ["Valid ID", "Age 17+", "Weight 110+ lbs"],
+    contact: "contact@redcross.org",
   },
   {
     id: 2,
-    name: 'City Hospital Emergency Drive',
-    organizer: 'City General Hospital',
-    location: 'City General Hospital',
-    address: '456 Healthcare Ave, Medical District',
-    date: '2024-12-18',
-    time: '8:00 AM - 6:00 PM',
-    bloodTypes: ['O-', 'A-', 'B-', 'AB-'],
+    name: "City Hospital Emergency Drive",
+    organizer: "City General Hospital",
+    location: "City General Hospital",
+    address: "456 Healthcare Ave, Medical District",
+    date: "2024-12-18",
+    time: "8:00 AM - 6:00 PM",
+    bloodTypes: ["O-", "A-", "B-", "AB-"],
     capacity: 75,
     registered: 45,
-    distance: '1.2 miles',
+    distance: "1.2 miles",
     coordinates: { lat: 40.7589, lng: -73.9851 },
-    description: 'Emergency blood drive due to high demand during winter season.',
-    requirements: ['Valid ID', 'Age 17+', 'Good health'],
-    contact: 'bloodbank@cityhospital.org'
+    description:
+      "Emergency blood drive due to high demand during winter season.",
+    requirements: ["Valid ID", "Age 17+", "Good health"],
+    contact: "bloodbank@cityhospital.org",
   },
   {
     id: 3,
-    name: 'University Student Drive',
-    organizer: 'State University Health Center',
-    location: 'Student Union Building',
-    address: '789 Campus Dr, University District',
-    date: '2024-12-20',
-    time: '12:00 PM - 8:00 PM',
-    bloodTypes: ['All Types Welcome'],
+    name: "University Student Drive",
+    organizer: "State University Health Center",
+    location: "Student Union Building",
+    address: "789 Campus Dr, University District",
+    date: "2024-12-20",
+    time: "12:00 PM - 8:00 PM",
+    bloodTypes: ["All Types Welcome"],
     capacity: 40,
     registered: 28,
-    distance: '2.1 miles',
+    distance: "2.1 miles",
     coordinates: { lat: 40.6892, lng: -74.0445 },
-    description: 'Student-organized blood drive with pizza and prizes for donors!',
-    requirements: ['Student ID or Valid ID', 'Age 17+'],
-    contact: 'health@university.edu'
-  }
+    description:
+      "Student-organized blood drive with pizza and prizes for donors!",
+    requirements: ["Student ID or Valid ID", "Age 17+"],
+    contact: "health@university.edu",
+  },
 ];
 
 export default function BloodDrives() {
-  const [searchLocation, setSearchLocation] = useState('');
-  const [selectedBloodType, setSelectedBloodType] = useState('');
+  const [searchLocation, setSearchLocation] = useState("");
+  const [selectedBloodType, setSelectedBloodType] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [filteredDrives, setFilteredDrives] = useState(mockBloodDrives);
 
-  const bloodTypes = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
+  const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
 
   const handleSearch = () => {
     let filtered = mockBloodDrives;
 
     // Filter by blood type
     if (selectedBloodType) {
-      filtered = filtered.filter(drive => 
-        drive.bloodTypes.includes(selectedBloodType) || 
-        drive.bloodTypes.includes('All Types Welcome')
+      filtered = filtered.filter(
+        (drive) =>
+          drive.bloodTypes.includes(selectedBloodType) ||
+          drive.bloodTypes.includes("All Types Welcome"),
       );
     }
 
     // Filter by date
     if (selectedDate) {
-      const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-      filtered = filtered.filter(drive => drive.date === selectedDateStr);
+      const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
+      filtered = filtered.filter((drive) => drive.date === selectedDateStr);
     }
 
     // Filter by location (simple text search)
     if (searchLocation) {
-      filtered = filtered.filter(drive =>
-        drive.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
-        drive.address.toLowerCase().includes(searchLocation.toLowerCase())
+      filtered = filtered.filter(
+        (drive) =>
+          drive.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
+          drive.address.toLowerCase().includes(searchLocation.toLowerCase()),
       );
     }
 
@@ -116,7 +141,9 @@ export default function BloodDrives() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <div className="flex items-center space-x-4">
               <Button variant="outline" asChild>
@@ -134,9 +161,12 @@ export default function BloodDrives() {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">Find Blood Drives</h1>
+          <h1 className="text-4xl font-bold text-hope-red mb-4">
+            Find Blood Drives
+          </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover blood donation opportunities in your area and help save lives
+            Discover blood donation opportunities in your area and help save
+            lives
           </p>
         </div>
 
@@ -167,14 +197,19 @@ export default function BloodDrives() {
               {/* Blood Type Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Blood Type Needed</label>
-                <Select value={selectedBloodType} onValueChange={setSelectedBloodType}>
+                <Select
+                  value={selectedBloodType}
+                  onValueChange={setSelectedBloodType}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="All blood types" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All blood types</SelectItem>
-                    {bloodTypes.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    {bloodTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -187,7 +222,9 @@ export default function BloodDrives() {
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start">
                       <CalendarIcon className="w-4 h-4 mr-2" />
-                      {selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'Any date'}
+                      {selectedDate
+                        ? format(selectedDate, "MMM dd, yyyy")
+                        : "Any date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -206,15 +243,15 @@ export default function BloodDrives() {
                 <label className="text-sm font-medium">View</label>
                 <div className="flex space-x-2">
                   <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    onClick={() => setViewMode('list')}
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    onClick={() => setViewMode("list")}
                     className="flex-1"
                   >
                     List
                   </Button>
                   <Button
-                    variant={viewMode === 'map' ? 'default' : 'outline'}
-                    onClick={() => setViewMode('map')}
+                    variant={viewMode === "map" ? "default" : "outline"}
+                    onClick={() => setViewMode("map")}
                     className="flex-1"
                   >
                     Map
@@ -228,8 +265,8 @@ export default function BloodDrives() {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setSearchLocation('');
-                  setSelectedBloodType('');
+                  setSearchLocation("");
+                  setSelectedBloodType("");
                   setSelectedDate(undefined);
                   setFilteredDrives(mockBloodDrives);
                 }}
@@ -243,7 +280,8 @@ export default function BloodDrives() {
         {/* Results */}
         <div className="mb-4 flex items-center justify-between">
           <p className="text-muted-foreground">
-            Found {filteredDrives.length} blood drive{filteredDrives.length !== 1 ? 's' : ''} near you
+            Found {filteredDrives.length} blood drive
+            {filteredDrives.length !== 1 ? "s" : ""} near you
           </p>
           <Button variant="outline" size="sm">
             <Navigation className="w-4 h-4 mr-2" />
@@ -252,17 +290,25 @@ export default function BloodDrives() {
         </div>
 
         {/* Drive List */}
-        {viewMode === 'list' ? (
+        {viewMode === "list" ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredDrives.map((drive) => (
-              <Card key={drive.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <Card
+                key={drive.id}
+                className="border-0 shadow-lg hover:shadow-xl transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-xl text-hope-red">{drive.name}</CardTitle>
+                      <CardTitle className="text-xl text-hope-red">
+                        {drive.name}
+                      </CardTitle>
                       <p className="text-muted-foreground">{drive.organizer}</p>
                     </div>
-                    <Badge variant="secondary" className="bg-hope-pink text-hope-red">
+                    <Badge
+                      variant="secondary"
+                      className="bg-hope-pink text-hope-red"
+                    >
                       {drive.distance}
                     </Badge>
                   </div>
@@ -273,7 +319,9 @@ export default function BloodDrives() {
                     <MapPin className="w-5 h-5 text-hope-red mt-0.5" />
                     <div>
                       <p className="font-medium">{drive.location}</p>
-                      <p className="text-sm text-muted-foreground">{drive.address}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {drive.address}
+                      </p>
                     </div>
                   </div>
 
@@ -281,8 +329,12 @@ export default function BloodDrives() {
                   <div className="flex items-center space-x-3">
                     <CalendarIcon className="w-5 h-5 text-hope-red" />
                     <div>
-                      <p className="font-medium">{format(new Date(drive.date), 'EEEE, MMMM dd, yyyy')}</p>
-                      <p className="text-sm text-muted-foreground">{drive.time}</p>
+                      <p className="font-medium">
+                        {format(new Date(drive.date), "EEEE, MMMM dd, yyyy")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {drive.time}
+                      </p>
                     </div>
                   </div>
 
@@ -290,11 +342,15 @@ export default function BloodDrives() {
                   <div className="flex items-center space-x-3">
                     <Users className="w-5 h-5 text-hope-red" />
                     <div>
-                      <p className="font-medium">{drive.registered}/{drive.capacity} registered</p>
+                      <p className="font-medium">
+                        {drive.registered}/{drive.capacity} registered
+                      </p>
                       <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                        <div 
-                          className="bg-hope-red h-2 rounded-full" 
-                          style={{ width: `${(drive.registered / drive.capacity) * 100}%` }}
+                        <div
+                          className="bg-hope-red h-2 rounded-full"
+                          style={{
+                            width: `${(drive.registered / drive.capacity) * 100}%`,
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -302,10 +358,16 @@ export default function BloodDrives() {
 
                   {/* Blood Types */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Blood types needed:</p>
+                    <p className="text-sm font-medium mb-2">
+                      Blood types needed:
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {drive.bloodTypes.map((type, index) => (
-                        <Badge key={index} variant="outline" className="border-hope-red text-hope-red">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="border-hope-red text-hope-red"
+                        >
                           {type}
                         </Badge>
                       ))}
@@ -313,11 +375,16 @@ export default function BloodDrives() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm text-muted-foreground">{drive.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {drive.description}
+                  </p>
 
                   {/* Actions */}
                   <div className="flex space-x-3 pt-4">
-                    <Button className="flex-1 bg-hope-red hover:bg-hope-red/90" asChild>
+                    <Button
+                      className="flex-1 bg-hope-red hover:bg-hope-red/90"
+                      asChild
+                    >
                       <Link to={`/book-appointment/${drive.id}`}>
                         Book Appointment
                       </Link>
@@ -340,7 +407,8 @@ export default function BloodDrives() {
                 <MapPin className="w-16 h-16 text-hope-red mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Interactive Map</h3>
                 <p className="text-muted-foreground mb-4">
-                  Map integration would show blood drives with interactive markers
+                  Map integration would show blood drives with interactive
+                  markers
                 </p>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p>• Google Maps or Mapbox integration</p>
@@ -348,10 +416,10 @@ export default function BloodDrives() {
                   <p>• Route navigation to selected drives</p>
                   <p>• Real-time location updates</p>
                 </div>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="mt-4"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                 >
                   Back to List View
                 </Button>
@@ -365,15 +433,18 @@ export default function BloodDrives() {
           <Card className="border-0 shadow-lg">
             <CardContent className="text-center py-12">
               <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No blood drives found</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                No blood drives found
+              </h3>
               <p className="text-muted-foreground mb-4">
-                Try adjusting your search criteria or check back later for new drives
+                Try adjusting your search criteria or check back later for new
+                drives
               </p>
               <Button
                 variant="outline"
                 onClick={() => {
-                  setSearchLocation('');
-                  setSelectedBloodType('');
+                  setSearchLocation("");
+                  setSelectedBloodType("");
                   setSelectedDate(undefined);
                   setFilteredDrives(mockBloodDrives);
                 }}

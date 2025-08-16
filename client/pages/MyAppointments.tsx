@@ -1,85 +1,99 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Heart, ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
-import { format, isAfter, isBefore, addDays } from 'date-fns';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Heart,
+  ArrowLeft,
+  Calendar as CalendarIcon,
+  Clock,
+  MapPin,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Plus,
+} from "lucide-react";
+import { format, isAfter, isBefore, addDays } from "date-fns";
 
 // Mock appointments data
 const mockAppointments = [
   {
     id: 1,
-    driveName: 'Red Cross Downtown Drive',
-    organizer: 'American Red Cross',
-    date: '2024-12-15',
-    time: '10:30 AM',
-    location: 'Downtown Community Center',
-    address: '123 Main St, Downtown',
-    status: 'confirmed',
-    notes: 'Remember to bring ID and eat a good meal beforehand',
-    reminderSent: true
+    driveName: "Red Cross Downtown Drive",
+    organizer: "American Red Cross",
+    date: "2024-12-15",
+    time: "10:30 AM",
+    location: "Downtown Community Center",
+    address: "123 Main St, Downtown",
+    status: "confirmed",
+    notes: "Remember to bring ID and eat a good meal beforehand",
+    reminderSent: true,
   },
   {
     id: 2,
-    driveName: 'City Hospital Emergency Drive',
-    organizer: 'City General Hospital',
-    date: '2024-12-20',
-    time: '2:00 PM',
-    location: 'City General Hospital',
-    address: '456 Healthcare Ave, Medical District',
-    status: 'confirmed',
-    notes: '',
-    reminderSent: false
+    driveName: "City Hospital Emergency Drive",
+    organizer: "City General Hospital",
+    date: "2024-12-20",
+    time: "2:00 PM",
+    location: "City General Hospital",
+    address: "456 Healthcare Ave, Medical District",
+    status: "confirmed",
+    notes: "",
+    reminderSent: false,
   },
   {
     id: 3,
-    driveName: 'University Student Drive',
-    organizer: 'State University Health Center',
-    date: '2024-11-20',
-    time: '3:30 PM',
-    location: 'Student Union Building',
-    address: '789 Campus Dr, University District',
-    status: 'completed',
-    notes: 'Great experience! Received Hero badge.',
-    reminderSent: true
+    driveName: "University Student Drive",
+    organizer: "State University Health Center",
+    date: "2024-11-20",
+    time: "3:30 PM",
+    location: "Student Union Building",
+    address: "789 Campus Dr, University District",
+    status: "completed",
+    notes: "Great experience! Received Hero badge.",
+    reminderSent: true,
   },
   {
     id: 4,
-    driveName: 'Community Health Fair',
-    organizer: 'Local Health Department',
-    date: '2024-11-10',
-    time: '11:00 AM',
-    location: 'Community Health Center',
-    address: '321 Health St, Downtown',
-    status: 'cancelled',
-    notes: 'Drive was cancelled due to severe weather',
-    reminderSent: false
-  }
+    driveName: "Community Health Fair",
+    organizer: "Local Health Department",
+    date: "2024-11-10",
+    time: "11:00 AM",
+    location: "Community Health Center",
+    address: "321 Health St, Downtown",
+    status: "cancelled",
+    notes: "Drive was cancelled due to severe weather",
+    reminderSent: false,
+  },
 ];
 
 export default function MyAppointments() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState("upcoming");
 
-  const upcomingAppointments = mockAppointments.filter(apt => 
-    isAfter(new Date(apt.date), new Date()) && apt.status === 'confirmed'
+  const upcomingAppointments = mockAppointments.filter(
+    (apt) =>
+      isAfter(new Date(apt.date), new Date()) && apt.status === "confirmed",
   );
 
-  const pastAppointments = mockAppointments.filter(apt => 
-    isBefore(new Date(apt.date), new Date()) || apt.status === 'completed' || apt.status === 'cancelled'
+  const pastAppointments = mockAppointments.filter(
+    (apt) =>
+      isBefore(new Date(apt.date), new Date()) ||
+      apt.status === "completed" ||
+      apt.status === "cancelled",
   );
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'confirmed':
+      case "confirmed":
         return <CheckCircle className="w-4 h-4 text-success" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle className="w-4 h-4 text-success" />;
-      case 'cancelled':
+      case "cancelled":
         return <XCircle className="w-4 h-4 text-destructive" />;
       default:
         return <AlertCircle className="w-4 h-4 text-warning" />;
@@ -88,19 +102,19 @@ export default function MyAppointments() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed':
-        return 'bg-success/10 text-success border-success/20';
-      case 'completed':
-        return 'bg-success/10 text-success border-success/20';
-      case 'cancelled':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
+      case "confirmed":
+        return "bg-success/10 text-success border-success/20";
+      case "completed":
+        return "bg-success/10 text-success border-success/20";
+      case "cancelled":
+        return "bg-destructive/10 text-destructive border-destructive/20";
       default:
-        return 'bg-warning/10 text-warning border-warning/20';
+        return "bg-warning/10 text-warning border-warning/20";
     }
   };
 
   // Get dates with appointments for calendar highlighting
-  const appointmentDates = mockAppointments.map(apt => new Date(apt.date));
+  const appointmentDates = mockAppointments.map((apt) => new Date(apt.date));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
@@ -112,7 +126,9 @@ export default function MyAppointments() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
             </Link>
             <div className="flex items-center space-x-4">
               <Button variant="outline" asChild>
@@ -135,9 +151,12 @@ export default function MyAppointments() {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">My Appointments</h1>
+          <h1 className="text-4xl font-bold text-hope-red mb-4">
+            My Appointments
+          </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Manage your blood donation appointments and view your donation history
+            Manage your blood donation appointments and view your donation
+            history
           </p>
         </div>
 
@@ -162,10 +181,10 @@ export default function MyAppointments() {
                   }}
                   modifiersStyles={{
                     hasAppointment: {
-                      backgroundColor: 'hsl(var(--hope-red))',
-                      color: 'white',
-                      borderRadius: '50%'
-                    }
+                      backgroundColor: "hsl(var(--hope-red))",
+                      color: "white",
+                      borderRadius: "50%",
+                    },
                   }}
                 />
                 <div className="mt-4 space-y-2 text-xs">
@@ -188,20 +207,30 @@ export default function MyAppointments() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                  <div className="text-2xl font-bold text-hope-red">{upcomingAppointments.length}</div>
+                  <div className="text-2xl font-bold text-hope-red">
+                    {upcomingAppointments.length}
+                  </div>
                   <div className="text-sm text-muted-foreground">Upcoming</div>
                 </div>
                 <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
                   <div className="text-2xl font-bold text-hope-red">
-                    {pastAppointments.filter(apt => apt.status === 'completed').length}
+                    {
+                      pastAppointments.filter(
+                        (apt) => apt.status === "completed",
+                      ).length
+                    }
                   </div>
                   <div className="text-sm text-muted-foreground">Completed</div>
                 </div>
                 <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
                   <div className="text-2xl font-bold text-hope-red">
-                    {pastAppointments.filter(apt => apt.status === 'completed').length * 3}
+                    {pastAppointments.filter(
+                      (apt) => apt.status === "completed",
+                    ).length * 3}
                   </div>
-                  <div className="text-sm text-muted-foreground">Lives Saved</div>
+                  <div className="text-sm text-muted-foreground">
+                    Lives Saved
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -224,11 +253,17 @@ export default function MyAppointments() {
                   <Card className="border-0 shadow-lg">
                     <CardContent className="text-center py-12">
                       <CalendarIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">No Upcoming Appointments</h3>
+                      <h3 className="text-xl font-semibold mb-2">
+                        No Upcoming Appointments
+                      </h3>
                       <p className="text-muted-foreground mb-6">
-                        Schedule your next blood donation to continue helping save lives
+                        Schedule your next blood donation to continue helping
+                        save lives
                       </p>
-                      <Button className="bg-hope-red hover:bg-hope-red/90" asChild>
+                      <Button
+                        className="bg-hope-red hover:bg-hope-red/90"
+                        asChild
+                      >
                         <Link to="/drives">Find Blood Drives</Link>
                       </Button>
                     </CardContent>
@@ -242,11 +277,15 @@ export default function MyAppointments() {
                             <CardTitle className="text-xl text-hope-red">
                               {appointment.driveName}
                             </CardTitle>
-                            <p className="text-muted-foreground">{appointment.organizer}</p>
+                            <p className="text-muted-foreground">
+                              {appointment.organizer}
+                            </p>
                           </div>
                           <Badge className={getStatusColor(appointment.status)}>
                             {getStatusIcon(appointment.status)}
-                            <span className="ml-1 capitalize">{appointment.status}</span>
+                            <span className="ml-1 capitalize">
+                              {appointment.status}
+                            </span>
                           </Badge>
                         </div>
                       </CardHeader>
@@ -256,10 +295,13 @@ export default function MyAppointments() {
                             <CalendarIcon className="w-5 h-5 text-hope-red" />
                             <div>
                               <p className="font-medium">
-                                {format(new Date(appointment.date), 'EEEE, MMM dd')}
+                                {format(
+                                  new Date(appointment.date),
+                                  "EEEE, MMM dd",
+                                )}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {format(new Date(appointment.date), 'yyyy')}
+                                {format(new Date(appointment.date), "yyyy")}
                               </p>
                             </div>
                           </div>
@@ -268,15 +310,21 @@ export default function MyAppointments() {
                             <Clock className="w-5 h-5 text-hope-red" />
                             <div>
                               <p className="font-medium">{appointment.time}</p>
-                              <p className="text-sm text-muted-foreground">Local time</p>
+                              <p className="text-sm text-muted-foreground">
+                                Local time
+                              </p>
                             </div>
                           </div>
 
                           <div className="flex items-start space-x-3">
                             <MapPin className="w-5 h-5 text-hope-red mt-0.5" />
                             <div>
-                              <p className="font-medium">{appointment.location}</p>
-                              <p className="text-sm text-muted-foreground">{appointment.address}</p>
+                              <p className="font-medium">
+                                {appointment.location}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {appointment.address}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -284,7 +332,9 @@ export default function MyAppointments() {
                         {appointment.notes && (
                           <Alert>
                             <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>{appointment.notes}</AlertDescription>
+                            <AlertDescription>
+                              {appointment.notes}
+                            </AlertDescription>
                           </Alert>
                         )}
 
@@ -314,11 +364,15 @@ export default function MyAppointments() {
                           <CardTitle className="text-xl text-hope-red">
                             {appointment.driveName}
                           </CardTitle>
-                          <p className="text-muted-foreground">{appointment.organizer}</p>
+                          <p className="text-muted-foreground">
+                            {appointment.organizer}
+                          </p>
                         </div>
                         <Badge className={getStatusColor(appointment.status)}>
                           {getStatusIcon(appointment.status)}
-                          <span className="ml-1 capitalize">{appointment.status}</span>
+                          <span className="ml-1 capitalize">
+                            {appointment.status}
+                          </span>
                         </Badge>
                       </div>
                     </CardHeader>
@@ -328,26 +382,39 @@ export default function MyAppointments() {
                           <CalendarIcon className="w-5 h-5 text-hope-red" />
                           <div>
                             <p className="font-medium">
-                              {format(new Date(appointment.date), 'EEEE, MMM dd, yyyy')}
+                              {format(
+                                new Date(appointment.date),
+                                "EEEE, MMM dd, yyyy",
+                              )}
                             </p>
-                            <p className="text-sm text-muted-foreground">{appointment.time}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {appointment.time}
+                            </p>
                           </div>
                         </div>
 
                         <div className="flex items-start space-x-3">
                           <MapPin className="w-5 h-5 text-hope-red mt-0.5" />
                           <div>
-                            <p className="font-medium">{appointment.location}</p>
-                            <p className="text-sm text-muted-foreground">{appointment.address}</p>
+                            <p className="font-medium">
+                              {appointment.location}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {appointment.address}
+                            </p>
                           </div>
                         </div>
 
-                        {appointment.status === 'completed' && (
+                        {appointment.status === "completed" && (
                           <div className="flex items-center space-x-3">
                             <Heart className="w-5 h-5 text-hope-red fill-current" />
                             <div>
-                              <p className="font-medium text-success">Donation Completed</p>
-                              <p className="text-sm text-muted-foreground">+100 points earned</p>
+                              <p className="font-medium text-success">
+                                Donation Completed
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                +100 points earned
+                              </p>
                             </div>
                           </div>
                         )}
@@ -356,11 +423,13 @@ export default function MyAppointments() {
                       {appointment.notes && (
                         <Alert>
                           <AlertCircle className="h-4 w-4" />
-                          <AlertDescription>{appointment.notes}</AlertDescription>
+                          <AlertDescription>
+                            {appointment.notes}
+                          </AlertDescription>
                         </Alert>
                       )}
 
-                      {appointment.status === 'completed' && (
+                      {appointment.status === "completed" && (
                         <div className="flex space-x-3 pt-4">
                           <Button variant="outline" className="flex-1">
                             View Certificate
@@ -368,7 +437,10 @@ export default function MyAppointments() {
                           <Button variant="outline" className="flex-1">
                             Share Achievement
                           </Button>
-                          <Button className="flex-1 bg-hope-red hover:bg-hope-red/90" asChild>
+                          <Button
+                            className="flex-1 bg-hope-red hover:bg-hope-red/90"
+                            asChild
+                          >
                             <Link to="/drives">Book Next Donation</Link>
                           </Button>
                         </div>

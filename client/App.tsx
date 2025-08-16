@@ -46,7 +46,10 @@ const AppContent = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/drives" element={<BloodDrives />} />
           <Route path="/find-drives" element={<BloodDrives />} />
-          <Route path="/book-appointment/:driveId" element={<BookAppointment />} />
+          <Route
+            path="/book-appointment/:driveId"
+            element={<BookAppointment />}
+          />
           <Route path="/appointments" element={<MyAppointments />} />
           <Route path="/profile" element={<Profile />} />
           <Route

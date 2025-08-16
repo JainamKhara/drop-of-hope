@@ -1,19 +1,46 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Heart, ArrowLeft, Users, Calendar, MapPin, TrendingUp, AlertTriangle, 
-  Plus, Search, Filter, Download, Settings, Shield, Activity, 
-  BarChart3, PieChart, LineChart, Clock, CheckCircle, XCircle,
-  Hospital, Building, UserCheck, Mail, Bell
-} from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Heart,
+  ArrowLeft,
+  Users,
+  Calendar,
+  MapPin,
+  TrendingUp,
+  AlertTriangle,
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Settings,
+  Shield,
+  Activity,
+  BarChart3,
+  PieChart,
+  LineChart,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Hospital,
+  Building,
+  UserCheck,
+  Mail,
+  Bell,
+} from "lucide-react";
+import { format, subDays } from "date-fns";
 
 // Mock analytics data
 const analyticsData = {
@@ -26,97 +53,132 @@ const analyticsData = {
   partnerships: 68,
   monthlyGrowth: 12.5,
   donationsThisMonth: 1245,
-  upcomingAppointments: 156
+  upcomingAppointments: 156,
 };
 
 // Mock recent donors
 const recentDonors = [
-  { id: 1, name: 'John Smith', bloodType: 'O+', lastDonation: '2024-12-10', status: 'eligible', donations: 8 },
-  { id: 2, name: 'Sarah Johnson', bloodType: 'A-', lastDonation: '2024-12-08', status: 'eligible', donations: 15 },
-  { id: 3, name: 'Mike Chen', bloodType: 'B+', lastDonation: '2024-12-05', status: 'pending', donations: 3 },
-  { id: 4, name: 'Emily Davis', bloodType: 'AB+', lastDonation: '2024-12-03', status: 'ineligible', donations: 22 },
-  { id: 5, name: 'Robert Wilson', bloodType: 'O-', lastDonation: '2024-12-01', status: 'eligible', donations: 11 }
+  {
+    id: 1,
+    name: "John Smith",
+    bloodType: "O+",
+    lastDonation: "2024-12-10",
+    status: "eligible",
+    donations: 8,
+  },
+  {
+    id: 2,
+    name: "Sarah Johnson",
+    bloodType: "A-",
+    lastDonation: "2024-12-08",
+    status: "eligible",
+    donations: 15,
+  },
+  {
+    id: 3,
+    name: "Mike Chen",
+    bloodType: "B+",
+    lastDonation: "2024-12-05",
+    status: "pending",
+    donations: 3,
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    bloodType: "AB+",
+    lastDonation: "2024-12-03",
+    status: "ineligible",
+    donations: 22,
+  },
+  {
+    id: 5,
+    name: "Robert Wilson",
+    bloodType: "O-",
+    lastDonation: "2024-12-01",
+    status: "eligible",
+    donations: 11,
+  },
 ];
 
 // Mock blood drives
 const bloodDrives = [
   {
     id: 1,
-    name: 'Holiday Blood Drive',
-    organizer: 'Red Cross Downtown',
-    date: '2024-12-15',
-    location: 'Community Center',
+    name: "Holiday Blood Drive",
+    organizer: "Red Cross Downtown",
+    date: "2024-12-15",
+    location: "Community Center",
     capacity: 100,
     registered: 78,
-    status: 'active'
+    status: "active",
   },
   {
     id: 2,
-    name: 'University Drive',
-    organizer: 'State University',
-    date: '2024-12-18',
-    location: 'Student Union',
+    name: "University Drive",
+    organizer: "State University",
+    date: "2024-12-18",
+    location: "Student Union",
     capacity: 60,
     registered: 45,
-    status: 'active'
+    status: "active",
   },
   {
     id: 3,
-    name: 'Hospital Emergency Drive',
-    organizer: 'City General Hospital',
-    date: '2024-12-20',
-    location: 'Hospital Main Lobby',
+    name: "Hospital Emergency Drive",
+    organizer: "City General Hospital",
+    date: "2024-12-20",
+    location: "Hospital Main Lobby",
     capacity: 80,
     registered: 92,
-    status: 'overbooked'
-  }
+    status: "overbooked",
+  },
 ];
 
 // Mock hospital partnerships
 const hospitals = [
   {
     id: 1,
-    name: 'City General Hospital',
-    contact: 'Dr. Sarah Wilson',
-    email: 'swilson@citygeneral.org',
-    status: 'active',
-    currentNeed: 'O-',
-    urgency: 'high'
+    name: "City General Hospital",
+    contact: "Dr. Sarah Wilson",
+    email: "swilson@citygeneral.org",
+    status: "active",
+    currentNeed: "O-",
+    urgency: "high",
   },
   {
     id: 2,
-    name: 'Children\'s Medical Center',
-    contact: 'Dr. Michael Rodriguez',
-    email: 'mrodriguez@childmed.org',
-    status: 'active',
-    currentNeed: 'A+',
-    urgency: 'medium'
+    name: "Children's Medical Center",
+    contact: "Dr. Michael Rodriguez",
+    email: "mrodriguez@childmed.org",
+    status: "active",
+    currentNeed: "A+",
+    urgency: "medium",
   },
   {
     id: 3,
-    name: 'Regional Medical Center',
-    contact: 'Dr. Lisa Chang',
-    email: 'lchang@regional.org',
-    status: 'pending',
-    currentNeed: 'B-',
-    urgency: 'low'
-  }
+    name: "Regional Medical Center",
+    contact: "Dr. Lisa Chang",
+    email: "lchang@regional.org",
+    status: "pending",
+    currentNeed: "B-",
+    urgency: "low",
+  },
 ];
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
-      case 'eligible':
+      case "active":
+      case "eligible":
         return <CheckCircle className="w-4 h-4 text-success" />;
-      case 'pending':
+      case "pending":
         return <Clock className="w-4 h-4 text-warning" />;
-      case 'inactive':
-      case 'ineligible':
+      case "inactive":
+      case "ineligible":
         return <XCircle className="w-4 h-4 text-destructive" />;
       default:
         return <AlertTriangle className="w-4 h-4 text-muted-foreground" />;
@@ -125,31 +187,31 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-      case 'eligible':
-        return 'bg-success/10 text-success border-success/20';
-      case 'pending':
-        return 'bg-warning/10 text-warning border-warning/20';
-      case 'inactive':
-      case 'ineligible':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
-      case 'overbooked':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case "active":
+      case "eligible":
+        return "bg-success/10 text-success border-success/20";
+      case "pending":
+        return "bg-warning/10 text-warning border-warning/20";
+      case "inactive":
+      case "ineligible":
+        return "bg-destructive/10 text-destructive border-destructive/20";
+      case "overbooked":
+        return "bg-orange-100 text-orange-800 border-orange-200";
       default:
-        return 'bg-muted/10 text-muted-foreground border-muted/20';
+        return "bg-muted/10 text-muted-foreground border-muted/20";
     }
   };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'high':
-        return 'bg-destructive/10 text-destructive';
-      case 'medium':
-        return 'bg-warning/10 text-warning';
-      case 'low':
-        return 'bg-success/10 text-success';
+      case "high":
+        return "bg-destructive/10 text-destructive";
+      case "medium":
+        return "bg-warning/10 text-warning";
+      case "low":
+        return "bg-success/10 text-success";
       default:
-        return 'bg-muted/10 text-muted-foreground';
+        return "bg-muted/10 text-muted-foreground";
     }
   };
 
@@ -163,7 +225,9 @@ export default function AdminDashboard() {
               <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
-              <span className="text-xl font-bold text-hope-red">Drop of Hope</span>
+              <span className="text-xl font-bold text-hope-red">
+                Drop of Hope
+              </span>
               <Badge className="bg-hope-red/10 text-hope-red">Admin</Badge>
             </Link>
             <div className="flex items-center space-x-4">
@@ -190,7 +254,9 @@ export default function AdminDashboard() {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-hope-red mb-2">Admin Dashboard</h1>
+            <h1 className="text-4xl font-bold text-hope-red mb-2">
+              Admin Dashboard
+            </h1>
             <p className="text-xl text-muted-foreground">
               Manage blood donations, drives, and community partnerships
             </p>
@@ -214,8 +280,12 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">Total Donors</p>
-                  <p className="text-3xl font-bold text-hope-red">{analyticsData.totalDonors.toLocaleString()}</p>
-                  <p className="text-sm text-success">+{analyticsData.monthlyGrowth}% this month</p>
+                  <p className="text-3xl font-bold text-hope-red">
+                    {analyticsData.totalDonors.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-success">
+                    +{analyticsData.monthlyGrowth}% this month
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <Users className="w-6 h-6 text-hope-red" />
@@ -228,9 +298,15 @@ export default function AdminDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Total Donations</p>
-                  <p className="text-3xl font-bold text-hope-red">{analyticsData.totalDonations.toLocaleString()}</p>
-                  <p className="text-sm text-success">{analyticsData.donationsThisMonth} this month</p>
+                  <p className="text-muted-foreground text-sm">
+                    Total Donations
+                  </p>
+                  <p className="text-3xl font-bold text-hope-red">
+                    {analyticsData.totalDonations.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-success">
+                    {analyticsData.donationsThisMonth} this month
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <Heart className="w-6 h-6 text-hope-red fill-current" />
@@ -244,8 +320,12 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">Active Drives</p>
-                  <p className="text-3xl font-bold text-hope-red">{analyticsData.activeDrives}</p>
-                  <p className="text-sm text-muted-foreground">{analyticsData.upcomingAppointments} appointments</p>
+                  <p className="text-3xl font-bold text-hope-red">
+                    {analyticsData.activeDrives}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {analyticsData.upcomingAppointments} appointments
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <Calendar className="w-6 h-6 text-hope-red" />
@@ -258,8 +338,12 @@ export default function AdminDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Lives Impacted</p>
-                  <p className="text-3xl font-bold text-hope-red">{analyticsData.livesImpacted.toLocaleString()}</p>
+                  <p className="text-muted-foreground text-sm">
+                    Lives Impacted
+                  </p>
+                  <p className="text-3xl font-bold text-hope-red">
+                    {analyticsData.livesImpacted.toLocaleString()}
+                  </p>
                   <p className="text-sm text-success">+3,672 this month</p>
                 </div>
                 <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
@@ -296,22 +380,34 @@ export default function AdminDashboard() {
                     <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
                       <div className="w-2 h-2 bg-hope-red rounded-full"></div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">New donor registration: Sarah Kim</p>
-                        <p className="text-xs text-muted-foreground">5 minutes ago</p>
+                        <p className="text-sm font-medium">
+                          New donor registration: Sarah Kim
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          5 minutes ago
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
                       <div className="w-2 h-2 bg-success rounded-full"></div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">Blood drive completed: Downtown Center</p>
-                        <p className="text-xs text-muted-foreground">2 hours ago</p>
+                        <p className="text-sm font-medium">
+                          Blood drive completed: Downtown Center
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          2 hours ago
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
                       <div className="w-2 h-2 bg-warning rounded-full"></div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">Urgent blood request: City Hospital</p>
-                        <p className="text-xs text-muted-foreground">4 hours ago</p>
+                        <p className="text-sm font-medium">
+                          Urgent blood request: City Hospital
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          4 hours ago
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -328,23 +424,32 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {hospitals.filter(h => h.urgency === 'high').map((hospital) => (
-                      <Alert key={hospital.id}>
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertDescription>
-                          <strong>{hospital.name}</strong> urgently needs {hospital.currentNeed} blood type.
-                          Contact: {hospital.contact}
-                        </AlertDescription>
-                      </Alert>
-                    ))}
-                    {hospitals.filter(h => h.urgency === 'medium').map((hospital) => (
-                      <div key={hospital.id} className="p-3 bg-warning/10 border border-warning/20 rounded-lg">
-                        <p className="text-sm font-medium">{hospital.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Needs {hospital.currentNeed} • Contact: {hospital.contact}
-                        </p>
-                      </div>
-                    ))}
+                    {hospitals
+                      .filter((h) => h.urgency === "high")
+                      .map((hospital) => (
+                        <Alert key={hospital.id}>
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            <strong>{hospital.name}</strong> urgently needs{" "}
+                            {hospital.currentNeed} blood type. Contact:{" "}
+                            {hospital.contact}
+                          </AlertDescription>
+                        </Alert>
+                      ))}
+                    {hospitals
+                      .filter((h) => h.urgency === "medium")
+                      .map((hospital) => (
+                        <div
+                          key={hospital.id}
+                          className="p-3 bg-warning/10 border border-warning/20 rounded-lg"
+                        >
+                          <p className="text-sm font-medium">{hospital.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Needs {hospital.currentNeed} • Contact:{" "}
+                            {hospital.contact}
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 </CardContent>
               </Card>
@@ -393,22 +498,32 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   {recentDonors.map((donor) => (
-                    <div key={donor.id} className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
+                    <div
+                      key={donor.id}
+                      className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold">
-                          {donor.name.split(' ').map(n => n[0]).join('')}
+                          {donor.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
                         </div>
                         <div>
                           <p className="font-medium">{donor.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {donor.bloodType} • {donor.donations} donations • Last: {format(new Date(donor.lastDonation), 'MMM dd')}
+                            {donor.bloodType} • {donor.donations} donations •
+                            Last:{" "}
+                            {format(new Date(donor.lastDonation), "MMM dd")}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <Badge className={getStatusColor(donor.status)}>
                           {getStatusIcon(donor.status)}
-                          <span className="ml-1 capitalize">{donor.status}</span>
+                          <span className="ml-1 capitalize">
+                            {donor.status}
+                          </span>
                         </Badge>
                         <Button variant="outline" size="sm">
                           <UserCheck className="w-4 h-4 mr-2" />
@@ -440,19 +555,27 @@ export default function AdminDashboard() {
                     <div key={drive.id} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
-                          <h3 className="font-semibold text-lg">{drive.name}</h3>
-                          <p className="text-muted-foreground">{drive.organizer}</p>
+                          <h3 className="font-semibold text-lg">
+                            {drive.name}
+                          </h3>
+                          <p className="text-muted-foreground">
+                            {drive.organizer}
+                          </p>
                         </div>
                         <Badge className={getStatusColor(drive.status)}>
                           {getStatusIcon(drive.status)}
-                          <span className="ml-1 capitalize">{drive.status}</span>
+                          <span className="ml-1 capitalize">
+                            {drive.status}
+                          </span>
                         </Badge>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-hope-red" />
-                          <span className="text-sm">{format(new Date(drive.date), 'MMM dd, yyyy')}</span>
+                          <span className="text-sm">
+                            {format(new Date(drive.date), "MMM dd, yyyy")}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-hope-red" />
@@ -460,23 +583,31 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4 text-hope-red" />
-                          <span className="text-sm">{drive.registered}/{drive.capacity} registered</span>
+                          <span className="text-sm">
+                            {drive.registered}/{drive.capacity} registered
+                          </span>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div className="flex-1 mr-4">
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                               className={`h-2 rounded-full ${
-                                drive.registered > drive.capacity ? 'bg-orange-500' : 'bg-hope-red'
+                                drive.registered > drive.capacity
+                                  ? "bg-orange-500"
+                                  : "bg-hope-red"
                               }`}
-                              style={{ width: `${Math.min((drive.registered / drive.capacity) * 100, 100)}%` }}
+                              style={{
+                                width: `${Math.min((drive.registered / drive.capacity) * 100, 100)}%`,
+                              }}
                             ></div>
                           </div>
                         </div>
                         <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">Edit</Button>
+                          <Button variant="outline" size="sm">
+                            Edit
+                          </Button>
                           <Button variant="outline" size="sm">
                             <Mail className="w-4 h-4 mr-2" />
                             Notify
@@ -511,8 +642,12 @@ export default function AdminDashboard() {
                     <div key={hospital.id} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
-                          <h3 className="font-semibold text-lg">{hospital.name}</h3>
-                          <p className="text-muted-foreground">{hospital.contact} • {hospital.email}</p>
+                          <h3 className="font-semibold text-lg">
+                            {hospital.name}
+                          </h3>
+                          <p className="text-muted-foreground">
+                            {hospital.contact} • {hospital.email}
+                          </p>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Badge className={getUrgencyColor(hospital.urgency)}>
@@ -520,17 +655,24 @@ export default function AdminDashboard() {
                           </Badge>
                           <Badge className={getStatusColor(hospital.status)}>
                             {getStatusIcon(hospital.status)}
-                            <span className="ml-1 capitalize">{hospital.status}</span>
+                            <span className="ml-1 capitalize">
+                              {hospital.status}
+                            </span>
                           </Badge>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Current Need: {hospital.currentNeed}</p>
+                          <p className="text-sm font-medium">
+                            Current Need: {hospital.currentNeed}
+                          </p>
                           <p className="text-xs text-muted-foreground">
-                            {hospital.urgency === 'high' ? 'Immediate attention required' :
-                             hospital.urgency === 'medium' ? 'Monitor closely' : 'Routine monitoring'}
+                            {hospital.urgency === "high"
+                              ? "Immediate attention required"
+                              : hospital.urgency === "medium"
+                                ? "Monitor closely"
+                                : "Routine monitoring"}
                           </p>
                         </div>
                         <div className="flex space-x-2">
@@ -538,7 +680,9 @@ export default function AdminDashboard() {
                             <Mail className="w-4 h-4 mr-2" />
                             Contact
                           </Button>
-                          <Button variant="outline" size="sm">View Details</Button>
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -562,7 +706,9 @@ export default function AdminDashboard() {
                 <CardContent className="h-64 flex items-center justify-center">
                   <div className="text-center">
                     <LineChart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Chart: Monthly donation trends over time</p>
+                    <p className="text-muted-foreground">
+                      Chart: Monthly donation trends over time
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -577,7 +723,9 @@ export default function AdminDashboard() {
                 <CardContent className="h-64 flex items-center justify-center">
                   <div className="text-center">
                     <PieChart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Chart: Blood type distribution among donors</p>
+                    <p className="text-muted-foreground">
+                      Chart: Blood type distribution among donors
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -592,7 +740,9 @@ export default function AdminDashboard() {
                 <CardContent className="h-64 flex items-center justify-center">
                   <div className="text-center">
                     <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Chart: Platform growth and engagement metrics</p>
+                    <p className="text-muted-foreground">
+                      Chart: Platform growth and engagement metrics
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -607,7 +757,9 @@ export default function AdminDashboard() {
                 <CardContent className="h-64 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Map: Donor distribution by geographic region</p>
+                    <p className="text-muted-foreground">
+                      Map: Donor distribution by geographic region
+                    </p>
                   </div>
                 </CardContent>
               </Card>
