@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, MapPin, Calendar, Users, Award, Shield, Phone, Mail } from 'lucide-react';
 
 export default function Index() {
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+
   const stats = [
     { label: 'Lives Saved', value: '10,000+', icon: Heart },
     { label: 'Active Donors', value: '5,000+', icon: Users },
