@@ -59,16 +59,7 @@ const AppContent = () => (
               />
             }
           />
-          <Route
-            path="/hospital-portal"
-            element={
-              <PlaceholderPage
-                title="Hospital Portal"
-                description="This page will provide hospital dashboard with blood inventory and request management."
-                suggestedPrompt="Create a hospital dashboard with blood inventory management and donation drive organization"
-              />
-            }
-          />
+          <Route path="/hospital-portal" element={<HospitalPortal />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route
             path="/about"
