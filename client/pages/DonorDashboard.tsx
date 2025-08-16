@@ -169,12 +169,22 @@ export default function DonorDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                    JD
-                  </div>
-                  <h3 className="font-semibold">John Doe</h3>
+                  {user?.imageUrl ? (
+                    <img
+                      src={user.imageUrl}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+                      {user?.firstName?.[0] || user?.fullName?.[0] || 'D'}
+                    </div>
+                  )}
+                  <h3 className="font-semibold">{user?.fullName || 'Donor'}</h3>
                   <p className="text-sm text-muted-foreground">Blood Type: A+</p>
-                  <p className="text-sm text-muted-foreground">Member since 2022</p>
+                  <p className="text-sm text-muted-foreground">
+                    Member since {new Date(user?.createdAt || Date.now()).getFullYear()}
+                  </p>
                 </div>
                 <Button variant="outline" className="w-full" asChild>
                   <Link to="/profile">Edit Profile</Link>
