@@ -87,18 +87,10 @@ const AppContent = () => (
 );
 
 const App = () => {
-  if (hasValidClerkKey) {
-    return (
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <AppContent />
-      </ClerkProvider>
-    );
-  }
-
   return (
-    <MockAuthProvider>
+    <AuthProvider>
       <AppContent />
-    </MockAuthProvider>
+    </AuthProvider>
   );
 };
 
