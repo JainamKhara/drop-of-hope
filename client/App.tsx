@@ -90,7 +90,6 @@ const AppContent = () => (
               />
             }
           />
-          <Route path="/rewards" element={<Rewards />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
