@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, useUser, SignOutButton } from "@clerk/clerk-react";
-import { useMockAuth, MockSignOutButton } from "@/contexts/MockAuthContext";
+import { useAuth, SignOutButton } from "@/contexts/AuthContext";
+import { db } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,54 +17,115 @@ import {
   Bell,
   Settings,
   LogOut,
+  Droplets,
+  TrendingUp,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
-const hasValidClerkKey =
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
+interface DashboardData {
+  appointments: any[];
+  donations: any[];
+  rewards: any[];
+  upcomingDrives: any[];
+  stats: {
+    totalDonations: number;
+    totalPoints: number;
+    level: number;
+    daysUntilNextDonation: number;
+  };
+}
 
 export default function DonorDashboard() {
-  // Use Clerk auth if available, otherwise use mock auth
-  let isSignedIn, isLoaded, user;
-
-  if (hasValidClerkKey) {
-    const clerkAuth = useAuth();
-    const clerkUser = useUser();
-    isSignedIn = clerkAuth.isSignedIn;
-    isLoaded = clerkAuth.isLoaded;
-    user = clerkUser.user;
-  } else {
-    const mockAuth = useMockAuth();
-    isSignedIn = mockAuth.isSignedIn;
-    isLoaded = mockAuth.isLoaded;
-    user = mockAuth.user;
-  }
-
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
-    if (isLoaded && !isSignedIn) {
+    if (!loading && !user) {
       navigate("/login");
     }
-  }, [isSignedIn, isLoaded, navigate]);
+  }, [user, loading, navigate]);
 
-  // Show loading while checking authentication
-  if (!isLoaded) {
+  // Load dashboard data
+  useEffect(() => {
+    if (user && profile) {
+      loadDashboardData();
+    }
+  }, [user, profile]);
+
+  const loadDashboardData = async () => {
+    if (!user) return;
+
+    setLoadingData(true);
+    try {
+      const [
+        appointmentsResult,
+        donationsResult,
+        rewardsResult,
+        drivesResult
+      ] = await Promise.all([
+        db.getUserAppointments(user.id),
+        db.getUserDonations(user.id),
+        db.getUserRewards(user.id),
+        db.getDrives({ city: profile?.city })
+      ]);
+
+      const appointments = appointmentsResult.data || [];
+      const donations = donationsResult.data || [];
+      const rewards = rewardsResult.data || [];
+      const upcomingDrives = (drivesResult.data || []).slice(0, 3);
+
+      // Calculate days until next donation (typically 56 days between whole blood donations)
+      const lastDonationDate = profile?.last_donation_date ? new Date(profile.last_donation_date) : null;
+      const daysUntilNextDonation = lastDonationDate 
+        ? Math.max(0, 56 - Math.floor((Date.now() - lastDonationDate.getTime()) / (1000 * 60 * 60 * 24)))
+        : 0;
+
+      setDashboardData({
+        appointments: appointments.slice(0, 3),
+        donations: donations.slice(0, 5),
+        rewards: rewards.slice(0, 5),
+        upcomingDrives,
+        stats: {
+          totalDonations: donations.length,
+          totalPoints: profile?.points || 0,
+          level: profile?.level || 1,
+          daysUntilNextDonation
+        }
+      });
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  if (loading || loadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full animate-pulse mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-6 h-6 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Don't render if not signed in (will redirect)
-  if (!isSignedIn) {
+  if (!user || !profile) {
     return null;
   }
+
+  const { stats, appointments, donations, rewards, upcomingDrives } = dashboardData || {
+    stats: { totalDonations: 0, totalPoints: 0, level: 1, daysUntilNextDonation: 0 },
+    appointments: [],
+    donations: [],
+    rewards: [],
+    upcomingDrives: []
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
@@ -80,240 +141,365 @@ export default function DonorDashboard() {
                 Drop of Hope
               </span>
             </Link>
+
             <div className="flex items-center space-x-4">
               <NotificationCenter />
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
-              </Button>
-              {hasValidClerkKey ? (
-                <SignOutButton>
-                  <Button variant="outline" size="sm">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
-                </SignOutButton>
-              ) : (
-                <MockSignOutButton>
-                  <Button variant="outline" size="sm">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
-                </MockSignOutButton>
-              )}
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-hope-red/10 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-hope-red" />
+                </div>
+                <span className="text-sm font-medium">{profile.name}</span>
+              </div>
+              <SignOutButton className="hidden md:flex" />
             </div>
           </div>
         </div>
       </header>
 
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Welcome Section */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl text-hope-red">
-                      Welcome back,{" "}
-                      {user?.firstName || user?.fullName || "Donor"}!
-                    </CardTitle>
-                    <p className="text-muted-foreground">
-                      Ready to save more lives?
-                    </p>
-                  </div>
-                  <Badge className="bg-hope-red">A+ Donor</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="text-2xl font-bold text-hope-red">12</div>
-                    <div className="text-sm text-muted-foreground">
-                      Total Donations
-                    </div>
-                  </div>
-                  <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="text-2xl font-bold text-hope-red">
-                      1,200
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Points Earned
-                    </div>
-                  </div>
-                  <div className="text-center p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="text-2xl font-bold text-hope-red">36</div>
-                    <div className="text-sm text-muted-foreground">
-                      Lives Saved
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button
-                    className="h-auto p-6 bg-hope-red hover:bg-hope-red/90"
-                    asChild
-                  >
-                    <Link
-                      to="/find-drives"
-                      className="flex flex-col items-center space-y-2"
-                    >
-                      <MapPin className="w-8 h-8" />
-                      <span className="text-lg">Find Blood Drives</span>
-                      <span className="text-sm opacity-90">
-                        3 drives near you
-                      </span>
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto p-6 border-hope-red text-hope-red hover:bg-hope-red hover:text-white"
-                    asChild
-                  >
-                    <Link
-                      to="/appointments"
-                      className="flex flex-col items-center space-y-2"
-                    >
-                      <Calendar className="w-8 h-8" />
-                      <span className="text-lg">My Appointments</span>
-                      <span className="text-sm opacity-70">Next: Dec 15</span>
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4 p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-white fill-current" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">Donation Completed</div>
-                      <div className="text-sm text-muted-foreground">
-                        Red Cross Center - Nov 28, 2024
-                      </div>
-                    </div>
-                    <Badge variant="secondary">+100 points</Badge>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                    <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center">
-                      <Award className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">Badge Earned</div>
-                      <div className="text-sm text-muted-foreground">
-                        Frequent Donor Badge - Nov 20, 2024
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Profile Card */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <User className="w-5 h-5" />
-                  <span>Profile</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  {user?.imageUrl ? (
-                    <img
-                      src={user.imageUrl}
-                      alt="Profile"
-                      className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                      {user?.firstName?.[0] || user?.fullName?.[0] || "D"}
-                    </div>
-                  )}
-                  <h3 className="font-semibold">{user?.fullName || "Donor"}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Blood Type: A+
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Member since{" "}
-                    {new Date(user?.createdAt || Date.now()).getFullYear()}
-                  </p>
-                </div>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/profile">Edit Profile</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Progress to Next Level */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Award className="w-5 h-5" />
-                  <span>Progress</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Gold Level</span>
-                    <span>1200/1500 pts</span>
-                  </div>
-                  <Progress value={80} className="h-2" />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  300 more points to reach Platinum level!
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Upcoming Appointments */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>Next Appointment</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="font-medium">City Hospital Blood Drive</div>
-                  <div className="text-sm text-muted-foreground">
-                    December 15, 2024
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    10:00 AM - 12:00 PM
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    View Details
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-hope-red mb-2">
+            Welcome back, {profile.name}!
+          </h1>
+          <p className="text-muted-foreground">
+            Thank you for being a life-saving hero. Here's your impact dashboard.
+          </p>
         </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+              <Droplets className="h-4 w-4 text-hope-red" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-hope-red">{stats.totalDonations}</div>
+              <p className="text-xs text-muted-foreground">
+                Lives potentially saved: {stats.totalDonations * 3}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Points Earned</CardTitle>
+              <Award className="h-4 w-4 text-hope-red" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-hope-red">{stats.totalPoints}</div>
+              <p className="text-xs text-muted-foreground">
+                Level {stats.level} donor
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Next Donation</CardTitle>
+              <CalendarIcon className="h-4 w-4 text-hope-red" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-hope-red">
+                {stats.daysUntilNextDonation === 0 ? "Ready!" : `${stats.daysUntilNextDonation} days`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.daysUntilNextDonation === 0 ? "You can donate now" : "Until you can donate again"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blood Type</CardTitle>
+              <Heart className="h-4 w-4 text-hope-red" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-hope-red">
+                {profile.blood_type || "Not Set"}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {profile.blood_type ? "Universal compatibility" : "Please update your profile"}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="mb-8 border-0 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-hope-red">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Button asChild className="bg-hope-red hover:bg-hope-red/90">
+                <Link to="/drives">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Find Blood Drives
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/appointments">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  My Appointments
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/profile">
+                  <User className="w-4 h-4 mr-2" />
+                  Update Profile
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/rewards">
+                  <Award className="w-4 h-4 mr-2" />
+                  View Rewards
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Upcoming Appointments */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-hope-red flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Upcoming Appointments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {appointments.length > 0 ? (
+                <div className="space-y-4">
+                  {appointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium">{appointment.drives?.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(appointment.appointment_date).toLocaleDateString()} at{" "}
+                          {appointment.appointment_time}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {appointment.drives?.location}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="bg-hope-red/10 text-hope-red">
+                        {appointment.status}
+                      </Badge>
+                    </div>
+                  ))}
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/appointments">View All Appointments</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    No upcoming appointments
+                  </p>
+                  <Button asChild>
+                    <Link to="/drives">Schedule an Appointment</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Donations */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-hope-red flex items-center">
+                <Droplets className="w-5 h-5 mr-2" />
+                Recent Donations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {donations.length > 0 ? (
+                <div className="space-y-4">
+                  {donations.map((donation) => (
+                    <div
+                      key={donation.id}
+                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          {donation.drives?.name || donation.hospitals?.name || "Direct Donation"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(donation.donation_date).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {donation.quantity_ml}ml • {donation.blood_type}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          +{donation.points_earned} points
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/profile">View Donation History</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Droplets className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    No donations yet
+                  </p>
+                  <Button asChild>
+                    <Link to="/drives">Find Your First Drive</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Rewards */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-hope-red flex items-center">
+                <Award className="w-5 h-5 mr-2" />
+                Recent Achievements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {rewards.length > 0 ? (
+                <div className="space-y-4">
+                  {rewards.map((reward) => (
+                    <div
+                      key={reward.id}
+                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="text-2xl">{reward.badge_icon || "🏆"}</div>
+                        <div>
+                          <p className="font-medium">{reward.badge_name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {reward.badge_description}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-hope-red/10 text-hope-red">
+                        {reward.points_threshold} pts
+                      </Badge>
+                    </div>
+                  ))}
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/rewards">View All Achievements</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    No achievements yet
+                  </p>
+                  <Button asChild>
+                    <Link to="/drives">Start Donating to Earn Rewards</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Nearby Blood Drives */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-hope-red flex items-center">
+                <MapPin className="w-5 h-5 mr-2" />
+                Nearby Blood Drives
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {upcomingDrives.length > 0 ? (
+                <div className="space-y-4">
+                  {upcomingDrives.map((drive) => (
+                    <div
+                      key={drive.id}
+                      className="p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium">{drive.name}</p>
+                        <Badge variant="secondary">
+                          {drive.registered_count}/{drive.capacity}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {drive.location}, {drive.city}
+                      </p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {new Date(drive.start_date).toLocaleDateString()} •{" "}
+                        {drive.start_time} - {drive.end_time}
+                      </p>
+                      <Button
+                        asChild
+                        size="sm"
+                        className="w-full bg-hope-red hover:bg-hope-red/90"
+                      >
+                        <Link to={`/book-appointment/${drive.id}`}>
+                          Book Appointment
+                        </Link>
+                      </Button>
+                    </div>
+                  ))}
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/drives">View All Drives</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    No nearby drives found
+                  </p>
+                  <Button asChild>
+                    <Link to="/drives">Explore All Drives</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Progress to Next Level */}
+        {stats.level < 10 && (
+          <Card className="mt-8 border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-hope-red flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2" />
+                Progress to Level {stats.level + 1}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Current Points: {stats.totalPoints}</span>
+                  <span>Target: {(stats.level + 1) * 100} points</span>
+                </div>
+                <Progress
+                  value={(stats.totalPoints % 100)}
+                  className="w-full"
+                />
+                <p className="text-sm text-muted-foreground">
+                  {((stats.level + 1) * 100) - stats.totalPoints} more points to level up!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* AI Chatbot */}
+      {/* Chatbot Widget */}
       <ChatbotWidget />
     </div>
   );
