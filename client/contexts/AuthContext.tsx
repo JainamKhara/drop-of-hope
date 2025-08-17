@@ -170,7 +170,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signUp,
     signIn,
     signOut,
-    updateProfile
+    updateProfile,
+    getRoleDashboard
   };
 
   return (
