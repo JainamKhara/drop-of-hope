@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Heart, ArrowLeft, Building2, Package, FileText, Calendar, Users } from "lucide-react";
 
 export default function HospitalLogin() {
-  const { user, loading, signIn } = useAuth();
+  const { user, profile, loading, signIn, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
