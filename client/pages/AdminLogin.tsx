@@ -29,11 +29,14 @@ export default function AdminLogin() {
     setError("");
 
     const { error } = await signIn(email, password);
-    
+
     if (error) {
       setError(error.message);
     } else {
-      // Navigation will be handled by useEffect after profile loads
+      // Wait a moment for profile to load, then navigate
+      setTimeout(() => {
+        navigate(getRoleDashboard());
+      }, 100);
     }
     setIsLoading(false);
   };
