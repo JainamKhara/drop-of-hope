@@ -33,9 +33,7 @@ export default function AdminLogin() {
     if (error) {
       setError(error.message);
     } else {
-      // After successful login, the useEffect will handle navigation
-      // based on user role
-      navigate("/admin");
+      // Navigation will be handled by useEffect after profile loads
     }
     setIsLoading(false);
   };
