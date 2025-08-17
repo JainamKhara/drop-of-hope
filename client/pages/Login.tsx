@@ -59,7 +59,7 @@ export default function Login() {
           {/* Welcome Message */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-hope-red mb-2">
-              Welcome Back
+              Welcome Back, Donor
             </h1>
             <p className="text-muted-foreground">
               Sign in to continue your life-saving journey
