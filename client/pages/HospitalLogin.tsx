@@ -16,13 +16,12 @@ export default function HospitalLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect to hospital portal if already signed in as hospital staff
+  // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
-    if (user && !loading) {
-      // Check if user has hospital role, if so redirect to hospital portal
-      navigate("/hospital-portal");
+    if (user && profile && !loading) {
+      navigate(getRoleDashboard());
     }
-  }, [user, loading, navigate]);
+  }, [user, profile, loading, navigate, getRoleDashboard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
