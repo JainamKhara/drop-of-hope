@@ -22,6 +22,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
+import { AdminOnlyRoute, HospitalOnlyRoute, DonorOnlyRoute, AuthenticatedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
