@@ -34,32 +34,42 @@ const AppContent = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<DonorDashboard />} />
+
+          {/* Donor-only routes */}
+          <Route path="/dashboard" element={<DonorOnlyRoute><DonorDashboard /></DonorOnlyRoute>} />
+          <Route path="/drives" element={<DonorOnlyRoute><BloodDrives /></DonorOnlyRoute>} />
+          <Route path="/find-drives" element={<DonorOnlyRoute><BloodDrives /></DonorOnlyRoute>} />
+          <Route path="/book-appointment/:driveId" element={<DonorOnlyRoute><BookAppointment /></DonorOnlyRoute>} />
+          <Route path="/appointments" element={<DonorOnlyRoute><MyAppointments /></DonorOnlyRoute>} />
+          <Route path="/profile" element={<DonorOnlyRoute><Profile /></DonorOnlyRoute>} />
+          <Route path="/rewards" element={<DonorOnlyRoute><Rewards /></DonorOnlyRoute>} />
+          <Route path="/community" element={<DonorOnlyRoute><Community /></DonorOnlyRoute>} />
+
+          {/* Admin-only routes */}
+          <Route path="/admin" element={<AdminOnlyRoute><AdminDashboard /></AdminOnlyRoute>} />
+
+          {/* Hospital-only routes */}
+          <Route path="/hospital-portal" element={<HospitalOnlyRoute><HospitalPortal /></HospitalOnlyRoute>} />
+
+          {/* Public routes */}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/hospital/login" element={<HospitalLogin />} />
-          <Route path="/drives" element={<BloodDrives />} />
-          <Route path="/find-drives" element={<BloodDrives />} />
-          <Route
-            path="/book-appointment/:driveId"
-            element={<BookAppointment />}
-          />
-          <Route path="/appointments" element={<MyAppointments />} />
-          <Route path="/profile" element={<Profile />} />
+
+          {/* Mixed access routes */}
           <Route
             path="/request"
             element={
-              <PlaceholderPage
-                title="Request Blood"
-                description="This page will allow hospitals and individuals to request blood donations."
-                suggestedPrompt="Create a blood request form for hospitals and emergency situations"
-              />
+              <AuthenticatedRoute>
+                <PlaceholderPage
+                  title="Request Blood"
+                  description="This page will allow hospitals and individuals to request blood donations."
+                  suggestedPrompt="Create a blood request form for hospitals and emergency situations"
+                />
+              </AuthenticatedRoute>
             }
           />
-          <Route path="/hospital-portal" element={<HospitalPortal />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/admin" element={<AdminDashboard />} />
           <Route
             path="/about"
             element={
