@@ -148,6 +148,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const getRoleDashboard = () => {
+    if (!profile) return '/dashboard';
+
+    switch (profile.role) {
+      case 'admin':
+        return '/admin';
+      case 'hospital':
+        return '/hospital-portal';
+      case 'donor':
+      default:
+        return '/dashboard';
+    }
+  };
+
   const value: AuthContextType = {
     user,
     profile,
