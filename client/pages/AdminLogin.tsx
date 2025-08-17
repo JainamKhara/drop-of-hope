@@ -16,13 +16,12 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect to admin dashboard if already signed in as admin
+  // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
-    if (user && !loading) {
-      // Check if user has admin role, if so redirect to admin dashboard
-      navigate("/admin");
+    if (user && profile && !loading) {
+      navigate(getRoleDashboard());
     }
-  }, [user, loading, navigate]);
+  }, [user, profile, loading, navigate, getRoleDashboard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
