@@ -127,7 +127,7 @@ export default function Index() {
             community and technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {isSignedIn ? (
+            {user ? (
               <>
                 <Button
                   size="lg"
