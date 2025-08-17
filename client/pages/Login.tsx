@@ -88,6 +88,23 @@ export default function Login() {
               </Link>
             </p>
 
+            <p className="text-muted-foreground mb-4">
+              Not a donor?{" "}
+              <Link
+                to="/admin/login"
+                className="text-blue-600 hover:text-blue-600/80 font-medium"
+              >
+                Admin login
+              </Link>{" "}
+              |{" "}
+              <Link
+                to="/hospital/login"
+                className="text-green-600 hover:text-green-600/80 font-medium"
+              >
+                Hospital login
+              </Link>
+            </p>
+
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>By signing in, you agree to our</p>
               <div className="space-x-4">
