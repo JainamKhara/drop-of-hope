@@ -113,6 +113,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(true);
     try {
       const result = await auth.signIn(email, password);
+      // Note: navigation will be handled by the login pages or protected routes
+      // after the profile is loaded in the useEffect
       return result;
     } finally {
       setLoading(false);
