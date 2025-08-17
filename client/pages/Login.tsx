@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft } from "lucide-react";
 
 export default function Login() {
-  const { user, loading } = useAuth();
+  const { user, loading, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
 
   // Redirect to dashboard if already signed in
