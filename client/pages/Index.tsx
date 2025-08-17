@@ -332,6 +332,14 @@ export default function Index() {
               <ul className="space-y-2 text-gray-400">
                 <li>
                   <Link
+                    to="/hospital/login"
+                    className="hover:text-white transition-colors"
+                  >
+                    Hospital Login
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="/hospital-portal"
                     className="hover:text-white transition-colors"
                   >
@@ -340,18 +348,39 @@ export default function Index() {
                 </li>
                 <li>
                   <Link
-                    to="/request-blood"
+                    to="/request"
                     className="hover:text-white transition-colors"
                   >
                     Request Blood
                   </Link>
                 </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Administration</h3>
+              <ul className="space-y-2 text-gray-400">
                 <li>
                   <Link
-                    to="/organize-drive"
+                    to="/admin/login"
                     className="hover:text-white transition-colors"
                   >
-                    Organize Drive
+                    Admin Login
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/admin"
+                    className="hover:text-white transition-colors"
+                  >
+                    Admin Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/contact"
+                    className="hover:text-white transition-colors"
+                  >
+                    Support
                   </Link>
                 </li>
               </ul>
