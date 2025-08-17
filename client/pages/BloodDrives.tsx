@@ -61,12 +61,12 @@ export default function BloodDrives() {
     try {
       const { data, error } = await db.getDrives();
       if (error) {
-        console.error('Error loading blood drives:', error);
+        console.error("Error loading blood drives:", error);
       } else {
         setDrives(data || []);
       }
     } catch (error) {
-      console.error('Error loading blood drives:', error);
+      console.error("Error loading blood drives:", error);
     } finally {
       setLoading(false);
     }
@@ -77,33 +77,40 @@ export default function BloodDrives() {
 
     // Filter by search query (name, location, organizer)
     if (searchQuery) {
-      filtered = filtered.filter((drive) =>
-        drive.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        drive.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        drive.profiles?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        drive.hospitals?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (drive) =>
+          drive.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          drive.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          drive.profiles?.name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          drive.hospitals?.name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       );
     }
 
     // Filter by blood type
     if (selectedBloodType) {
       filtered = filtered.filter((drive) =>
-        drive.blood_types_needed?.includes(selectedBloodType)
+        drive.blood_types_needed?.includes(selectedBloodType),
       );
     }
 
     // Filter by date
     if (selectedDate) {
       const selectedDateString = format(selectedDate, "yyyy-MM-dd");
-      filtered = filtered.filter((drive) =>
-        drive.start_date <= selectedDateString && drive.end_date >= selectedDateString
+      filtered = filtered.filter(
+        (drive) =>
+          drive.start_date <= selectedDateString &&
+          drive.end_date >= selectedDateString,
       );
     }
 
     // Filter by city
     if (cityFilter) {
       filtered = filtered.filter((drive) =>
-        drive.city.toLowerCase().includes(cityFilter.toLowerCase())
+        drive.city.toLowerCase().includes(cityFilter.toLowerCase()),
       );
     }
 
@@ -177,7 +184,8 @@ export default function BloodDrives() {
             Find Blood Drives Near You
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Discover upcoming blood donation drives in your area and make a difference in someone's life today.
+            Discover upcoming blood donation drives in your area and make a
+            difference in someone's life today.
           </p>
         </div>
 
@@ -210,7 +218,10 @@ export default function BloodDrives() {
               />
 
               {/* Blood Type Filter */}
-              <Select value={selectedBloodType} onValueChange={setSelectedBloodType}>
+              <Select
+                value={selectedBloodType}
+                onValueChange={setSelectedBloodType}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Blood Type" />
                 </SelectTrigger>
@@ -275,7 +286,10 @@ export default function BloodDrives() {
         {filteredDrives.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDrives.map((drive) => (
-              <Card key={drive.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+              <Card
+                key={drive.id}
+                className="border-0 shadow-md hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
@@ -283,17 +297,23 @@ export default function BloodDrives() {
                         {drive.name}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        by {drive.profiles?.name || drive.hospitals?.name || "Unknown Organizer"}
+                        by{" "}
+                        {drive.profiles?.name ||
+                          drive.hospitals?.name ||
+                          "Unknown Organizer"}
                       </p>
                     </div>
                     <Badge
                       variant="secondary"
                       className={`${getAvailabilityColor(
                         drive.registered_count || 0,
-                        drive.capacity
+                        drive.capacity,
                       )} bg-transparent border`}
                     >
-                      {getAvailabilityText(drive.registered_count || 0, drive.capacity)}
+                      {getAvailabilityText(
+                        drive.registered_count || 0,
+                        drive.capacity,
+                      )}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -314,10 +334,9 @@ export default function BloodDrives() {
                     <div className="flex items-center space-x-2">
                       <CalendarIcon className="w-4 h-4 text-hope-red" />
                       <p className="text-sm">
-                        {new Date(drive.start_date).toLocaleDateString()} 
-                        {drive.start_date !== drive.end_date && 
-                          ` - ${new Date(drive.end_date).toLocaleDateString()}`
-                        }
+                        {new Date(drive.start_date).toLocaleDateString()}
+                        {drive.start_date !== drive.end_date &&
+                          ` - ${new Date(drive.end_date).toLocaleDateString()}`}
                       </p>
                     </div>
 
@@ -332,27 +351,31 @@ export default function BloodDrives() {
                     <div className="flex items-center space-x-2">
                       <Users className="w-4 h-4 text-hope-red" />
                       <p className="text-sm">
-                        {drive.registered_count || 0}/{drive.capacity} registered
+                        {drive.registered_count || 0}/{drive.capacity}{" "}
+                        registered
                       </p>
                     </div>
 
                     {/* Blood Types Needed */}
-                    {drive.blood_types_needed && drive.blood_types_needed.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium mb-2">Blood Types Needed:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {drive.blood_types_needed.map((type) => (
-                            <Badge
-                              key={type}
-                              variant="outline"
-                              className="text-xs border-hope-red text-hope-red"
-                            >
-                              {type}
-                            </Badge>
-                          ))}
+                    {drive.blood_types_needed &&
+                      drive.blood_types_needed.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium mb-2">
+                            Blood Types Needed:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {drive.blood_types_needed.map((type) => (
+                              <Badge
+                                key={type}
+                                variant="outline"
+                                className="text-xs border-hope-red text-hope-red"
+                              >
+                                {type}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Description */}
                     {drive.description && (
@@ -369,7 +392,9 @@ export default function BloodDrives() {
                         disabled={drive.registered_count >= drive.capacity}
                       >
                         <Link to={`/book-appointment/${drive.id}`}>
-                          {drive.registered_count >= drive.capacity ? "Full" : "Book Appointment"}
+                          {drive.registered_count >= drive.capacity
+                            ? "Full"
+                            : "Book Appointment"}
                         </Link>
                       </Button>
                       {drive.latitude && drive.longitude && (
@@ -379,7 +404,7 @@ export default function BloodDrives() {
                           onClick={() =>
                             window.open(
                               `https://maps.google.com/?q=${drive.latitude},${drive.longitude}`,
-                              "_blank"
+                              "_blank",
                             )
                           }
                         >
@@ -396,7 +421,9 @@ export default function BloodDrives() {
           <Card className="border-0 shadow-md">
             <CardContent className="text-center py-12">
               <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Blood Drives Found</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                No Blood Drives Found
+              </h3>
               <p className="text-muted-foreground mb-6">
                 {drives.length === 0
                   ? "There are currently no blood drives scheduled."
@@ -412,7 +439,7 @@ export default function BloodDrives() {
         )}
 
         {/* Call to Action for Creating Drives */}
-        {user && profile?.role === 'admin' && (
+        {user && profile?.role === "admin" && (
           <Card className="mt-8 border-0 shadow-md bg-hope-pink dark:bg-hope-coral">
             <CardContent className="text-center py-8">
               <h3 className="text-xl font-semibold text-hope-red mb-2">

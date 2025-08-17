@@ -6,7 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft, Shield, Users, BarChart3, Settings } from "lucide-react";
+import {
+  Heart,
+  ArrowLeft,
+  Shield,
+  Users,
+  BarChart3,
+  Settings,
+} from "lucide-react";
 
 export default function AdminLogin() {
   const { user, profile, loading, signIn, getRoleDashboard } = useAuth();
@@ -136,7 +143,10 @@ export default function AdminLogin() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Admin Email
                   </Label>
                   <Input
@@ -150,7 +160,10 @@ export default function AdminLogin() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </Label>
                   <Input
@@ -162,7 +175,7 @@ export default function AdminLogin() {
                     required
                   />
                 </div>
-                
+
                 {error && (
                   <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
@@ -174,7 +187,7 @@ export default function AdminLogin() {
                   disabled={isLoading}
                   className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  {isLoading ? 'Signing In...' : 'Sign In to Admin Panel'}
+                  {isLoading ? "Signing In..." : "Sign In to Admin Panel"}
                 </button>
               </form>
             </CardContent>
@@ -202,7 +215,8 @@ export default function AdminLogin() {
             <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
               <Shield className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800 dark:text-blue-200">
-                <strong>Admin Access Required:</strong> This portal is restricted to authorized administrative personnel only. 
+                <strong>Admin Access Required:</strong> This portal is
+                restricted to authorized administrative personnel only.
                 Unauthorized access attempts are logged and monitored.
               </AlertDescription>
             </Alert>

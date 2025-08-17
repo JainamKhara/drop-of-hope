@@ -1,16 +1,31 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase, auth, db, Profile } from '../lib/supabase';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase, auth, db, Profile } from "../lib/supabase";
 
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: { name: string; role?: string }) => Promise<{ data: any; error: any }>;
-  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    userData: { name: string; role?: string },
+  ) => Promise<{ data: any; error: any }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<{ error: any }>;
-  updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any }>;
+  updateProfile: (
+    updates: Partial<Profile>,
+  ) => Promise<{ data: any; error: any }>;
   getRoleDashboard: () => string;
 }
 
@@ -19,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -47,19 +62,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
-        } else {
-          setProfile(null);
-          setLoading(false);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        await loadUserProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setLoading(false);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -67,24 +82,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const loadUserProfile = async (userId: string) => {
     try {
       const { data: existingProfile, error } = await db.getProfile(userId);
-      
-      if (error && error.code === 'PGRST116') {
+
+      if (error && error.code === "PGRST116") {
         // Profile doesn't exist, create one
         const user = await auth.getCurrentUser();
         if (user.user) {
-          const newProfile: Omit<Profile, 'created_at' | 'updated_at'> = {
+          const newProfile: Omit<Profile, "created_at" | "updated_at"> = {
             id: userId,
-            email: user.user.email || '',
-            name: user.user.user_metadata?.name || 'User',
-            role: user.user.user_metadata?.role || 'donor',
+            email: user.user.email || "",
+            name: user.user.user_metadata?.name || "User",
+            role: user.user.user_metadata?.role || "donor",
             points: 0,
             level: 1,
-            is_verified: false
+            is_verified: false,
           };
-          
-          const { data: createdProfile, error: createError } = await db.createProfile(newProfile);
+
+          const { data: createdProfile, error: createError } =
+            await db.createProfile(newProfile);
           if (createError) {
-            console.error('Error creating profile:', createError);
+            console.error("Error creating profile:", createError);
           } else {
             setProfile(createdProfile);
           }
@@ -93,13 +109,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfile(existingProfile);
       }
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      console.error("Error loading user profile:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, userData: { name: string; role?: string }) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    userData: { name: string; role?: string },
+  ) => {
     setLoading(true);
     try {
       const result = await auth.signUp(email, password, userData);
@@ -136,7 +156,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) {
-      return { data: null, error: new Error('No user logged in') };
+      return { data: null, error: new Error("No user logged in") };
     }
 
     try {
@@ -151,16 +171,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const getRoleDashboard = () => {
-    if (!profile) return '/dashboard';
+    if (!profile) return "/dashboard";
 
     switch (profile.role) {
-      case 'admin':
-        return '/admin';
-      case 'hospital':
-        return '/hospital-portal';
-      case 'donor':
+      case "admin":
+        return "/admin";
+      case "hospital":
+        return "/hospital-portal";
+      case "donor":
       default:
-        return '/dashboard';
+        return "/dashboard";
     }
   };
 
@@ -173,31 +193,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signIn,
     signOut,
     updateProfile,
-    getRoleDashboard
+    getRoleDashboard,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Auth UI Components for sign in/up forms
 export const SignInForm = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     const { error } = await signIn(email, password);
-    
+
     if (error) {
       setError(error.message);
     } else {
@@ -210,7 +226,10 @@ export const SignInForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     <div className="w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -223,7 +242,10 @@ export const SignInForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input
@@ -235,15 +257,13 @@ export const SignInForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             required
           />
         </div>
-        {error && (
-          <div className="text-red-600 text-sm">{error}</div>
-        )}
+        {error && <div className="text-red-600 text-sm">{error}</div>}
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-hope-red-600 text-white py-2 px-4 rounded-md hover:bg-hope-red-700 disabled:opacity-50"
         >
-          {loading ? 'Signing In...' : 'Sign In'}
+          {loading ? "Signing In..." : "Sign In"}
         </button>
       </form>
     </div>
@@ -251,21 +271,21 @@ export const SignInForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 };
 
 export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('donor');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("donor");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     const { error } = await signUp(email, password, { name, role });
-    
+
     if (error) {
       setError(error.message);
     } else {
@@ -278,7 +298,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     <div className="w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Full Name
           </label>
           <input
@@ -291,7 +314,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -304,7 +330,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input
@@ -317,7 +346,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
         </div>
         <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="role"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Role
           </label>
           <select
@@ -331,15 +363,13 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <option value="admin">Admin</option>
           </select>
         </div>
-        {error && (
-          <div className="text-red-600 text-sm">{error}</div>
-        )}
+        {error && <div className="text-red-600 text-sm">{error}</div>}
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-hope-red-600 text-white py-2 px-4 rounded-md hover:bg-hope-red-700 disabled:opacity-50"
         >
-          {loading ? 'Signing Up...' : 'Sign Up'}
+          {loading ? "Signing Up..." : "Sign Up"}
         </button>
       </form>
     </div>
@@ -355,7 +385,7 @@ export const SignOutButton = ({ className = "" }: { className?: string }) => {
       disabled={loading}
       className={`bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 disabled:opacity-50 ${className}`}
     >
-      {loading ? 'Signing Out...' : 'Sign Out'}
+      {loading ? "Signing Out..." : "Sign Out"}
     </button>
   );
 };

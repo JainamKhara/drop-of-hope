@@ -11,8 +11,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  }
+    detectSessionInUrl: true,
+  },
 });
 
 // Database types based on your schema
@@ -185,13 +185,17 @@ export interface BloodInventory {
 
 // Helper functions for authentication
 export const auth = {
-  signUp: async (email: string, password: string, userData: { name: string; role?: string }) => {
+  signUp: async (
+    email: string,
+    password: string,
+    userData: { name: string; role?: string },
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: userData
-      }
+        data: userData,
+      },
     });
     return { data, error };
   },
@@ -199,7 +203,7 @@ export const auth = {
   signIn: async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
     return { data, error };
   },
@@ -210,13 +214,16 @@ export const auth = {
   },
 
   getCurrentUser: async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     return { user, error };
   },
 
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
     return supabase.auth.onAuthStateChange(callback);
-  }
+  },
 };
 
 // Helper functions for database operations
@@ -224,26 +231,28 @@ export const db = {
   // Profile operations
   getProfile: async (userId: string) => {
     const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
       .single();
     return { data, error };
   },
 
   updateProfile: async (userId: string, updates: Partial<Profile>) => {
     const { data, error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update(updates)
-      .eq('id', userId)
+      .eq("id", userId)
       .select()
       .single();
     return { data, error };
   },
 
-  createProfile: async (profile: Omit<Profile, 'created_at' | 'updated_at'>) => {
+  createProfile: async (
+    profile: Omit<Profile, "created_at" | "updated_at">,
+  ) => {
     const { data, error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .insert([profile])
       .select()
       .single();
@@ -251,34 +260,42 @@ export const db = {
   },
 
   // Blood drives operations
-  getDrives: async (filters?: { city?: string; bloodType?: string; date?: string }) => {
+  getDrives: async (filters?: {
+    city?: string;
+    bloodType?: string;
+    date?: string;
+  }) => {
     let query = supabase
-      .from('drives')
-      .select(`
+      .from("drives")
+      .select(
+        `
         *,
         hospitals(name, city, state),
         profiles!drives_organizer_id_fkey(name)
-      `)
-      .eq('is_active', true)
-      .order('start_date', { ascending: true });
+      `,
+      )
+      .eq("is_active", true)
+      .order("start_date", { ascending: true });
 
     if (filters?.city) {
-      query = query.ilike('city', `%${filters.city}%`);
+      query = query.ilike("city", `%${filters.city}%`);
     }
     if (filters?.bloodType) {
-      query = query.contains('blood_types_needed', [filters.bloodType]);
+      query = query.contains("blood_types_needed", [filters.bloodType]);
     }
     if (filters?.date) {
-      query = query.gte('start_date', filters.date);
+      query = query.gte("start_date", filters.date);
     }
 
     const { data, error } = await query;
     return { data, error };
   },
 
-  createDrive: async (drive: Omit<Drive, 'id' | 'created_at' | 'updated_at'>) => {
+  createDrive: async (
+    drive: Omit<Drive, "id" | "created_at" | "updated_at">,
+  ) => {
     const { data, error } = await supabase
-      .from('drives')
+      .from("drives")
       .insert([drive])
       .select()
       .single();
@@ -286,9 +303,11 @@ export const db = {
   },
 
   // Appointments operations
-  createAppointment: async (appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'>) => {
+  createAppointment: async (
+    appointment: Omit<Appointment, "id" | "created_at" | "updated_at">,
+  ) => {
     const { data, error } = await supabase
-      .from('appointments')
+      .from("appointments")
       .insert([appointment])
       .select()
       .single();
@@ -297,33 +316,37 @@ export const db = {
 
   getUserAppointments: async (userId: string) => {
     const { data, error } = await supabase
-      .from('appointments')
-      .select(`
+      .from("appointments")
+      .select(
+        `
         *,
         drives(name, location, city, start_date, start_time)
-      `)
-      .eq('donor_id', userId)
-      .order('appointment_date', { ascending: true });
+      `,
+      )
+      .eq("donor_id", userId)
+      .order("appointment_date", { ascending: true });
     return { data, error };
   },
 
   // Donations operations
   getUserDonations: async (userId: string) => {
     const { data, error } = await supabase
-      .from('donations')
-      .select(`
+      .from("donations")
+      .select(
+        `
         *,
         drives(name, location),
         hospitals(name, city)
-      `)
-      .eq('donor_id', userId)
-      .order('donation_date', { ascending: false });
+      `,
+      )
+      .eq("donor_id", userId)
+      .order("donation_date", { ascending: false });
     return { data, error };
   },
 
-  createDonation: async (donation: Omit<Donation, 'id' | 'created_at'>) => {
+  createDonation: async (donation: Omit<Donation, "id" | "created_at">) => {
     const { data, error } = await supabase
-      .from('donations')
+      .from("donations")
       .insert([donation])
       .select()
       .single();
@@ -333,34 +356,36 @@ export const db = {
   // Rewards operations
   getUserRewards: async (userId: string) => {
     const { data, error } = await supabase
-      .from('rewards')
-      .select('*')
-      .eq('donor_id', userId)
-      .order('earned_at', { ascending: false });
+      .from("rewards")
+      .select("*")
+      .eq("donor_id", userId)
+      .order("earned_at", { ascending: false });
     return { data, error };
   },
 
   // Notifications operations
   getUserNotifications: async (userId: string) => {
     const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
     return { data, error };
   },
 
   markNotificationAsRead: async (notificationId: string) => {
     const { data, error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true })
-      .eq('id', notificationId);
+      .eq("id", notificationId);
     return { data, error };
   },
 
-  createNotification: async (notification: Omit<Notification, 'id' | 'created_at'>) => {
+  createNotification: async (
+    notification: Omit<Notification, "id" | "created_at">,
+  ) => {
     const { data, error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .insert([notification])
       .select()
       .single();
@@ -370,18 +395,25 @@ export const db = {
   // Community operations
   getCommunityPosts: async () => {
     const { data, error } = await supabase
-      .from('community_posts')
-      .select(`
+      .from("community_posts")
+      .select(
+        `
         *,
         profiles!community_posts_author_id_fkey(name, profile_pic_url)
-      `)
-      .order('created_at', { ascending: false });
+      `,
+      )
+      .order("created_at", { ascending: false });
     return { data, error };
   },
 
-  createCommunityPost: async (post: Omit<CommunityPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'comments_count'>) => {
+  createCommunityPost: async (
+    post: Omit<
+      CommunityPost,
+      "id" | "created_at" | "updated_at" | "likes_count" | "comments_count"
+    >,
+  ) => {
     const { data, error } = await supabase
-      .from('community_posts')
+      .from("community_posts")
       .insert([post])
       .select()
       .single();
@@ -391,34 +423,38 @@ export const db = {
   // Blood inventory operations (for hospitals)
   getBloodInventory: async (hospitalId: string) => {
     const { data, error } = await supabase
-      .from('blood_inventory')
-      .select('*')
-      .eq('hospital_id', hospitalId)
-      .order('expiry_date', { ascending: true });
+      .from("blood_inventory")
+      .select("*")
+      .eq("hospital_id", hospitalId)
+      .order("expiry_date", { ascending: true });
     return { data, error };
   },
 
   // Blood requests operations
   getBloodRequests: async (hospitalId?: string) => {
     let query = supabase
-      .from('blood_requests')
-      .select(`
+      .from("blood_requests")
+      .select(
+        `
         *,
         hospitals(name, city, state)
-      `)
-      .order('created_at', { ascending: false });
+      `,
+      )
+      .order("created_at", { ascending: false });
 
     if (hospitalId) {
-      query = query.eq('hospital_id', hospitalId);
+      query = query.eq("hospital_id", hospitalId);
     }
 
     const { data, error } = await query;
     return { data, error };
   },
 
-  createBloodRequest: async (request: Omit<BloodRequest, 'id' | 'created_at' | 'updated_at'>) => {
+  createBloodRequest: async (
+    request: Omit<BloodRequest, "id" | "created_at" | "updated_at">,
+  ) => {
     const { data, error } = await supabase
-      .from('blood_requests')
+      .from("blood_requests")
       .insert([request])
       .select()
       .single();
@@ -431,19 +467,22 @@ export const db = {
       { count: totalDonors },
       { count: totalDonations },
       { count: totalDrives },
-      { count: totalHospitals }
+      { count: totalHospitals },
     ] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'donor'),
-      supabase.from('donations').select('*', { count: 'exact', head: true }),
-      supabase.from('drives').select('*', { count: 'exact', head: true }),
-      supabase.from('hospitals').select('*', { count: 'exact', head: true })
+      supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "donor"),
+      supabase.from("donations").select("*", { count: "exact", head: true }),
+      supabase.from("drives").select("*", { count: "exact", head: true }),
+      supabase.from("hospitals").select("*", { count: "exact", head: true }),
     ]);
 
     return {
       totalDonors,
       totalDonations,
       totalDrives,
-      totalHospitals
+      totalHospitals,
     };
-  }
+  },
 };

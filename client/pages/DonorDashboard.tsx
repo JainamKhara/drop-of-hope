@@ -38,7 +38,9 @@ interface DashboardData {
 export default function DonorDashboard() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
   const [loadingData, setLoadingData] = useState(true);
 
   // Redirect to login if not authenticated
@@ -60,17 +62,13 @@ export default function DonorDashboard() {
 
     setLoadingData(true);
     try {
-      const [
-        appointmentsResult,
-        donationsResult,
-        rewardsResult,
-        drivesResult
-      ] = await Promise.all([
-        db.getUserAppointments(user.id),
-        db.getUserDonations(user.id),
-        db.getUserRewards(user.id),
-        db.getDrives({ city: profile?.city })
-      ]);
+      const [appointmentsResult, donationsResult, rewardsResult, drivesResult] =
+        await Promise.all([
+          db.getUserAppointments(user.id),
+          db.getUserDonations(user.id),
+          db.getUserRewards(user.id),
+          db.getDrives({ city: profile?.city }),
+        ]);
 
       const appointments = appointmentsResult.data || [];
       const donations = donationsResult.data || [];
@@ -78,9 +76,18 @@ export default function DonorDashboard() {
       const upcomingDrives = (drivesResult.data || []).slice(0, 3);
 
       // Calculate days until next donation (typically 56 days between whole blood donations)
-      const lastDonationDate = profile?.last_donation_date ? new Date(profile.last_donation_date) : null;
-      const daysUntilNextDonation = lastDonationDate 
-        ? Math.max(0, 56 - Math.floor((Date.now() - lastDonationDate.getTime()) / (1000 * 60 * 60 * 24)))
+      const lastDonationDate = profile?.last_donation_date
+        ? new Date(profile.last_donation_date)
+        : null;
+      const daysUntilNextDonation = lastDonationDate
+        ? Math.max(
+            0,
+            56 -
+              Math.floor(
+                (Date.now() - lastDonationDate.getTime()) /
+                  (1000 * 60 * 60 * 24),
+              ),
+          )
         : 0;
 
       setDashboardData({
@@ -92,11 +99,11 @@ export default function DonorDashboard() {
           totalDonations: donations.length,
           totalPoints: profile?.points || 0,
           level: profile?.level || 1,
-          daysUntilNextDonation
-        }
+          daysUntilNextDonation,
+        },
       });
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      console.error("Error loading dashboard data:", error);
     } finally {
       setLoadingData(false);
     }
@@ -119,13 +126,19 @@ export default function DonorDashboard() {
     return null;
   }
 
-  const { stats, appointments, donations, rewards, upcomingDrives } = dashboardData || {
-    stats: { totalDonations: 0, totalPoints: 0, level: 1, daysUntilNextDonation: 0 },
-    appointments: [],
-    donations: [],
-    rewards: [],
-    upcomingDrives: []
-  };
+  const { stats, appointments, donations, rewards, upcomingDrives } =
+    dashboardData || {
+      stats: {
+        totalDonations: 0,
+        totalPoints: 0,
+        level: 1,
+        daysUntilNextDonation: 0,
+      },
+      appointments: [],
+      donations: [],
+      rewards: [],
+      upcomingDrives: [],
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
@@ -164,7 +177,8 @@ export default function DonorDashboard() {
             Welcome back, {profile.name}!
           </h1>
           <p className="text-muted-foreground">
-            Thank you for being a life-saving hero. Here's your impact dashboard.
+            Thank you for being a life-saving hero. Here's your impact
+            dashboard.
           </p>
         </div>
 
@@ -172,11 +186,15 @@ export default function DonorDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-0 shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Donations
+              </CardTitle>
               <Droplets className="h-4 w-4 text-hope-red" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-hope-red">{stats.totalDonations}</div>
+              <div className="text-2xl font-bold text-hope-red">
+                {stats.totalDonations}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Lives potentially saved: {stats.totalDonations * 3}
               </p>
@@ -185,11 +203,15 @@ export default function DonorDashboard() {
 
           <Card className="border-0 shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Points Earned</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Points Earned
+              </CardTitle>
               <Award className="h-4 w-4 text-hope-red" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-hope-red">{stats.totalPoints}</div>
+              <div className="text-2xl font-bold text-hope-red">
+                {stats.totalPoints}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Level {stats.level} donor
               </p>
@@ -198,15 +220,21 @@ export default function DonorDashboard() {
 
           <Card className="border-0 shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Next Donation</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Next Donation
+              </CardTitle>
               <CalendarIcon className="h-4 w-4 text-hope-red" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-hope-red">
-                {stats.daysUntilNextDonation === 0 ? "Ready!" : `${stats.daysUntilNextDonation} days`}
+                {stats.daysUntilNextDonation === 0
+                  ? "Ready!"
+                  : `${stats.daysUntilNextDonation} days`}
               </div>
               <p className="text-xs text-muted-foreground">
-                {stats.daysUntilNextDonation === 0 ? "You can donate now" : "Until you can donate again"}
+                {stats.daysUntilNextDonation === 0
+                  ? "You can donate now"
+                  : "Until you can donate again"}
               </p>
             </CardContent>
           </Card>
@@ -221,7 +249,9 @@ export default function DonorDashboard() {
                 {profile.blood_type || "Not Set"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {profile.blood_type ? "Universal compatibility" : "Please update your profile"}
+                {profile.blood_type
+                  ? "Universal compatibility"
+                  : "Please update your profile"}
               </p>
             </CardContent>
           </Card>
@@ -280,16 +310,23 @@ export default function DonorDashboard() {
                       className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
                     >
                       <div>
-                        <p className="font-medium">{appointment.drives?.name}</p>
+                        <p className="font-medium">
+                          {appointment.drives?.name}
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(appointment.appointment_date).toLocaleDateString()} at{" "}
-                          {appointment.appointment_time}
+                          {new Date(
+                            appointment.appointment_date,
+                          ).toLocaleDateString()}{" "}
+                          at {appointment.appointment_time}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {appointment.drives?.location}
                         </p>
                       </div>
-                      <Badge variant="secondary" className="bg-hope-red/10 text-hope-red">
+                      <Badge
+                        variant="secondary"
+                        className="bg-hope-red/10 text-hope-red"
+                      >
                         {appointment.status}
                       </Badge>
                     </div>
@@ -330,17 +367,24 @@ export default function DonorDashboard() {
                     >
                       <div>
                         <p className="font-medium">
-                          {donation.drives?.name || donation.hospitals?.name || "Direct Donation"}
+                          {donation.drives?.name ||
+                            donation.hospitals?.name ||
+                            "Direct Donation"}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(donation.donation_date).toLocaleDateString()}
+                          {new Date(
+                            donation.donation_date,
+                          ).toLocaleDateString()}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {donation.quantity_ml}ml • {donation.blood_type}
                         </p>
                       </div>
                       <div className="text-right">
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-800"
+                        >
                           +{donation.points_earned} points
                         </Badge>
                       </div>
@@ -353,9 +397,7 @@ export default function DonorDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <Droplets className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    No donations yet
-                  </p>
+                  <p className="text-muted-foreground mb-4">No donations yet</p>
                   <Button asChild>
                     <Link to="/drives">Find Your First Drive</Link>
                   </Button>
@@ -381,7 +423,9 @@ export default function DonorDashboard() {
                       className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="text-2xl">{reward.badge_icon || "🏆"}</div>
+                        <div className="text-2xl">
+                          {reward.badge_icon || "🏆"}
+                        </div>
                         <div>
                           <p className="font-medium">{reward.badge_name}</p>
                           <p className="text-sm text-muted-foreground">
@@ -389,7 +433,10 @@ export default function DonorDashboard() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="bg-hope-red/10 text-hope-red">
+                      <Badge
+                        variant="secondary"
+                        className="bg-hope-red/10 text-hope-red"
+                      >
                         {reward.points_threshold} pts
                       </Badge>
                     </div>
@@ -486,12 +533,10 @@ export default function DonorDashboard() {
                   <span>Current Points: {stats.totalPoints}</span>
                   <span>Target: {(stats.level + 1) * 100} points</span>
                 </div>
-                <Progress
-                  value={(stats.totalPoints % 100)}
-                  className="w-full"
-                />
+                <Progress value={stats.totalPoints % 100} className="w-full" />
                 <p className="text-sm text-muted-foreground">
-                  {((stats.level + 1) * 100) - stats.totalPoints} more points to level up!
+                  {(stats.level + 1) * 100 - stats.totalPoints} more points to
+                  level up!
                 </p>
               </div>
             </CardContent>

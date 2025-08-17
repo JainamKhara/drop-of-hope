@@ -1,17 +1,17 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: ('donor' | 'admin' | 'hospital')[];
+  allowedRoles: ("donor" | "admin" | "hospital")[];
   redirectTo?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedRoles, 
-  redirectTo 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
+  redirectTo,
 }) => {
   const { user, profile, loading } = useAuth();
 
@@ -37,10 +37,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Check if user role is allowed
   if (!allowedRoles.includes(profile.role)) {
     // Redirect to appropriate dashboard based on user's actual role
-    const userDashboard = profile.role === 'admin' ? '/admin' 
-                        : profile.role === 'hospital' ? '/hospital-portal'
-                        : '/dashboard';
-    
+    const userDashboard =
+      profile.role === "admin"
+        ? "/admin"
+        : profile.role === "hospital"
+          ? "/hospital-portal"
+          : "/dashboard";
+
     return <Navigate to={redirectTo || userDashboard} replace />;
   }
 
@@ -49,20 +52,22 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 };
 
 // Specific role-based route components for easier use
-export const AdminOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ProtectedRoute allowedRoles={['admin']}>{children}</ProtectedRoute>
-);
+export const AdminOnlyRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <ProtectedRoute allowedRoles={["admin"]}>{children}</ProtectedRoute>;
 
-export const HospitalOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ProtectedRoute allowedRoles={['hospital']}>{children}</ProtectedRoute>
-);
+export const HospitalOnlyRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <ProtectedRoute allowedRoles={["hospital"]}>{children}</ProtectedRoute>;
 
-export const DonorOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ProtectedRoute allowedRoles={['donor']}>{children}</ProtectedRoute>
-);
+export const DonorOnlyRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <ProtectedRoute allowedRoles={["donor"]}>{children}</ProtectedRoute>;
 
 // Component for any authenticated user (but will redirect to their correct dashboard)
-export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { user, profile, loading } = useAuth();
 
   if (loading) {

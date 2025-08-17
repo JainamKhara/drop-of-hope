@@ -22,7 +22,12 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
-import { AdminOnlyRoute, HospitalOnlyRoute, DonorOnlyRoute, AuthenticatedRoute } from "./components/ProtectedRoute";
+import {
+  AdminOnlyRoute,
+  HospitalOnlyRoute,
+  DonorOnlyRoute,
+  AuthenticatedRoute,
+} from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -36,20 +41,90 @@ const AppContent = () => (
           <Route path="/" element={<Index />} />
 
           {/* Donor-only routes */}
-          <Route path="/dashboard" element={<DonorOnlyRoute><DonorDashboard /></DonorOnlyRoute>} />
-          <Route path="/drives" element={<DonorOnlyRoute><BloodDrives /></DonorOnlyRoute>} />
-          <Route path="/find-drives" element={<DonorOnlyRoute><BloodDrives /></DonorOnlyRoute>} />
-          <Route path="/book-appointment/:driveId" element={<DonorOnlyRoute><BookAppointment /></DonorOnlyRoute>} />
-          <Route path="/appointments" element={<DonorOnlyRoute><MyAppointments /></DonorOnlyRoute>} />
-          <Route path="/profile" element={<DonorOnlyRoute><Profile /></DonorOnlyRoute>} />
-          <Route path="/rewards" element={<DonorOnlyRoute><Rewards /></DonorOnlyRoute>} />
-          <Route path="/community" element={<DonorOnlyRoute><Community /></DonorOnlyRoute>} />
+          <Route
+            path="/dashboard"
+            element={
+              <DonorOnlyRoute>
+                <DonorDashboard />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/drives"
+            element={
+              <DonorOnlyRoute>
+                <BloodDrives />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/find-drives"
+            element={
+              <DonorOnlyRoute>
+                <BloodDrives />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/book-appointment/:driveId"
+            element={
+              <DonorOnlyRoute>
+                <BookAppointment />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              <DonorOnlyRoute>
+                <MyAppointments />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <DonorOnlyRoute>
+                <Profile />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/rewards"
+            element={
+              <DonorOnlyRoute>
+                <Rewards />
+              </DonorOnlyRoute>
+            }
+          />
+          <Route
+            path="/community"
+            element={
+              <DonorOnlyRoute>
+                <Community />
+              </DonorOnlyRoute>
+            }
+          />
 
           {/* Admin-only routes */}
-          <Route path="/admin" element={<AdminOnlyRoute><AdminDashboard /></AdminOnlyRoute>} />
+          <Route
+            path="/admin"
+            element={
+              <AdminOnlyRoute>
+                <AdminDashboard />
+              </AdminOnlyRoute>
+            }
+          />
 
           {/* Hospital-only routes */}
-          <Route path="/hospital-portal" element={<HospitalOnlyRoute><HospitalPortal /></HospitalOnlyRoute>} />
+          <Route
+            path="/hospital-portal"
+            element={
+              <HospitalOnlyRoute>
+                <HospitalPortal />
+              </HospitalOnlyRoute>
+            }
+          />
 
           {/* Public routes */}
           <Route path="/register" element={<Register />} />

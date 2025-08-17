@@ -6,7 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft, Building2, Package, FileText, Calendar, Users } from "lucide-react";
+import {
+  Heart,
+  ArrowLeft,
+  Building2,
+  Package,
+  FileText,
+  Calendar,
+  Users,
+} from "lucide-react";
 
 export default function HospitalLogin() {
   const { user, profile, loading, signIn, getRoleDashboard } = useAuth();
@@ -136,7 +144,10 @@ export default function HospitalLogin() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Hospital Email
                   </Label>
                   <Input
@@ -150,7 +161,10 @@ export default function HospitalLogin() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </Label>
                   <Input
@@ -162,7 +176,7 @@ export default function HospitalLogin() {
                     required
                   />
                 </div>
-                
+
                 {error && (
                   <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
@@ -174,7 +188,7 @@ export default function HospitalLogin() {
                   disabled={isLoading}
                   className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
                 >
-                  {isLoading ? 'Signing In...' : 'Access Hospital Portal'}
+                  {isLoading ? "Signing In..." : "Access Hospital Portal"}
                 </button>
               </form>
             </CardContent>
@@ -202,8 +216,9 @@ export default function HospitalLogin() {
             <Alert className="border-green-200 bg-green-50 dark:bg-green-950 mb-4">
               <Building2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800 dark:text-green-200">
-                <strong>Hospital Staff Only:</strong> This portal is for verified hospital personnel. 
-                Access requires proper credentials and authorization from your hospital administrator.
+                <strong>Hospital Staff Only:</strong> This portal is for
+                verified hospital personnel. Access requires proper credentials
+                and authorization from your hospital administrator.
               </AlertDescription>
             </Alert>
 
@@ -214,7 +229,8 @@ export default function HospitalLogin() {
                   New Hospital Registration
                 </h3>
                 <p className="text-sm text-green-700 dark:text-green-300 mb-3">
-                  If your hospital isn't registered with Drop of Hope, please contact our team to get started.
+                  If your hospital isn't registered with Drop of Hope, please
+                  contact our team to get started.
                 </p>
                 <div className="space-y-1 text-sm text-green-600">
                   <p>📧 hospitals@dropofhope.com</p>
