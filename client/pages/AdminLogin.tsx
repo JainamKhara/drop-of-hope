@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Heart, ArrowLeft, Shield, Users, BarChart3, Settings } from "lucide-react";
 
 export default function AdminLogin() {
-  const { user, loading, signIn } = useAuth();
+  const { user, profile, loading, signIn, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
