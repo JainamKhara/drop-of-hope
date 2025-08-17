@@ -36,6 +36,8 @@ const AppContent = () => (
           <Route path="/dashboard" element={<DonorDashboard />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/hospital/login" element={<HospitalLogin />} />
           <Route path="/drives" element={<BloodDrives />} />
           <Route path="/find-drives" element={<BloodDrives />} />
           <Route
