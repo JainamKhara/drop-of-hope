@@ -11,6 +11,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<{ error: any }>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any }>;
+  getRoleDashboard: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
