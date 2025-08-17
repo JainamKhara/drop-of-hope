@@ -72,7 +72,7 @@ export default function Login() {
               <CardTitle className="text-2xl text-hope-red">Sign In</CardTitle>
             </CardHeader>
             <CardContent>
-              <SignInForm onSuccess={() => navigate("/dashboard")} />
+              <SignInForm onSuccess={() => navigate(getRoleDashboard())} />
             </CardContent>
           </Card>
 
