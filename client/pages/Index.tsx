@@ -316,51 +316,14 @@ export default function Index() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">For Hospitals</h3>
+              <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
                 <li>
                   <Link
-                    to="/hospital/login"
+                    to="/about"
                     className="hover:text-white transition-colors"
                   >
-                    Hospital Login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/hospital-portal"
-                    className="hover:text-white transition-colors"
-                  >
-                    Hospital Portal
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/request"
-                    className="hover:text-white transition-colors"
-                  >
-                    Request Blood
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Administration</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link
-                    to="/admin/login"
-                    className="hover:text-white transition-colors"
-                  >
-                    Admin Login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/admin"
-                    className="hover:text-white transition-colors"
-                  >
-                    Admin Dashboard
+                    About Us
                   </Link>
                 </li>
                 <li>
@@ -368,7 +331,15 @@ export default function Index() {
                     to="/contact"
                     className="hover:text-white transition-colors"
                   >
-                    Support
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/terms"
+                    className="hover:text-white transition-colors"
+                  >
+                    Terms of Service
                   </Link>
                 </li>
               </ul>
