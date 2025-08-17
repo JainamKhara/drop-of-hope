@@ -33,8 +33,7 @@ export default function HospitalLogin() {
     if (error) {
       setError(error.message);
     } else {
-      // After successful login, navigate to hospital portal
-      navigate("/hospital-portal");
+      // Navigation will be handled by useEffect after profile loads
     }
     setIsLoading(false);
   };
