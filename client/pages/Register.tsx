@@ -1,37 +1,33 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { SignUp, useAuth } from "@clerk/clerk-react";
-import { useMockAuth, MockSignUp } from "@/contexts/MockAuthContext";
+import { useAuth, SignUpForm } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft } from "lucide-react";
 
-const hasValidClerkKey =
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY &&
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== "__CLERK_PUBLISHABLE_KEY__";
-
 export default function Register() {
-  // Use Clerk auth if available, otherwise use mock auth
-  let isSignedIn, isLoaded;
-
-  if (hasValidClerkKey) {
-    const clerkAuth = useAuth();
-    isSignedIn = clerkAuth.isSignedIn;
-    isLoaded = clerkAuth.isLoaded;
-  } else {
-    const mockAuth = useMockAuth();
-    isSignedIn = mockAuth.isSignedIn;
-    isLoaded = mockAuth.isLoaded;
-  }
-
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   // Redirect to dashboard if already signed in
   React.useEffect(() => {
-    if (isSignedIn) {
+    if (user && !loading) {
       navigate("/dashboard");
     }
-  }, [isSignedIn, navigate]);
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-5 h-5 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
@@ -70,63 +66,15 @@ export default function Register() {
             </p>
           </div>
 
-          {/* Clerk Sign Up Component */}
+          {/* Sign Up Form */}
           <Card className="border-0 shadow-xl">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl text-hope-red">
                 Create Account
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="flex justify-center">
-                {hasValidClerkKey ? (
-                  <SignUp
-                    routing="path"
-                    path="/register"
-                    redirectUrl="/dashboard"
-                    signInUrl="/login"
-                    appearance={{
-                      elements: {
-                        formButtonPrimary: {
-                          backgroundColor: "hsl(var(--hope-red))",
-                          "&:hover": {
-                            backgroundColor: "hsl(var(--hope-red) / 0.9)",
-                          },
-                        },
-                        socialButtonsBlockButton: {
-                          border: "1px solid hsl(var(--border))",
-                          "&:hover": {
-                            backgroundColor: "hsl(var(--hope-red))",
-                            color: "white",
-                          },
-                        },
-                        dividerLine: {
-                          backgroundColor: "hsl(var(--border))",
-                        },
-                        formFieldInput: {
-                          borderColor: "hsl(var(--border))",
-                          "&:focus": {
-                            borderColor: "hsl(var(--hope-red))",
-                            boxShadow: "0 0 0 2px hsl(var(--hope-red) / 0.2)",
-                          },
-                        },
-                        footerActionLink: {
-                          color: "hsl(var(--hope-red))",
-                          "&:hover": {
-                            color: "hsl(var(--hope-red) / 0.8)",
-                          },
-                        },
-                      },
-                      layout: {
-                        socialButtonsPlacement: "top",
-                        socialButtonsVariant: "blockButton",
-                      },
-                    }}
-                  />
-                ) : (
-                  <MockSignUp />
-                )}
-              </div>
+            <CardContent>
+              <SignUpForm onSuccess={() => navigate("/dashboard")} />
             </CardContent>
           </Card>
 
