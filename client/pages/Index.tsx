@@ -97,8 +97,20 @@ export default function Index() {
                 </>
               ) : (
                 <>
+                  <div className="hidden md:flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/admin/login" className="text-blue-600 hover:text-blue-700">
+                        Admin
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/hospital/login" className="text-green-600 hover:text-green-700">
+                        Hospital
+                      </Link>
+                    </Button>
+                  </div>
                   <Button variant="outline" asChild>
-                    <Link to="/login">Sign In</Link>
+                    <Link to="/login">Donor Sign In</Link>
                   </Button>
                   <Button className="bg-hope-red hover:bg-hope-red/90" asChild>
                     <Link to="/register">Donate Now</Link>
