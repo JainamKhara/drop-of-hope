@@ -24,6 +24,25 @@ export default function Login() {
     }
   }, [user, loading, navigate, getRoleDashboard]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Use role-based authentication to ensure only donors can login
+    const { error } = await auth.signInWithRole(email, password, 'donor');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      // Wait a moment for profile to load, then navigate to donor dashboard
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
+    }
+    setIsLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
