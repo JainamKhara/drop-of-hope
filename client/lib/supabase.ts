@@ -224,6 +224,49 @@ export const auth = {
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
     return supabase.auth.onAuthStateChange(callback);
   },
+
+  // Role-based authentication functions
+  signInWithRole: async (email: string, password: string, expectedRole: 'donor' | 'admin' | 'hospital') => {
+    // First, authenticate with Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { data: null, error };
+    }
+
+    if (!data.user) {
+      return { data: null, error: { message: 'Authentication failed' } };
+    }
+
+    // Check user role in profiles table
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profileError) {
+      // Sign out the user since role check failed
+      await supabase.auth.signOut();
+      return { data: null, error: { message: 'Unable to verify user role' } };
+    }
+
+    if (profile.role !== expectedRole) {
+      // Sign out the user since role doesn't match
+      await supabase.auth.signOut();
+      return {
+        data: null,
+        error: {
+          message: `Access denied. This login is for ${expectedRole} users only.`
+        }
+      };
+    }
+
+    return { data, error: null };
+  },
 };
 
 // Helper functions for database operations
