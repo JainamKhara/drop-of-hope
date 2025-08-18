@@ -226,7 +226,11 @@ export const auth = {
   },
 
   // Role-based authentication functions
-  signInWithRole: async (email: string, password: string, expectedRole: 'donor' | 'admin' | 'hospital') => {
+  signInWithRole: async (
+    email: string,
+    password: string,
+    expectedRole: "donor" | "admin" | "hospital",
+  ) => {
     // First, authenticate with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -238,20 +242,20 @@ export const auth = {
     }
 
     if (!data.user) {
-      return { data: null, error: { message: 'Authentication failed' } };
+      return { data: null, error: { message: "Authentication failed" } };
     }
 
     // Check user role in profiles table
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
       .single();
 
     if (profileError) {
       // Sign out the user since role check failed
       await supabase.auth.signOut();
-      return { data: null, error: { message: 'Unable to verify user role' } };
+      return { data: null, error: { message: "Unable to verify user role" } };
     }
 
     if (profile.role !== expectedRole) {
@@ -260,8 +264,8 @@ export const auth = {
       return {
         data: null,
         error: {
-          message: `Access denied. This login is for ${expectedRole} users only.`
-        }
+          message: `Access denied. This login is for ${expectedRole} users only.`,
+        },
       };
     }
 
@@ -550,7 +554,7 @@ export const db = {
     return { data, error };
   },
 
-  getUsersByRole: async (role: 'donor' | 'admin' | 'hospital') => {
+  getUsersByRole: async (role: "donor" | "admin" | "hospital") => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")

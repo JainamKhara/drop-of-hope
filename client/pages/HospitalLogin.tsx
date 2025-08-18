@@ -38,14 +38,14 @@ export default function HospitalLogin() {
     setError("");
 
     // Use role-based authentication to ensure only hospital staff can login
-    const { error } = await auth.signInWithRole(email, password, 'hospital');
+    const { error } = await auth.signInWithRole(email, password, "hospital");
 
     if (error) {
       setError(error.message);
     } else {
       // Wait a moment for profile to load, then navigate to hospital portal
       setTimeout(() => {
-        navigate('/hospital-portal');
+        navigate("/hospital-portal");
       }, 100);
     }
     setIsLoading(false);

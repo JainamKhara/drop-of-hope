@@ -30,14 +30,14 @@ export default function Login() {
     setError("");
 
     // Use role-based authentication to ensure only donors can login
-    const { error } = await auth.signInWithRole(email, password, 'donor');
+    const { error } = await auth.signInWithRole(email, password, "donor");
 
     if (error) {
       setError(error.message);
     } else {
       // Wait a moment for profile to load, then navigate to donor dashboard
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }, 100);
     }
     setIsLoading(false);
@@ -101,7 +101,10 @@ export default function Login() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email
                   </Label>
                   <Input
@@ -114,7 +117,10 @@ export default function Login() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </Label>
                   <Input
@@ -138,7 +144,7 @@ export default function Login() {
                   disabled={isLoading}
                   className="w-full bg-hope-red-600 text-white py-2 px-4 rounded-md hover:bg-hope-red-700 disabled:opacity-50 transition-colors"
                 >
-                  {isLoading ? 'Signing In...' : 'Sign In as Donor'}
+                  {isLoading ? "Signing In..." : "Sign In as Donor"}
                 </button>
               </form>
             </CardContent>

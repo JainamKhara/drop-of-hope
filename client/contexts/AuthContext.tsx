@@ -123,7 +123,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(true);
     try {
       // Always set role to 'donor' for regular signups
-      const result = await auth.signUp(email, password, { ...userData, role: 'donor' });
+      const result = await auth.signUp(email, password, {
+        ...userData,
+        role: "donor",
+      });
       return result;
     } finally {
       setLoading(false);

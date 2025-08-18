@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Heart, ArrowLeft } from 'lucide-react';
-import AdminSetup from '@/components/AdminSetup';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Heart, ArrowLeft } from "lucide-react";
+import AdminSetup from "@/components/AdminSetup";
 
 export default function Setup() {
   return (
