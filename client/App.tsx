@@ -20,6 +20,7 @@ import HospitalPortal from "./pages/HospitalPortal";
 import Community from "./pages/Community";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Setup from "./pages/Setup";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 import {
