@@ -12,6 +12,10 @@ import { Heart, ArrowLeft } from "lucide-react";
 export default function Login() {
   const { user, loading, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
