@@ -275,7 +275,6 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("donor");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { signUp } = useAuth();
@@ -285,7 +284,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     setLoading(true);
     setError("");
 
-    const { error } = await signUp(email, password, { name, role });
+    const { error } = await signUp(email, password, { name });
 
     if (error) {
       setError(error.message);
