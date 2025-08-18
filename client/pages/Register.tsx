@@ -6,15 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, ArrowLeft } from "lucide-react";
 
 export default function Register() {
-  const { user, loading } = useAuth();
+  const { user, loading, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to dashboard if already signed in
+  // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
     if (user && !loading) {
-      navigate("/dashboard");
+      navigate(getRoleDashboard());
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, getRoleDashboard]);
 
   if (loading) {
     return (
