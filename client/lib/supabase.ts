@@ -508,6 +508,8 @@ export const db = {
   getAnalytics: async () => {
     const [
       { count: totalDonors },
+      { count: totalAdmins },
+      { count: totalHospitalStaff },
       { count: totalDonations },
       { count: totalDrives },
       { count: totalHospitals },
@@ -516,6 +518,14 @@ export const db = {
         .from("profiles")
         .select("*", { count: "exact", head: true })
         .eq("role", "donor"),
+      supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "admin"),
+      supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "hospital"),
       supabase.from("donations").select("*", { count: "exact", head: true }),
       supabase.from("drives").select("*", { count: "exact", head: true }),
       supabase.from("hospitals").select("*", { count: "exact", head: true }),
@@ -523,9 +533,29 @@ export const db = {
 
     return {
       totalDonors,
+      totalAdmins,
+      totalHospitalStaff,
       totalDonations,
       totalDrives,
       totalHospitals,
     };
+  },
+
+  // User management operations for admin
+  getAllUsers: async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+    return { data, error };
+  },
+
+  getUsersByRole: async (role: 'donor' | 'admin' | 'hospital') => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("role", role)
+      .order("created_at", { ascending: false });
+    return { data, error };
   },
 };
