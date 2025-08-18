@@ -345,24 +345,6 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             required
           />
         </div>
-        <div>
-          <label
-            htmlFor="role"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Role
-          </label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-hope-red-500"
-          >
-            <option value="donor">Donor</option>
-            <option value="hospital">Hospital Staff</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
         {error && <div className="text-red-600 text-sm">{error}</div>}
         <button
           type="submit"
