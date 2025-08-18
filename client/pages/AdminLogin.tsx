@@ -36,14 +36,15 @@ export default function AdminLogin() {
     setIsLoading(true);
     setError("");
 
-    const { error } = await signIn(email, password);
+    // Use role-based authentication to ensure only admins can login
+    const { error } = await auth.signInWithRole(email, password, 'admin');
 
     if (error) {
       setError(error.message);
     } else {
-      // Wait a moment for profile to load, then navigate
+      // Wait a moment for profile to load, then navigate to admin dashboard
       setTimeout(() => {
-        navigate(getRoleDashboard());
+        navigate('/admin');
       }, 100);
     }
     setIsLoading(false);
