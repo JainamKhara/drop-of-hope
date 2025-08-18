@@ -16,7 +16,7 @@ interface AuthContextType {
   signUp: (
     email: string,
     password: string,
-    userData: { name: string; role?: string },
+    userData: { name: string },
   ) => Promise<{ data: any; error: any }>;
   signIn: (
     email: string,
