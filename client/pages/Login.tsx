@@ -99,7 +99,48 @@ export default function Login() {
               <CardTitle className="text-2xl text-hope-red">Sign In</CardTitle>
             </CardHeader>
             <CardContent>
-              <SignInForm onSuccess={() => navigate(getRoleDashboard())} />
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-hope-red-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-hope-red-500"
+                    required
+                  />
+                </div>
+
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-hope-red-600 text-white py-2 px-4 rounded-md hover:bg-hope-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {isLoading ? 'Signing In...' : 'Sign In as Donor'}
+                </button>
+              </form>
             </CardContent>
           </Card>
 
