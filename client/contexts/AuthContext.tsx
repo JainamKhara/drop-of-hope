@@ -118,11 +118,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signUp = async (
     email: string,
     password: string,
-    userData: { name: string; role?: string },
+    userData: { name: string },
   ) => {
     setLoading(true);
     try {
-      const result = await auth.signUp(email, password, userData);
+      // Always set role to 'donor' for regular signups
+      const result = await auth.signUp(email, password, { ...userData, role: 'donor' });
       return result;
     } finally {
       setLoading(false);
