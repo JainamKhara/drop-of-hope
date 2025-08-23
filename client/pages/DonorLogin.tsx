@@ -78,15 +78,22 @@ function ClerkUnavailableMessage() {
 
         <div className="flex flex-col space-y-2">
           <Button asChild variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
-            <a 
-              href="https://dashboard.clerk.com/last-active?path=api-keys" 
-              target="_blank" 
+            <a
+              href="https://dashboard.clerk.com/last-active?path=api-keys"
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Open Clerk Dashboard
             </a>
+          </Button>
+
+          <Button asChild variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+            <Link to="/clerk-setup" className="flex items-center">
+              <Settings className="w-4 h-4 mr-2" />
+              Setup Instructions
+            </Link>
           </Button>
           
           <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
