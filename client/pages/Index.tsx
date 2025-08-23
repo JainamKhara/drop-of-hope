@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,9 @@ import {
 } from "lucide-react";
 
 export default function Index() {
-  const { user, profile } = useAuth();
+  const { isSignedIn, donorProfile, adminProfile, hospitalStaffProfile } = useHybridAuth();
+  const user = isSignedIn;
+  const profile = donorProfile || adminProfile || hospitalStaffProfile;
 
   const stats = [
     { label: "Lives Saved", value: "10,000+", icon: Heart },
