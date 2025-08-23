@@ -141,6 +141,7 @@ export default function DonorLogin() {
   } catch (error) {
     clerkError = error;
     isClerkAvailable = false;
+    console.warn("Clerk login unavailable:", error);
   }
 
   // Redirect if already authenticated as a donor
