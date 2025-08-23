@@ -85,26 +85,26 @@ export default function BookAppointment() {
   }, [driveId, isSignedIn]);
 
   useEffect(() => {
-    if (donorProfile) {
+    if (userProfile && userRole === "donor") {
       setDonorInfo({
-        name: donorProfile.name || "",
-        email: donorProfile.email || "",
-        phone: donorProfile.phone || "",
-        bloodType: donorProfile.blood_type || "",
-        dateOfBirth: donorProfile.date_of_birth || "",
-        address: donorProfile.address || "",
-        city: donorProfile.city || "",
-        state: donorProfile.state || "",
-        postalCode: donorProfile.postal_code || "",
+        name: userProfile.name || "",
+        email: userProfile.email || "",
+        phone: userProfile.phone || "",
+        bloodType: userProfile.blood_type || "",
+        dateOfBirth: userProfile.date_of_birth || "",
+        address: userProfile.address || "",
+        city: userProfile.city || "",
+        state: userProfile.state || "",
+        postalCode: userProfile.postal_code || "",
       });
-      if (donorProfile.last_donation_date) {
+      if (userProfile.last_donation_date) {
         setMedicalInfo((prev) => ({
           ...prev,
-          lastDonation: donorProfile.last_donation_date || "",
+          lastDonation: userProfile.last_donation_date || "",
         }));
       }
     }
-  }, [donorProfile]);
+  }, [userProfile, userRole]);
 
   const loadDriveDetails = async () => {
     if (!driveId) return;
