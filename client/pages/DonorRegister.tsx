@@ -9,28 +9,33 @@ import { Heart, ArrowLeft, AlertCircle, ExternalLink } from "lucide-react";
 function ClerkSignUpForm() {
   return (
     <div className="flex justify-center">
-      <SignUp 
+      <SignUp
         appearance={{
           elements: {
             rootBox: "mx-auto",
             card: "shadow-xl border-0 bg-white dark:bg-gray-800",
             headerTitle: "text-hope-red font-bold",
             headerSubtitle: "text-muted-foreground",
-            
+
             // OAuth/Social buttons styling
-            socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
-            socialButtonsBlockButtonText: "text-gray-700 dark:text-gray-200 font-medium",
-            
+            socialButtonsBlockButton:
+              "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
+            socialButtonsBlockButtonText:
+              "text-gray-700 dark:text-gray-200 font-medium",
+
             // Primary form button
-            formButtonPrimary: "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
-            
+            formButtonPrimary:
+              "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
+
             // Form styling
-            formFieldInput: "border-gray-300 focus:border-hope-red focus:ring-hope-red",
+            formFieldInput:
+              "border-gray-300 focus:border-hope-red focus:ring-hope-red",
             formFieldLabel: "text-gray-700 dark:text-gray-200",
-            
+
             // Footer links
-            footerActionLink: "text-hope-red hover:text-hope-red/80 font-medium",
-            
+            footerActionLink:
+              "text-hope-red hover:text-hope-red/80 font-medium",
+
             // Divider styling
             dividerLine: "bg-gray-200",
             dividerText: "text-gray-500",
@@ -62,12 +67,15 @@ function ClerkUnavailableMessage() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Clerk authentication is not properly configured. Please set up your Clerk publishable key to enable donor registration.
+            Clerk authentication is not properly configured. Please set up your
+            Clerk publishable key to enable donor registration.
           </AlertDescription>
         </Alert>
-        
+
         <div className="space-y-3 text-sm">
-          <p className="font-medium text-red-800">To enable donor registration:</p>
+          <p className="font-medium text-red-800">
+            To enable donor registration:
+          </p>
           <ol className="list-decimal list-inside space-y-2 text-red-700">
             <li>Go to your Clerk Dashboard</li>
             <li>Navigate to API Keys section</li>
@@ -78,10 +86,14 @@ function ClerkUnavailableMessage() {
         </div>
 
         <div className="flex flex-col space-y-2">
-          <Button asChild variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
-            <a 
-              href="https://dashboard.clerk.com/last-active?path=api-keys" 
-              target="_blank" 
+          <Button
+            asChild
+            variant="outline"
+            className="border-red-300 text-red-700 hover:bg-red-100"
+          >
+            <a
+              href="https://dashboard.clerk.com/last-active?path=api-keys"
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center"
             >
@@ -89,16 +101,18 @@ function ClerkUnavailableMessage() {
               Get Clerk API Key
             </a>
           </Button>
-          
+
           <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
-            <strong>Current Key:</strong> {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
+            <strong>Current Key:</strong>{" "}
+            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
           </div>
         </div>
 
         <div className="bg-blue-50 p-3 rounded text-sm">
           <p className="font-medium text-blue-800 mb-1">Alternative Access:</p>
           <p className="text-blue-700">
-            Admin and Hospital staff can still access their respective login pages which use Supabase authentication.
+            Admin and Hospital staff can still access their respective login
+            pages which use Supabase authentication.
           </p>
         </div>
       </CardContent>
@@ -109,7 +123,7 @@ function ClerkUnavailableMessage() {
 export default function DonorRegister() {
   // Check if we're in a Clerk context
   let isClerkAvailable = false;
-  
+
   try {
     // This will throw if Clerk is not available
     const auth = useAuth();

@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 export default function AdminLogin() {
-  const { adminProfile, loading, supabaseSignIn, getRoleDashboard } = useHybridAuth();
+  const { adminProfile, loading, supabaseSignIn, getRoleDashboard } =
+    useHybridAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

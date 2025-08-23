@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 
 export default function Index() {
-  const { isSignedIn, donorProfile, adminProfile, hospitalStaffProfile } = useHybridAuth();
+  const { isSignedIn, donorProfile, adminProfile, hospitalStaffProfile } =
+    useHybridAuth();
   const user = isSignedIn;
   const profile = donorProfile || adminProfile || hospitalStaffProfile;
 

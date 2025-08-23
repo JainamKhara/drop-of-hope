@@ -7,18 +7,19 @@ import "./global.css";
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Check if key exists and looks valid (starts with pk_)
-const isValidClerkKey = PUBLISHABLE_KEY && 
-  PUBLISHABLE_KEY.startsWith('pk_') && 
+const isValidClerkKey =
+  PUBLISHABLE_KEY &&
+  PUBLISHABLE_KEY.startsWith("pk_") &&
   PUBLISHABLE_KEY.length > 20 &&
-  !PUBLISHABLE_KEY.includes('__') && // Not placeholder
-  PUBLISHABLE_KEY !== 'pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY'; // Not the invalid key
+  !PUBLISHABLE_KEY.includes("__") && // Not placeholder
+  PUBLISHABLE_KEY !== "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY"; // Not the invalid key
 
 console.log("Clerk Key Status:", {
   exists: !!PUBLISHABLE_KEY,
   length: PUBLISHABLE_KEY?.length,
-  startsWithPk: PUBLISHABLE_KEY?.startsWith('pk_'),
+  startsWithPk: PUBLISHABLE_KEY?.startsWith("pk_"),
   isValid: isValidClerkKey,
-  preview: PUBLISHABLE_KEY?.slice(0, 20) + "..."
+  preview: PUBLISHABLE_KEY?.slice(0, 20) + "...",
 });
 
 const rootElement = document.getElementById("root");
@@ -30,7 +31,7 @@ const root = createRoot(rootElement);
 if (isValidClerkKey) {
   console.log("✅ Using Clerk authentication");
   root.render(
-    <ClerkProvider 
+    <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
       appearance={{
         baseTheme: undefined,
@@ -40,10 +41,14 @@ if (isValidClerkKey) {
       }}
     >
       <App />
-    </ClerkProvider>
+    </ClerkProvider>,
   );
 } else {
-  console.warn("⚠️ Invalid or missing Clerk key - running without Clerk authentication");
-  console.warn("Please get a valid key from: https://dashboard.clerk.com/last-active?path=api-keys");
+  console.warn(
+    "⚠️ Invalid or missing Clerk key - running without Clerk authentication",
+  );
+  console.warn(
+    "Please get a valid key from: https://dashboard.clerk.com/last-active?path=api-keys",
+  );
   root.render(<App />);
 }

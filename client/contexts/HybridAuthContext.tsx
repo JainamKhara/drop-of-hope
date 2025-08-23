@@ -67,33 +67,41 @@ interface HybridAuthContextType {
   donorProfile: DonorProfile | null;
   adminProfile: AdminProfile | null;
   hospitalStaffProfile: HospitalStaffProfile | null;
-  
+
   // Auth state
   isLoaded: boolean;
   isSignedIn: boolean;
   loading: boolean;
-  
+
   // Clerk auth functions (for donors)
   clerkSignOut: () => Promise<void>;
-  
+
   // Supabase auth functions (for admins and hospital staff)
   supabaseSignIn: (
     email: string,
     password: string,
-    expectedRole: "admin" | "hospital"
+    expectedRole: "admin" | "hospital",
   ) => Promise<{ data: any; error: any }>;
   supabaseSignOut: () => Promise<{ error: any }>;
-  
+
   // Profile management
-  updateDonorProfile: (updates: Partial<DonorProfile>) => Promise<{ data: any; error: any }>;
-  updateAdminProfile: (updates: Partial<AdminProfile>) => Promise<{ data: any; error: any }>;
-  updateHospitalStaffProfile: (updates: Partial<HospitalStaffProfile>) => Promise<{ data: any; error: any }>;
-  
+  updateDonorProfile: (
+    updates: Partial<DonorProfile>,
+  ) => Promise<{ data: any; error: any }>;
+  updateAdminProfile: (
+    updates: Partial<AdminProfile>,
+  ) => Promise<{ data: any; error: any }>;
+  updateHospitalStaffProfile: (
+    updates: Partial<HospitalStaffProfile>,
+  ) => Promise<{ data: any; error: any }>;
+
   // Navigation helper
   getRoleDashboard: () => string;
 }
 
-const HybridAuthContext = createContext<HybridAuthContextType | undefined>(undefined);
+const HybridAuthContext = createContext<HybridAuthContextType | undefined>(
+  undefined,
+);
 
 export const useHybridAuth = () => {
   const context = useContext(HybridAuthContext);
@@ -124,26 +132,35 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   }
 
   // Use Clerk data if available, otherwise use fallback values
-  const { isLoaded, isSignedIn, signOut: clerkSignOut } = isClerkAvailable
+  const {
+    isLoaded,
+    isSignedIn,
+    signOut: clerkSignOut,
+  } = isClerkAvailable
     ? clerkAuth
     : { isLoaded: true, isSignedIn: false, signOut: async () => {} };
-  
+
   // Supabase auth for admins and hospital staff
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
-  
+
   // User profiles
   const [donorProfile, setDonorProfile] = useState<DonorProfile | null>(null);
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
-  const [hospitalStaffProfile, setHospitalStaffProfile] = useState<HospitalStaffProfile | null>(null);
-  
+  const [hospitalStaffProfile, setHospitalStaffProfile] =
+    useState<HospitalStaffProfile | null>(null);
+
   // Loading states
   const [loading, setLoading] = useState(true);
-  
+
   // Determine user role
-  const userRole: UserRole | null = donorProfile ? "donor" : 
-                                   adminProfile ? "admin" : 
-                                   hospitalStaffProfile ? "hospital" : null;
+  const userRole: UserRole | null = donorProfile
+    ? "donor"
+    : adminProfile
+      ? "admin"
+      : hospitalStaffProfile
+        ? "hospital"
+        : null;
 
   // Initialize Supabase auth
   useEffect(() => {
@@ -264,7 +281,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   const supabaseSignIn = async (
     email: string,
     password: string,
-    expectedRole: "admin" | "hospital"
+    expectedRole: "admin" | "hospital",
   ) => {
     // First, authenticate with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -361,9 +378,14 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     }
   };
 
-  const updateHospitalStaffProfile = async (updates: Partial<HospitalStaffProfile>) => {
+  const updateHospitalStaffProfile = async (
+    updates: Partial<HospitalStaffProfile>,
+  ) => {
     if (!hospitalStaffProfile) {
-      return { data: null, error: new Error("No hospital staff profile loaded") };
+      return {
+        data: null,
+        error: new Error("No hospital staff profile loaded"),
+      };
     }
 
     try {
@@ -422,15 +444,29 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 // Legacy Auth Hook for backward compatibility
 export const useAuth = () => {
   const hybridAuth = useHybridAuth();
-  
+
   // Convert hybrid auth to legacy auth format for existing components
   return {
-    user: hybridAuth.donorProfile || hybridAuth.adminProfile || hybridAuth.hospitalStaffProfile,
-    profile: hybridAuth.donorProfile || hybridAuth.adminProfile || hybridAuth.hospitalStaffProfile,
+    user:
+      hybridAuth.donorProfile ||
+      hybridAuth.adminProfile ||
+      hybridAuth.hospitalStaffProfile,
+    profile:
+      hybridAuth.donorProfile ||
+      hybridAuth.adminProfile ||
+      hybridAuth.hospitalStaffProfile,
     session: null, // Legacy session not needed
     loading: hybridAuth.loading,
-    signUp: () => Promise.resolve({ data: null, error: new Error("Use Clerk for donor signup") }),
-    signIn: () => Promise.resolve({ data: null, error: new Error("Use role-specific signin") }),
+    signUp: () =>
+      Promise.resolve({
+        data: null,
+        error: new Error("Use Clerk for donor signup"),
+      }),
+    signIn: () =>
+      Promise.resolve({
+        data: null,
+        error: new Error("Use role-specific signin"),
+      }),
     signOut: () => {
       if (hybridAuth.userRole === "donor") {
         return hybridAuth.clerkSignOut().then(() => ({ error: null }));
@@ -446,7 +482,10 @@ export const useAuth = () => {
       } else if (hybridAuth.userRole === "hospital") {
         return hybridAuth.updateHospitalStaffProfile(updates);
       }
-      return Promise.resolve({ data: null, error: new Error("No profile loaded") });
+      return Promise.resolve({
+        data: null,
+        error: new Error("No profile loaded"),
+      });
     },
     getRoleDashboard: hybridAuth.getRoleDashboard,
   };

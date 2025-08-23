@@ -18,7 +18,8 @@ export default function ClerkSetupInstructions() {
           <Alert>
             <Settings className="h-4 w-4" />
             <AlertDescription>
-              Your Clerk publishable key is invalid or missing. Follow these steps to get the correct key.
+              Your Clerk publishable key is invalid or missing. Follow these
+              steps to get the correct key.
             </AlertDescription>
           </Alert>
 
@@ -29,11 +30,13 @@ export default function ClerkSetupInstructions() {
               </div>
               <div>
                 <p className="font-medium">Access Clerk Dashboard</p>
-                <p className="text-sm text-gray-600 mb-2">Go to your Clerk dashboard and navigate to API Keys</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  Go to your Clerk dashboard and navigate to API Keys
+                </p>
                 <Button asChild variant="outline" size="sm">
-                  <a 
-                    href="https://dashboard.clerk.com/last-active?path=api-keys" 
-                    target="_blank" 
+                  <a
+                    href="https://dashboard.clerk.com/last-active?path=api-keys"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center"
                   >
@@ -51,7 +54,9 @@ export default function ClerkSetupInstructions() {
               <div>
                 <p className="font-medium">Copy Publishable Key</p>
                 <p className="text-sm text-gray-600">
-                  Find your Publishable Key (starts with <code className="bg-gray-100 px-1 rounded">pk_</code>) and copy it
+                  Find your Publishable Key (starts with{" "}
+                  <code className="bg-gray-100 px-1 rounded">pk_</code>) and
+                  copy it
                 </p>
               </div>
             </div>
@@ -63,7 +68,11 @@ export default function ClerkSetupInstructions() {
               <div>
                 <p className="font-medium">Update Environment Variable</p>
                 <p className="text-sm text-gray-600 mb-2">
-                  Set the <code className="bg-gray-100 px-1 rounded">VITE_CLERK_PUBLISHABLE_KEY</code> environment variable
+                  Set the{" "}
+                  <code className="bg-gray-100 px-1 rounded">
+                    VITE_CLERK_PUBLISHABLE_KEY
+                  </code>{" "}
+                  environment variable
                 </p>
                 <div className="bg-gray-50 p-2 rounded text-xs font-mono">
                   VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_key_here
@@ -85,7 +94,9 @@ export default function ClerkSetupInstructions() {
           </div>
 
           <div className="bg-yellow-50 p-3 rounded">
-            <p className="text-sm font-medium text-yellow-800 mb-1">Current Status:</p>
+            <p className="text-sm font-medium text-yellow-800 mb-1">
+              Current Status:
+            </p>
             <p className="text-xs text-yellow-700">
               Key: {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
             </p>
@@ -96,8 +107,9 @@ export default function ClerkSetupInstructions() {
       <Card className="border-green-200 bg-green-50">
         <CardContent className="pt-4">
           <p className="text-sm text-green-800">
-            <strong>Note:</strong> Admin and Hospital authentication will continue to work normally using Supabase. 
-            Only donor authentication requires Clerk setup.
+            <strong>Note:</strong> Admin and Hospital authentication will
+            continue to work normally using Supabase. Only donor authentication
+            requires Clerk setup.
           </p>
         </CardContent>
       </Card>

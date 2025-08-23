@@ -4,33 +4,44 @@ import { SignIn, useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft, AlertCircle, ExternalLink, Settings } from "lucide-react";
+import {
+  Heart,
+  ArrowLeft,
+  AlertCircle,
+  ExternalLink,
+  Settings,
+} from "lucide-react";
 
 function ClerkLoginForm() {
   return (
     <div className="flex justify-center">
-      <SignIn 
+      <SignIn
         appearance={{
           elements: {
             rootBox: "mx-auto",
             card: "shadow-xl border-0 bg-white dark:bg-gray-800",
             headerTitle: "text-hope-red font-bold",
             headerSubtitle: "text-muted-foreground",
-            
+
             // OAuth/Social buttons styling
-            socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
-            socialButtonsBlockButtonText: "text-gray-700 dark:text-gray-200 font-medium",
-            
+            socialButtonsBlockButton:
+              "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
+            socialButtonsBlockButtonText:
+              "text-gray-700 dark:text-gray-200 font-medium",
+
             // Primary form button
-            formButtonPrimary: "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
-            
+            formButtonPrimary:
+              "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
+
             // Form styling
-            formFieldInput: "border-gray-300 focus:border-hope-red focus:ring-hope-red",
+            formFieldInput:
+              "border-gray-300 focus:border-hope-red focus:ring-hope-red",
             formFieldLabel: "text-gray-700 dark:text-gray-200",
-            
+
             // Footer links
-            footerActionLink: "text-hope-red hover:text-hope-red/80 font-medium",
-            
+            footerActionLink:
+              "text-hope-red hover:text-hope-red/80 font-medium",
+
             // Divider styling
             dividerLine: "bg-gray-200",
             dividerText: "text-gray-500",
@@ -62,10 +73,11 @@ function ClerkUnavailableMessage() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Clerk authentication is not properly configured. Please set up your Clerk publishable key.
+            Clerk authentication is not properly configured. Please set up your
+            Clerk publishable key.
           </AlertDescription>
         </Alert>
-        
+
         <div className="space-y-3 text-sm">
           <p className="font-medium text-red-800">To fix this:</p>
           <ol className="list-decimal list-inside space-y-2 text-red-700">
@@ -77,7 +89,11 @@ function ClerkUnavailableMessage() {
         </div>
 
         <div className="flex flex-col space-y-2">
-          <Button asChild variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
+          <Button
+            asChild
+            variant="outline"
+            className="border-red-300 text-red-700 hover:bg-red-100"
+          >
             <a
               href="https://dashboard.clerk.com/last-active?path=api-keys"
               target="_blank"
@@ -89,15 +105,20 @@ function ClerkUnavailableMessage() {
             </a>
           </Button>
 
-          <Button asChild variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+          <Button
+            asChild
+            variant="outline"
+            className="border-blue-300 text-blue-700 hover:bg-blue-100"
+          >
             <Link to="/clerk-setup" className="flex items-center">
               <Settings className="w-4 h-4 mr-2" />
               Setup Instructions
             </Link>
           </Button>
-          
+
           <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
-            <strong>Current Key:</strong> {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
+            <strong>Current Key:</strong>{" "}
+            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
           </div>
         </div>
       </CardContent>
@@ -109,7 +130,7 @@ export default function DonorLogin() {
   // Check if we're in a Clerk context
   let isClerkAvailable = false;
   let clerkError = null;
-  
+
   try {
     // This will throw if Clerk is not available
     const auth = useAuth();

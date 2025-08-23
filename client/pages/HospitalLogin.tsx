@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 
 export default function HospitalLogin() {
-  const { hospitalStaffProfile, loading, supabaseSignIn, getRoleDashboard } = useHybridAuth();
+  const { hospitalStaffProfile, loading, supabaseSignIn, getRoleDashboard } =
+    useHybridAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -12,7 +12,9 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <p className="text-muted-foreground">Redirecting to donor registration...</p>
+        <p className="text-muted-foreground">
+          Redirecting to donor registration...
+        </p>
       </div>
     </div>
   );
