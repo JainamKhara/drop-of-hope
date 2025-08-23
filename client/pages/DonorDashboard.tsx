@@ -161,9 +161,17 @@ export default function DonorDashboard() {
                 <div className="w-8 h-8 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-hope-red" />
                 </div>
-                <span className="text-sm font-medium">{profile.name}</span>
+                <span className="text-sm font-medium">{donorProfile.name}</span>
               </div>
-              <SignOutButton className="hidden md:flex" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:flex"
+                onClick={() => clerkSignOut()}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
@@ -174,7 +182,7 @@ export default function DonorDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-hope-red mb-2">
-            Welcome back, {profile.name}!
+            Welcome back, {donorProfile.name}!
           </h1>
           <p className="text-muted-foreground">
             Thank you for being a life-saving hero. Here's your impact
@@ -246,10 +254,10 @@ export default function DonorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-hope-red">
-                {profile.blood_type || "Not Set"}
+                {donorProfile.blood_type || "Not Set"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {profile.blood_type
+                {donorProfile.blood_type
                   ? "Universal compatibility"
                   : "Please update your profile"}
               </p>
