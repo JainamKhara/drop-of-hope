@@ -39,7 +39,7 @@ interface DriveWithDetails extends Drive {
 }
 
 export default function BloodDrives() {
-  const { donorProfile, adminProfile, isSignedIn } = useHybridAuth();
+  const { userProfile, userRole, isSignedIn } = useHybridAuth();
   const [drives, setDrives] = useState<DriveWithDetails[]>([]);
   const [filteredDrives, setFilteredDrives] = useState<DriveWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -439,7 +439,7 @@ export default function BloodDrives() {
         )}
 
         {/* Call to Action for Creating Drives */}
-        {adminProfile && (
+        {userRole === "admin" && userProfile && (
           <Card className="mt-8 border-0 shadow-md bg-hope-pink dark:bg-hope-coral">
             <CardContent className="text-center py-8">
               <h3 className="text-xl font-semibold text-hope-red mb-2">
