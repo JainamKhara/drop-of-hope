@@ -39,7 +39,7 @@ interface DriveWithDetails extends Drive {
 
 export default function BookAppointment() {
   const { driveId } = useParams<{ driveId: string }>();
-  const { user, profile } = useAuth();
+  const { donorProfile, isSignedIn } = useHybridAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
