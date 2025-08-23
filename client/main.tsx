@@ -59,5 +59,11 @@ if (isValidClerkKey) {
   console.warn(
     "Please get a valid key from: https://dashboard.clerk.com/last-active?path=api-keys",
   );
+  console.warn("Current key:", PUBLISHABLE_KEY || "Not set");
+
+  if (PUBLISHABLE_KEY && INVALID_KEYS.includes(PUBLISHABLE_KEY)) {
+    console.warn("❌ This key is known to be invalid/expired. Please get a new one.");
+  }
+
   root.render(<App />);
 }
