@@ -118,7 +118,8 @@ interface HybridAuthProviderProps {
 export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   // Check if Clerk publishable key is configured
   const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-  const isClerkConfigured = clerkPublishableKey && clerkPublishableKey.startsWith('pk_');
+  const isClerkConfigured =
+    clerkPublishableKey && clerkPublishableKey.startsWith("pk_");
 
   // Only use Clerk hooks if properly configured
   let clerkAuth: any = null;
@@ -158,6 +159,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
   // Loading states
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Determine user role
   const userRole: UserRole | null = donorProfile
@@ -209,11 +211,22 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   // Set loading to false when auth system is loaded or when Clerk is not configured
   useEffect(() => {
     if (isLoaded || !isClerkConfigured) {
+      // Only set loading to false if we're not waiting for profile to load
+      if (!profileLoading) {
+        setLoading(false);
+      }
+    }
+  }, [isLoaded, isClerkConfigured, profileLoading]);
+
+  // Handle loading state when profile is being loaded
+  useEffect(() => {
+    if (!profileLoading && (isLoaded || !isClerkConfigured)) {
       setLoading(false);
     }
-  }, [isLoaded, isClerkConfigured]);
+  }, [profileLoading, isLoaded, isClerkConfigured]);
 
   const loadDonorProfile = async (clerkUserId: string) => {
+    setProfileLoading(true);
     try {
       const { data, error } = await supabase
         .from("donors")
@@ -251,10 +264,13 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       }
     } catch (error) {
       console.error("Error loading donor profile:", error);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
   const loadSupabaseUserProfile = async (userId: string) => {
+    setProfileLoading(true);
     try {
       // Try to find admin profile
       const { data: adminData } = await supabase
@@ -281,6 +297,8 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       }
     } catch (error) {
       console.error("Error loading Supabase user profile:", error);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -430,7 +448,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     hospitalStaffProfile,
     isLoaded,
     isSignedIn: isSignedIn || !!supabaseUser,
-    loading,
+    loading: loading || profileLoading,
     clerkSignOut,
     supabaseSignIn,
     supabaseSignOut,

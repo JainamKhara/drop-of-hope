@@ -85,7 +85,9 @@ function ClerkUnavailableMessage() {
             <li>Go to your Clerk Dashboard (create free account if needed)</li>
             <li>Create a new application or select existing one</li>
             <li>Navigate to API Keys section</li>
-            <li>Copy your Publishable Key (starts with pk_test_ or pk_live_)</li>
+            <li>
+              Copy your Publishable Key (starts with pk_test_ or pk_live_)
+            </li>
             <li>Update the VITE_CLERK_PUBLISHABLE_KEY environment variable</li>
             <li>Restart the development server</li>
           </ol>
@@ -146,15 +148,30 @@ export default function DonorLogin() {
     console.warn("Clerk login unavailable:", error);
   }
 
-  // Redirect if already authenticated as a donor
+  // Only redirect if authentication and profile loading are completely finished
+  // This prevents redirect cycles by ensuring userRole is fully determined
   if (!loading && isSignedIn && userRole === "donor") {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Redirect other user types to their dashboards
-  if (!loading && isSignedIn && userRole) {
+  // Redirect other user types to their dashboards (only if role is definitively determined)
+  if (!loading && isSignedIn && userRole && userRole !== "donor") {
     const dashboard = userRole === "admin" ? "/admin" : "/hospital-portal";
     return <Navigate to={dashboard} replace />;
+  }
+
+  // Show loading while authentication state is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-6 h-6 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
