@@ -259,10 +259,10 @@ export default function DonorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-hope-red">
-                {donorProfile.blood_type || "Not Set"}
+                {userProfile.blood_type || "Not Set"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {donorProfile.blood_type
+                {userProfile.blood_type
                   ? "Universal compatibility"
                   : "Please update your profile"}
               </p>
