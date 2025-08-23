@@ -6,6 +6,13 @@ import "./global.css";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+// List of known invalid or expired keys
+const INVALID_KEYS = [
+  "pk_test_example",
+  "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY", // Expired/invalid key
+  "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXYk", // With extra character
+];
+
 // Check if key exists and looks valid (starts with pk_)
 const isValidClerkKey =
   PUBLISHABLE_KEY &&
@@ -13,7 +20,7 @@ const isValidClerkKey =
   PUBLISHABLE_KEY.length > 20 &&
   !PUBLISHABLE_KEY.includes("__") && // Not placeholder
   !PUBLISHABLE_KEY.includes("your_") && // Not placeholder
-  PUBLISHABLE_KEY !== "pk_test_example"; // Not example key
+  !INVALID_KEYS.includes(PUBLISHABLE_KEY); // Not in blacklist
 
 console.log("Clerk Key Status:", {
   exists: !!PUBLISHABLE_KEY,
