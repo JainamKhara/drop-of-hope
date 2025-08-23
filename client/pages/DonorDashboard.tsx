@@ -71,8 +71,8 @@ export default function DonorDashboard() {
       const upcomingDrives = (drivesResult.data || []).slice(0, 3);
 
       // Calculate days until next donation (typically 56 days between whole blood donations)
-      const lastDonationDate = donorProfile?.last_donation_date
-        ? new Date(donorProfile.last_donation_date)
+      const lastDonationDate = userProfile?.last_donation_date
+        ? new Date(userProfile.last_donation_date)
         : null;
       const daysUntilNextDonation = lastDonationDate
         ? Math.max(
