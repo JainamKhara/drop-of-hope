@@ -189,7 +189,7 @@ export default function BookAppointment() {
   };
 
   const handleSubmit = async () => {
-    if (!donorProfile || !drive || !selectedDate || !selectedTime) {
+    if (!userProfile || userRole !== "donor" || !drive || !selectedDate || !selectedTime) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
