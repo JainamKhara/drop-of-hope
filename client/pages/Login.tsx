@@ -1,60 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { auth } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { user, loading, getRoleDashboard } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  // Redirect to appropriate dashboard if already signed in
+  // Redirect to the new Clerk-based donor login
   React.useEffect(() => {
-    if (user && !loading) {
-      navigate(getRoleDashboard());
-    }
-  }, [user, loading, navigate, getRoleDashboard]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    // Use role-based authentication to ensure only donors can login
-    const { error } = await auth.signInWithRole(email, password, "donor");
-
-    if (error) {
-      setError(error.message);
-    } else {
-      // Wait a moment for profile to load, then navigate to donor dashboard
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 100);
-    }
-    setIsLoading(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Heart className="w-5 h-5 text-white fill-current" />
-          </div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    navigate("/donor/login");
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
