@@ -45,29 +45,29 @@ export default function DonorDashboard() {
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login");
+    if (!loading && !isSignedIn) {
+      navigate("/donor/login");
     }
-  }, [user, loading, navigate]);
+  }, [isSignedIn, loading, navigate]);
 
   // Load dashboard data
   useEffect(() => {
-    if (user && profile) {
+    if (isSignedIn && donorProfile) {
       loadDashboardData();
     }
-  }, [user, profile]);
+  }, [isSignedIn, donorProfile]);
 
   const loadDashboardData = async () => {
-    if (!user) return;
+    if (!donorProfile) return;
 
     setLoadingData(true);
     try {
       const [appointmentsResult, donationsResult, rewardsResult, drivesResult] =
         await Promise.all([
-          db.getUserAppointments(user.id),
-          db.getUserDonations(user.id),
-          db.getUserRewards(user.id),
-          db.getDrives({ city: profile?.city }),
+          db.getUserAppointments(donorProfile.id),
+          db.getUserDonations(donorProfile.id),
+          db.getUserRewards(donorProfile.id),
+          db.getDrives({ city: donorProfile?.city }),
         ]);
 
       const appointments = appointmentsResult.data || [];
@@ -76,8 +76,8 @@ export default function DonorDashboard() {
       const upcomingDrives = (drivesResult.data || []).slice(0, 3);
 
       // Calculate days until next donation (typically 56 days between whole blood donations)
-      const lastDonationDate = profile?.last_donation_date
-        ? new Date(profile.last_donation_date)
+      const lastDonationDate = donorProfile?.last_donation_date
+        ? new Date(donorProfile.last_donation_date)
         : null;
       const daysUntilNextDonation = lastDonationDate
         ? Math.max(
@@ -97,8 +97,8 @@ export default function DonorDashboard() {
         upcomingDrives,
         stats: {
           totalDonations: donations.length,
-          totalPoints: profile?.points || 0,
-          level: profile?.level || 1,
+          totalPoints: donorProfile?.points || 0,
+          level: donorProfile?.level || 1,
           daysUntilNextDonation,
         },
       });
@@ -122,7 +122,7 @@ export default function DonorDashboard() {
     );
   }
 
-  if (!user || !profile) {
+  if (!isSignedIn || !donorProfile) {
     return null;
   }
 
