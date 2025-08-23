@@ -133,9 +133,7 @@ const AppContent = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/donor/login" element={<DonorLogin />} />
-          <Route path="/donor/login-simple" element={<DonorLoginSimple />} />
           <Route path="/donor/register" element={<DonorRegister />} />
-          <Route path="/clerk-test" element={<ClerkTest />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/hospital/login" element={<HospitalLogin />} />
 
