@@ -166,7 +166,7 @@ export default function DonorDashboard() {
                 <div className="w-8 h-8 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-hope-red" />
                 </div>
-                <span className="text-sm font-medium">{donorProfile.name}</span>
+                <span className="text-sm font-medium">{userProfile.name}</span>
               </div>
               <Button
                 variant="outline"
