@@ -128,8 +128,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       if (session?.user) {
         await loadSupabaseUserProfile(session.user.id);
       } else {
-        setAdminProfile(null);
-        setHospitalStaffProfile(null);
+        setUserProfile(null);
       }
     });
 
