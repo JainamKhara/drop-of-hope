@@ -123,6 +123,7 @@ function ClerkUnavailableMessage() {
 export default function DonorRegister() {
   // Check if we're in a Clerk context
   let isClerkAvailable = false;
+  let clerkError = null;
 
   try {
     // This will throw if Clerk is not available
@@ -130,6 +131,8 @@ export default function DonorRegister() {
     isClerkAvailable = true;
   } catch (error) {
     isClerkAvailable = false;
+    clerkError = error;
+    console.warn("Clerk registration unavailable:", error);
   }
 
   return (
