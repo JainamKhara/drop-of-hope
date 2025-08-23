@@ -18,6 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // Database types based on your schema
 export interface Profile {
   id: string;
+  clerk_user_id?: string; // For donors using Clerk authentication
   email: string;
   name: string;
   phone?: string;
