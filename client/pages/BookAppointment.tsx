@@ -63,7 +63,7 @@ export default function BookAppointment() {
     postalCode: donorProfile?.postal_code || "",
   });
   const [medicalInfo, setMedicalInfo] = useState({
-    lastDonation: profile?.last_donation_date || "",
+    lastDonation: donorProfile?.last_donation_date || "",
     medications: "",
     allergies: "",
     medicalConditions: "",
