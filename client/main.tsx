@@ -9,8 +9,7 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 // List of known invalid or expired keys
 const INVALID_KEYS = [
   "pk_test_example",
-  "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY", // Expired/invalid key
-  "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXYk", // With extra character
+  // Removed user's key to test validity
 ];
 
 // Check if key exists and looks valid (starts with pk_)
