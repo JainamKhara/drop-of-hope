@@ -75,14 +75,14 @@ export default function BookAppointment() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
+    if (!isSignedIn) {
+      navigate("/donor/login");
       return;
     }
     if (driveId) {
       loadDriveDetails();
     }
-  }, [driveId, user]);
+  }, [driveId, isSignedIn]);
 
   useEffect(() => {
     if (profile) {
