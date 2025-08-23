@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, SignOutButton } from "@/contexts/AuthContext";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { db } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +36,7 @@ interface DashboardData {
 }
 
 export default function DonorDashboard() {
-  const { user, profile, loading } = useAuth();
+  const { donorProfile, loading, isSignedIn, clerkSignOut } = useHybridAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
@@ -45,29 +45,29 @@ export default function DonorDashboard() {
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login");
+    if (!loading && !isSignedIn) {
+      navigate("/donor/login");
     }
-  }, [user, loading, navigate]);
+  }, [isSignedIn, loading, navigate]);
 
   // Load dashboard data
   useEffect(() => {
-    if (user && profile) {
+    if (isSignedIn && donorProfile) {
       loadDashboardData();
     }
-  }, [user, profile]);
+  }, [isSignedIn, donorProfile]);
 
   const loadDashboardData = async () => {
-    if (!user) return;
+    if (!donorProfile) return;
 
     setLoadingData(true);
     try {
       const [appointmentsResult, donationsResult, rewardsResult, drivesResult] =
         await Promise.all([
-          db.getUserAppointments(user.id),
-          db.getUserDonations(user.id),
-          db.getUserRewards(user.id),
-          db.getDrives({ city: profile?.city }),
+          db.getUserAppointments(donorProfile.id),
+          db.getUserDonations(donorProfile.id),
+          db.getUserRewards(donorProfile.id),
+          db.getDrives({ city: donorProfile?.city }),
         ]);
 
       const appointments = appointmentsResult.data || [];
@@ -76,8 +76,8 @@ export default function DonorDashboard() {
       const upcomingDrives = (drivesResult.data || []).slice(0, 3);
 
       // Calculate days until next donation (typically 56 days between whole blood donations)
-      const lastDonationDate = profile?.last_donation_date
-        ? new Date(profile.last_donation_date)
+      const lastDonationDate = donorProfile?.last_donation_date
+        ? new Date(donorProfile.last_donation_date)
         : null;
       const daysUntilNextDonation = lastDonationDate
         ? Math.max(
@@ -97,8 +97,8 @@ export default function DonorDashboard() {
         upcomingDrives,
         stats: {
           totalDonations: donations.length,
-          totalPoints: profile?.points || 0,
-          level: profile?.level || 1,
+          totalPoints: donorProfile?.points || 0,
+          level: donorProfile?.level || 1,
           daysUntilNextDonation,
         },
       });
@@ -122,7 +122,7 @@ export default function DonorDashboard() {
     );
   }
 
-  if (!user || !profile) {
+  if (!isSignedIn || !donorProfile) {
     return null;
   }
 
@@ -161,9 +161,17 @@ export default function DonorDashboard() {
                 <div className="w-8 h-8 bg-hope-red/10 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-hope-red" />
                 </div>
-                <span className="text-sm font-medium">{profile.name}</span>
+                <span className="text-sm font-medium">{donorProfile.name}</span>
               </div>
-              <SignOutButton className="hidden md:flex" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:flex"
+                onClick={() => clerkSignOut()}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
@@ -174,7 +182,7 @@ export default function DonorDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-hope-red mb-2">
-            Welcome back, {profile.name}!
+            Welcome back, {donorProfile.name}!
           </h1>
           <p className="text-muted-foreground">
             Thank you for being a life-saving hero. Here's your impact
@@ -246,10 +254,10 @@ export default function DonorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-hope-red">
-                {profile.blood_type || "Not Set"}
+                {donorProfile.blood_type || "Not Set"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {profile.blood_type
+                {donorProfile.blood_type
                   ? "Universal compatibility"
                   : "Please update your profile"}
               </p>

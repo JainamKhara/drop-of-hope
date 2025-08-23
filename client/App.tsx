@@ -3,12 +3,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { HybridAuthProvider } from "./contexts/HybridAuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
 import HospitalLogin from "./pages/HospitalLogin";
 import Register from "./pages/Register";
+import DonorLogin from "./pages/DonorLogin";
+import DonorRegister from "./pages/DonorRegister";
+import ClerkSetup from "./pages/ClerkSetup";
 import DonorDashboard from "./pages/DonorDashboard";
 import BloodDrives from "./pages/BloodDrives";
 import BookAppointment from "./pages/BookAppointment";
@@ -130,6 +133,9 @@ const AppContent = () => (
           {/* Public routes */}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/donor/login" element={<DonorLogin />} />
+          <Route path="/donor/register" element={<DonorRegister />} />
+          <Route path="/clerk-setup" element={<ClerkSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/hospital/login" element={<HospitalLogin />} />
 
@@ -179,9 +185,9 @@ const AppContent = () => (
 
 const App = () => {
   return (
-    <AuthProvider>
+    <HybridAuthProvider>
       <AppContent />
-    </AuthProvider>
+    </HybridAuthProvider>
   );
 };
 

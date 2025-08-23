@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { db, Drive } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,7 @@ interface DriveWithDetails extends Drive {
 
 export default function BookAppointment() {
   const { driveId } = useParams<{ driveId: string }>();
-  const { user, profile } = useAuth();
+  const { donorProfile, isSignedIn } = useHybridAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -52,18 +52,18 @@ export default function BookAppointment() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [donorInfo, setDonorInfo] = useState({
-    name: profile?.name || "",
-    email: profile?.email || "",
-    phone: profile?.phone || "",
-    bloodType: profile?.blood_type || "",
-    dateOfBirth: profile?.date_of_birth || "",
-    address: profile?.address || "",
-    city: profile?.city || "",
-    state: profile?.state || "",
-    postalCode: profile?.postal_code || "",
+    name: donorProfile?.name || "",
+    email: donorProfile?.email || "",
+    phone: donorProfile?.phone || "",
+    bloodType: donorProfile?.blood_type || "",
+    dateOfBirth: donorProfile?.date_of_birth || "",
+    address: donorProfile?.address || "",
+    city: donorProfile?.city || "",
+    state: donorProfile?.state || "",
+    postalCode: donorProfile?.postal_code || "",
   });
   const [medicalInfo, setMedicalInfo] = useState({
-    lastDonation: profile?.last_donation_date || "",
+    lastDonation: donorProfile?.last_donation_date || "",
     medications: "",
     allergies: "",
     medicalConditions: "",
@@ -75,36 +75,36 @@ export default function BookAppointment() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
+    if (!isSignedIn) {
+      navigate("/donor/login");
       return;
     }
     if (driveId) {
       loadDriveDetails();
     }
-  }, [driveId, user]);
+  }, [driveId, isSignedIn]);
 
   useEffect(() => {
-    if (profile) {
+    if (donorProfile) {
       setDonorInfo({
-        name: profile.name || "",
-        email: profile.email || "",
-        phone: profile.phone || "",
-        bloodType: profile.blood_type || "",
-        dateOfBirth: profile.date_of_birth || "",
-        address: profile.address || "",
-        city: profile.city || "",
-        state: profile.state || "",
-        postalCode: profile.postal_code || "",
+        name: donorProfile.name || "",
+        email: donorProfile.email || "",
+        phone: donorProfile.phone || "",
+        bloodType: donorProfile.blood_type || "",
+        dateOfBirth: donorProfile.date_of_birth || "",
+        address: donorProfile.address || "",
+        city: donorProfile.city || "",
+        state: donorProfile.state || "",
+        postalCode: donorProfile.postal_code || "",
       });
-      if (profile.last_donation_date) {
+      if (donorProfile.last_donation_date) {
         setMedicalInfo((prev) => ({
           ...prev,
-          lastDonation: profile.last_donation_date || "",
+          lastDonation: donorProfile.last_donation_date || "",
         }));
       }
     }
-  }, [profile]);
+  }, [donorProfile]);
 
   const loadDriveDetails = async () => {
     if (!driveId) return;
@@ -189,7 +189,7 @@ export default function BookAppointment() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !drive || !selectedDate || !selectedTime) {
+    if (!donorProfile || !drive || !selectedDate || !selectedTime) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -210,7 +210,7 @@ export default function BookAppointment() {
     setSubmitting(true);
     try {
       const appointmentData = {
-        donor_id: user.id,
+        donor_id: donorProfile.id,
         drive_id: drive.id,
         appointment_date: format(selectedDate, "yyyy-MM-dd"),
         appointment_time: selectedTime,
@@ -231,11 +231,12 @@ export default function BookAppointment() {
         // Update user profile if needed
         if (
           donorInfo.bloodType &&
-          donorInfo.bloodType !== profile?.blood_type
+          donorInfo.bloodType !== donorProfile?.blood_type
         ) {
-          await db.updateProfile(user.id, {
-            blood_type: donorInfo.bloodType as any,
-          });
+          // TODO: Use updateDonorProfile from hybrid auth context
+          // await updateDonorProfile({
+          //   blood_type: donorInfo.bloodType as any,
+          // });
         }
 
         toast({

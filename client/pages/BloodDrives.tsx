@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { db, Drive } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,7 @@ interface DriveWithDetails extends Drive {
 }
 
 export default function BloodDrives() {
-  const { user, profile } = useAuth();
+  const { donorProfile, adminProfile, isSignedIn } = useHybridAuth();
   const [drives, setDrives] = useState<DriveWithDetails[]>([]);
   const [filteredDrives, setFilteredDrives] = useState<DriveWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,9 +166,9 @@ export default function BloodDrives() {
 
             <div className="flex items-center space-x-4">
               <Button variant="outline" asChild>
-                <Link to={user ? "/dashboard" : "/"}>
+                <Link to={isSignedIn ? "/dashboard" : "/"}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {user ? "Dashboard" : "Home"}
+                  {isSignedIn ? "Dashboard" : "Home"}
                 </Link>
               </Button>
             </div>
@@ -439,7 +439,7 @@ export default function BloodDrives() {
         )}
 
         {/* Call to Action for Creating Drives */}
-        {user && profile?.role === "admin" && (
+        {adminProfile && (
           <Card className="mt-8 border-0 shadow-md bg-hope-pink dark:bg-hope-coral">
             <CardContent className="text-center py-8">
               <h3 className="text-xl font-semibold text-hope-red mb-2">
