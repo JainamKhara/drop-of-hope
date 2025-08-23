@@ -116,19 +116,25 @@ interface HybridAuthProviderProps {
 }
 
 export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
-  // Check if Clerk is available
+  // Check if Clerk publishable key is configured
+  const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  const isClerkConfigured = clerkPublishableKey && clerkPublishableKey.startsWith('pk_');
+
+  // Only use Clerk hooks if properly configured
   let clerkAuth: any = null;
   let clerkUser: any = null;
   let isClerkAvailable = false;
 
-  try {
-    clerkAuth = useClerkAuth();
-    clerkUser = useUser().user;
-    isClerkAvailable = true;
-  } catch (error) {
-    // Clerk is not available (invalid key or not configured)
-    console.warn("Clerk is not available:", error);
-    isClerkAvailable = false;
+  if (isClerkConfigured) {
+    try {
+      clerkAuth = useClerkAuth();
+      clerkUser = useUser().user;
+      isClerkAvailable = true;
+    } catch (error) {
+      // Only catch configuration errors, not runtime auth errors
+      console.warn("Clerk configuration error:", error);
+      isClerkAvailable = false;
+    }
   }
 
   // Use Clerk data if available, otherwise use fallback values
