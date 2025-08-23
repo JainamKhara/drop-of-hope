@@ -47,22 +47,22 @@ export default function DonorDashboard() {
 
   // Load dashboard data
   useEffect(() => {
-    if (isSignedIn && donorProfile) {
+    if (isSignedIn && userRole === "donor" && userProfile) {
       loadDashboardData();
     }
-  }, [isSignedIn, donorProfile]);
+  }, [isSignedIn, userRole, userProfile]);
 
   const loadDashboardData = async () => {
-    if (!donorProfile) return;
+    if (!userProfile || userRole !== "donor") return;
 
     setLoadingData(true);
     try {
       const [appointmentsResult, donationsResult, rewardsResult, drivesResult] =
         await Promise.all([
-          db.getUserAppointments(donorProfile.id),
-          db.getUserDonations(donorProfile.id),
-          db.getUserRewards(donorProfile.id),
-          db.getDrives({ city: donorProfile?.city }),
+          db.getUserAppointments(userProfile.id),
+          db.getUserDonations(userProfile.id),
+          db.getUserRewards(userProfile.id),
+          db.getDrives({ city: userProfile?.city }),
         ]);
 
       const appointments = appointmentsResult.data || [];
