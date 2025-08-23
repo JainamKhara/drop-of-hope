@@ -65,5 +65,18 @@ if (isValidClerkKey) {
     console.warn("❌ This key is known to be invalid/expired. Please get a new one.");
   }
 
+  console.log(`
+🚀 To enable donor authentication:
+1. Visit: https://dashboard.clerk.com
+2. Create/sign in to your account
+3. Create a new application
+4. Copy the Publishable Key
+5. Set VITE_CLERK_PUBLISHABLE_KEY environment variable
+6. Restart the dev server
+
+📝 The app will run in fallback mode until Clerk is configured.
+✅ Admin and Hospital logins still work (they use Supabase).
+  `);
+
   root.render(<App />);
 }
