@@ -11,8 +11,6 @@ import HospitalLogin from "./pages/HospitalLogin";
 import Register from "./pages/Register";
 import DonorLogin from "./pages/DonorLogin";
 import DonorRegister from "./pages/DonorRegister";
-import ClerkTest from "./pages/ClerkTest";
-import DonorLoginSimple from "./pages/DonorLoginSimple";
 import DonorDashboard from "./pages/DonorDashboard";
 import BloodDrives from "./pages/BloodDrives";
 import BookAppointment from "./pages/BookAppointment";
