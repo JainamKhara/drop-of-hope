@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { SignIn, useAuth } from "@clerk/clerk-react";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -127,6 +128,8 @@ function ClerkUnavailableMessage() {
 }
 
 export default function DonorLogin() {
+  const { userRole, isSignedIn, loading } = useHybridAuth();
+
   // Check if we're in a Clerk context
   let isClerkAvailable = false;
   let clerkError = null;
@@ -138,6 +141,17 @@ export default function DonorLogin() {
   } catch (error) {
     clerkError = error;
     isClerkAvailable = false;
+  }
+
+  // Redirect if already authenticated as a donor
+  if (!loading && isSignedIn && userRole === "donor") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Redirect other user types to their dashboards
+  if (!loading && isSignedIn && userRole) {
+    const dashboard = userRole === "admin" ? "/admin" : "/hospital-portal";
+    return <Navigate to={dashboard} replace />;
   }
 
   return (
