@@ -117,8 +117,18 @@ export default function DonorDashboard() {
     );
   }
 
-  if (!isSignedIn || !donorProfile) {
-    return null;
+  // Note: isSignedIn check is handled by DonorOnlyRoute wrapper
+  if (!donorProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-6 h-6 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Setting up your profile...</p>
+        </div>
+      </div>
+    );
   }
 
   const { stats, appointments, donations, rewards, upcomingDrives } =
