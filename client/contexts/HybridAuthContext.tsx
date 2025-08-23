@@ -9,64 +9,16 @@ import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
-// Types for different user roles
-export interface DonorProfile {
-  id: string;
-  clerk_user_id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  blood_type?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
-  date_of_birth?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  profile_pic_url?: string;
-  points?: number;
-  level?: number;
-  is_verified?: boolean;
-  last_donation_date?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { Profile } from "../lib/supabase";
 
-export interface AdminProfile {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  profile_pic_url?: string;
-  is_verified?: boolean;
-  permissions?: Record<string, any>;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface HospitalStaffProfile {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  hospital_id?: string;
-  department?: string;
-  position?: string;
-  profile_pic_url?: string;
-  is_verified?: boolean;
-  permissions?: Record<string, any>;
-  created_at?: string;
-  updated_at?: string;
-}
-
+// Use the unified Profile interface from supabase.ts
 export type UserRole = "donor" | "admin" | "hospital";
-export type UserProfile = DonorProfile | AdminProfile | HospitalStaffProfile;
+export type UserProfile = Profile;
 
 interface HybridAuthContextType {
   // User data
   userRole: UserRole | null;
-  donorProfile: DonorProfile | null;
-  adminProfile: AdminProfile | null;
-  hospitalStaffProfile: HospitalStaffProfile | null;
+  userProfile: Profile | null;
 
   // Auth state
   isLoaded: boolean;
@@ -85,14 +37,8 @@ interface HybridAuthContextType {
   supabaseSignOut: () => Promise<{ error: any }>;
 
   // Profile management
-  updateDonorProfile: (
-    updates: Partial<DonorProfile>,
-  ) => Promise<{ data: any; error: any }>;
-  updateAdminProfile: (
-    updates: Partial<AdminProfile>,
-  ) => Promise<{ data: any; error: any }>;
-  updateHospitalStaffProfile: (
-    updates: Partial<HospitalStaffProfile>,
+  updateProfile: (
+    updates: Partial<Profile>,
   ) => Promise<{ data: any; error: any }>;
 
   // Navigation helper
@@ -151,24 +97,15 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
 
-  // User profiles
-  const [donorProfile, setDonorProfile] = useState<DonorProfile | null>(null);
-  const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
-  const [hospitalStaffProfile, setHospitalStaffProfile] =
-    useState<HospitalStaffProfile | null>(null);
+  // Unified user profile
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
 
   // Loading states
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  // Determine user role
-  const userRole: UserRole | null = donorProfile
-    ? "donor"
-    : adminProfile
-      ? "admin"
-      : hospitalStaffProfile
-        ? "hospital"
-        : null;
+  // Determine user role from profile
+  const userRole: UserRole | null = userProfile?.role || null;
 
   // Initialize Supabase auth
   useEffect(() => {
