@@ -52,18 +52,18 @@ export default function BookAppointment() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [donorInfo, setDonorInfo] = useState({
-    name: donorProfile?.name || "",
-    email: donorProfile?.email || "",
-    phone: donorProfile?.phone || "",
-    bloodType: donorProfile?.blood_type || "",
-    dateOfBirth: donorProfile?.date_of_birth || "",
-    address: donorProfile?.address || "",
-    city: donorProfile?.city || "",
-    state: donorProfile?.state || "",
-    postalCode: donorProfile?.postal_code || "",
+    name: userProfile?.name || "",
+    email: userProfile?.email || "",
+    phone: userProfile?.phone || "",
+    bloodType: userProfile?.blood_type || "",
+    dateOfBirth: userProfile?.date_of_birth || "",
+    address: userProfile?.address || "",
+    city: userProfile?.city || "",
+    state: userProfile?.state || "",
+    postalCode: userProfile?.postal_code || "",
   });
   const [medicalInfo, setMedicalInfo] = useState({
-    lastDonation: donorProfile?.last_donation_date || "",
+    lastDonation: userProfile?.last_donation_date || "",
     medications: "",
     allergies: "",
     medicalConditions: "",
