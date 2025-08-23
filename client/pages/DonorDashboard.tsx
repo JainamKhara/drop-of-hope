@@ -187,7 +187,7 @@ export default function DonorDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-hope-red mb-2">
-            Welcome back, {donorProfile.name}!
+            Welcome back, {userProfile.name}!
           </h1>
           <p className="text-muted-foreground">
             Thank you for being a life-saving hero. Here's your impact
