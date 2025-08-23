@@ -135,6 +135,7 @@ const AppContent = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/donor/login" element={<DonorLogin />} />
           <Route path="/donor/register" element={<DonorRegister />} />
+          <Route path="/clerk-setup" element={<ClerkSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/hospital/login" element={<HospitalLogin />} />
 
