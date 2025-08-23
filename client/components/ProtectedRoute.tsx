@@ -30,12 +30,28 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Redirect to login if not authenticated
-  if (!isSignedIn || !userRole) {
+  // Only redirect if we're sure the user is not signed in (not just missing userRole)
+  if (!isSignedIn) {
     return <Navigate to="/donor/login" replace />;
   }
 
+  // If user is signed in but userRole is null, it might still be loading
+  // Show loading instead of redirecting to prevent cycles
+  if (isSignedIn && !userRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <div className="w-4 h-4 bg-white rounded-full"></div>
+          </div>
+          <p className="text-muted-foreground">Setting up your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Check if user role is allowed
-  if (!allowedRoles.includes(userRole)) {
+  if (userRole && !allowedRoles.includes(userRole)) {
     // Redirect to appropriate dashboard based on user's actual role
     const userDashboard =
       userRole === "admin"
