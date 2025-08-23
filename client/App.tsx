@@ -179,9 +179,9 @@ const AppContent = () => (
 
 const App = () => {
   return (
-    <AuthProvider>
+    <HybridAuthProvider>
       <AppContent />
-    </AuthProvider>
+    </HybridAuthProvider>
   );
 };
 
