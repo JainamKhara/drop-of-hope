@@ -36,7 +36,7 @@ interface DashboardData {
 }
 
 export default function DonorDashboard() {
-  const { user, profile, loading } = useAuth();
+  const { donorProfile, loading, isSignedIn, clerkSignOut } = useHybridAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
