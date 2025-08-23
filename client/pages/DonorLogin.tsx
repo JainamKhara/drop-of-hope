@@ -54,8 +54,8 @@ function ClerkLoginForm() {
             privacyPageUrl: "/privacy",
           },
         }}
-        redirectUrl="/dashboard"
         afterSignInUrl="/dashboard"
+        signUpUrl="/donor/register"
       />
     </div>
   );
