@@ -166,9 +166,9 @@ export default function BloodDrives() {
 
             <div className="flex items-center space-x-4">
               <Button variant="outline" asChild>
-                <Link to={user ? "/dashboard" : "/"}>
+                <Link to={isSignedIn ? "/dashboard" : "/"}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {user ? "Dashboard" : "Home"}
+                  {isSignedIn ? "Dashboard" : "Home"}
                 </Link>
               </Button>
             </div>
