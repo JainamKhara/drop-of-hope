@@ -323,18 +323,14 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
   const value: HybridAuthContextType = {
     userRole,
-    donorProfile,
-    adminProfile,
-    hospitalStaffProfile,
+    userProfile,
     isLoaded,
     isSignedIn: isSignedIn || !!supabaseUser,
     loading: loading || profileLoading,
     clerkSignOut,
     supabaseSignIn,
     supabaseSignOut,
-    updateDonorProfile,
-    updateAdminProfile,
-    updateHospitalStaffProfile,
+    updateProfile,
     getRoleDashboard,
   };
 
