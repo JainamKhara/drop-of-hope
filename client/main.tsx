@@ -12,7 +12,8 @@ const isValidClerkKey =
   PUBLISHABLE_KEY.startsWith("pk_") &&
   PUBLISHABLE_KEY.length > 20 &&
   !PUBLISHABLE_KEY.includes("__") && // Not placeholder
-  PUBLISHABLE_KEY !== "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY"; // Not the invalid key
+  !PUBLISHABLE_KEY.includes("your_") && // Not placeholder
+  PUBLISHABLE_KEY !== "pk_test_example"; // Not example key
 
 console.log("Clerk Key Status:", {
   exists: !!PUBLISHABLE_KEY,
