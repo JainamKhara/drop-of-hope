@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { SignIn } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Heart, ArrowLeft } from "lucide-react";
+import ClerkDebug from "@/components/ClerkDebug";
 
 export default function DonorLogin() {
   const navigate = useNavigate();
