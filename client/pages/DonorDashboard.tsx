@@ -118,7 +118,7 @@ export default function DonorDashboard() {
   }
 
   // Note: isSignedIn check is handled by DonorOnlyRoute wrapper
-  if (!donorProfile) {
+  if (!userProfile || userRole !== "donor") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
