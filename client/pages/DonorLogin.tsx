@@ -46,16 +46,37 @@ export default function DonorLogin() {
 
           {/* Clerk Sign In Component */}
           <div className="flex justify-center">
-            <SignIn 
+            <SignIn
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
-                  card: "shadow-xl border-0",
-                  headerTitle: "text-hope-red",
+                  card: "shadow-xl border-0 bg-white dark:bg-gray-800",
+                  headerTitle: "text-hope-red font-bold",
                   headerSubtitle: "text-muted-foreground",
-                  socialButtonsBlockButton: "border-gray-300 hover:bg-gray-50",
-                  formButtonPrimary: "bg-hope-red hover:bg-hope-red/90",
-                  footerActionLink: "text-hope-red hover:text-hope-red/80",
+
+                  // OAuth/Social buttons styling
+                  socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
+                  socialButtonsBlockButtonText: "text-gray-700 dark:text-gray-200 font-medium",
+
+                  // Primary form button
+                  formButtonPrimary: "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
+
+                  // Form styling
+                  formFieldInput: "border-gray-300 focus:border-hope-red focus:ring-hope-red",
+                  formFieldLabel: "text-gray-700 dark:text-gray-200",
+
+                  // Footer links
+                  footerActionLink: "text-hope-red hover:text-hope-red/80 font-medium",
+
+                  // Divider styling
+                  dividerLine: "bg-gray-200",
+                  dividerText: "text-gray-500",
+                },
+                layout: {
+                  socialButtonsPlacement: "top",
+                  socialButtonsVariant: "blockButton",
+                  termsPageUrl: "/terms",
+                  privacyPageUrl: "/privacy",
                 },
               }}
               redirectUrl="/dashboard"
