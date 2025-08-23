@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export default function AdminLogin() {
-  const { user, profile, loading, signIn, getRoleDashboard } = useAuth();
+  const { adminProfile, loading, supabaseSignIn, getRoleDashboard } = useHybridAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,10 +25,10 @@ export default function AdminLogin() {
 
   // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
-    if (user && profile && !loading) {
+    if (adminProfile && !loading) {
       navigate(getRoleDashboard());
     }
-  }, [user, profile, loading, navigate, getRoleDashboard]);
+  }, [adminProfile, loading, navigate, getRoleDashboard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export default function AdminLogin() {
     setError("");
 
     // Use role-based authentication to ensure only admins can login
-    const { error } = await auth.signInWithRole(email, password, "admin");
+    const { error } = await supabaseSignIn(email, password, "admin");
 
     if (error) {
       setError(error.message);
