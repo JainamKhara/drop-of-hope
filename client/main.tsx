@@ -27,7 +27,8 @@ console.log("Clerk Key Status:", {
   length: PUBLISHABLE_KEY?.length,
   startsWithPk: PUBLISHABLE_KEY?.startsWith("pk_"),
   isValid: isValidClerkKey,
-  preview: PUBLISHABLE_KEY?.slice(0, 20) + "...",
+  isBlacklisted: PUBLISHABLE_KEY ? INVALID_KEYS.includes(PUBLISHABLE_KEY) : false,
+  preview: PUBLISHABLE_KEY ? PUBLISHABLE_KEY.slice(0, 20) + "..." : "None",
 });
 
 const rootElement = document.getElementById("root");
