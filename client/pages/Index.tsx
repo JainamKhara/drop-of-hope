@@ -17,10 +17,9 @@ import {
 } from "lucide-react";
 
 export default function Index() {
-  const { isSignedIn, donorProfile, adminProfile, hospitalStaffProfile } =
-    useHybridAuth();
+  const { isSignedIn, userProfile } = useHybridAuth();
   const user = isSignedIn;
-  const profile = donorProfile || adminProfile || hospitalStaffProfile;
+  const profile = userProfile;
 
   const stats = [
     { label: "Lives Saved", value: "10,000+", icon: Heart },
