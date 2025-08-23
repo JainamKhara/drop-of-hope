@@ -347,14 +347,8 @@ export const useAuth = () => {
 
   // Convert hybrid auth to legacy auth format for existing components
   return {
-    user:
-      hybridAuth.donorProfile ||
-      hybridAuth.adminProfile ||
-      hybridAuth.hospitalStaffProfile,
-    profile:
-      hybridAuth.donorProfile ||
-      hybridAuth.adminProfile ||
-      hybridAuth.hospitalStaffProfile,
+    user: hybridAuth.userProfile,
+    profile: hybridAuth.userProfile,
     session: null, // Legacy session not needed
     loading: hybridAuth.loading,
     signUp: () =>
@@ -375,17 +369,7 @@ export const useAuth = () => {
       }
     },
     updateProfile: (updates: any) => {
-      if (hybridAuth.userRole === "donor") {
-        return hybridAuth.updateDonorProfile(updates);
-      } else if (hybridAuth.userRole === "admin") {
-        return hybridAuth.updateAdminProfile(updates);
-      } else if (hybridAuth.userRole === "hospital") {
-        return hybridAuth.updateHospitalStaffProfile(updates);
-      }
-      return Promise.resolve({
-        data: null,
-        error: new Error("No profile loaded"),
-      });
+      return hybridAuth.updateProfile(updates);
     },
     getRoleDashboard: hybridAuth.getRoleDashboard,
   };
