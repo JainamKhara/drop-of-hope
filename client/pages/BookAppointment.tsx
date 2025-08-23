@@ -210,7 +210,7 @@ export default function BookAppointment() {
     setSubmitting(true);
     try {
       const appointmentData = {
-        donor_id: donorProfile.id,
+        donor_id: userProfile.id,
         drive_id: drive.id,
         appointment_date: format(selectedDate, "yyyy-MM-dd"),
         appointment_time: selectedTime,
