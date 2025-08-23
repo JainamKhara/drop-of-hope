@@ -39,7 +39,7 @@ interface DriveWithDetails extends Drive {
 }
 
 export default function BloodDrives() {
-  const { donorProfile, isSignedIn } = useHybridAuth();
+  const { donorProfile, adminProfile, isSignedIn } = useHybridAuth();
   const [drives, setDrives] = useState<DriveWithDetails[]>([]);
   const [filteredDrives, setFilteredDrives] = useState<DriveWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
