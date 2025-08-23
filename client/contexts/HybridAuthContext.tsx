@@ -206,12 +206,12 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     }
   }, [isLoaded, isSignedIn, clerkUser]);
 
-  // Set loading to false when either auth system is loaded
+  // Set loading to false when auth system is loaded or when Clerk is not configured
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded || !isClerkConfigured) {
       setLoading(false);
     }
-  }, [isLoaded]);
+  }, [isLoaded, isClerkConfigured]);
 
   const loadDonorProfile = async (clerkUserId: string) => {
     try {
