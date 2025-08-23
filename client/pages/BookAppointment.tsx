@@ -231,11 +231,12 @@ export default function BookAppointment() {
         // Update user profile if needed
         if (
           donorInfo.bloodType &&
-          donorInfo.bloodType !== profile?.blood_type
+          donorInfo.bloodType !== donorProfile?.blood_type
         ) {
-          await db.updateProfile(user.id, {
-            blood_type: donorInfo.bloodType as any,
-          });
+          // TODO: Use updateDonorProfile from hybrid auth context
+          // await updateDonorProfile({
+          //   blood_type: donorInfo.bloodType as any,
+          // });
         }
 
         toast({
