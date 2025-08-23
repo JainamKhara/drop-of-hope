@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 export default function HospitalLogin() {
-  const { hospitalStaffProfile, loading, supabaseSignIn, getRoleDashboard } =
+  const { userProfile, userRole, loading, supabaseSignIn, getRoleDashboard } =
     useHybridAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -27,10 +27,10 @@ export default function HospitalLogin() {
 
   // Redirect to appropriate dashboard if already signed in
   React.useEffect(() => {
-    if (hospitalStaffProfile && !loading) {
+    if (userRole === "hospital" && userProfile && !loading) {
       navigate(getRoleDashboard());
     }
-  }, [hospitalStaffProfile, loading, navigate, getRoleDashboard]);
+  }, [userRole, userProfile, loading, navigate, getRoleDashboard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
