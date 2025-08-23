@@ -140,8 +140,9 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   useEffect(() => {
     if (isLoaded && isSignedIn && clerkUser) {
       loadDonorProfile(clerkUser.id);
-    } else {
-      setDonorProfile(null);
+    } else if (!supabaseUser) {
+      // Only clear profile if not logged in via Supabase
+      setUserProfile(null);
     }
   }, [isLoaded, isSignedIn, clerkUser]);
 
@@ -166,26 +167,28 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     setProfileLoading(true);
     try {
       const { data, error } = await supabase
-        .from("donors")
+        .from("profiles")
         .select("*")
         .eq("clerk_user_id", clerkUserId)
+        .eq("role", "donor")
         .single();
 
       if (error && error.code === "PGRST116") {
         // Profile doesn't exist, create one
         if (clerkUser) {
-          const newProfile: Omit<DonorProfile, "created_at" | "updated_at"> = {
+          const newProfile: Omit<Profile, "created_at" | "updated_at"> = {
             id: crypto.randomUUID(),
             clerk_user_id: clerkUserId,
             email: clerkUser.emailAddresses[0]?.emailAddress || "",
             name: clerkUser.fullName || clerkUser.firstName || "User",
+            role: "donor",
             points: 0,
             level: 1,
             is_verified: false,
           };
 
           const { data: createdProfile, error: createError } = await supabase
-            .from("donors")
+            .from("profiles")
             .insert([newProfile])
             .select()
             .single();
@@ -193,11 +196,11 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
           if (createError) {
             console.error("Error creating donor profile:", createError);
           } else {
-            setDonorProfile(createdProfile);
+            setUserProfile(createdProfile);
           }
         }
       } else if (data) {
-        setDonorProfile(data);
+        setUserProfile(data);
       }
     } catch (error) {
       console.error("Error loading donor profile:", error);
@@ -209,28 +212,18 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   const loadSupabaseUserProfile = async (userId: string) => {
     setProfileLoading(true);
     try {
-      // Try to find admin profile
-      const { data: adminData } = await supabase
-        .from("admins")
+      // Find user profile in the unified profiles table
+      const { data, error } = await supabase
+        .from("profiles")
         .select("*")
         .eq("id", userId)
+        .in("role", ["admin", "hospital"])
         .single();
 
-      if (adminData) {
-        setAdminProfile(adminData);
-        return;
-      }
-
-      // Try to find hospital staff profile
-      const { data: hospitalData } = await supabase
-        .from("hospital_staff")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (hospitalData) {
-        setHospitalStaffProfile(hospitalData);
-        return;
+      if (error) {
+        console.error("Error loading Supabase user profile:", error);
+      } else if (data) {
+        setUserProfile(data);
       }
     } catch (error) {
       console.error("Error loading Supabase user profile:", error);
@@ -258,12 +251,12 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       return { data: null, error: { message: "Authentication failed" } };
     }
 
-    // Check user role in the appropriate table
-    const tableName = expectedRole === "admin" ? "admins" : "hospital_staff";
+    // Check user role in the profiles table
     const { data: profile, error: profileError } = await supabase
-      .from(tableName)
+      .from("profiles")
       .select("*")
       .eq("id", data.user.id)
+      .eq("role", expectedRole)
       .single();
 
     if (profileError) {
@@ -289,8 +282,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   const supabaseSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     setSupabaseUser(null);
-    setAdminProfile(null);
-    setHospitalStaffProfile(null);
+    setUserProfile(null);
     setSupabaseSession(null);
     return { error };
   };
