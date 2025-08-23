@@ -4,7 +4,7 @@ import { SignIn, useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft, AlertCircle, ExternalLink } from "lucide-react";
+import { Heart, ArrowLeft, AlertCircle, ExternalLink, Settings } from "lucide-react";
 
 function ClerkLoginForm() {
   return (
