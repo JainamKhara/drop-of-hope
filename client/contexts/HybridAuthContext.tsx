@@ -287,70 +287,21 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     return { error };
   };
 
-  const updateDonorProfile = async (updates: Partial<DonorProfile>) => {
-    if (!donorProfile) {
-      return { data: null, error: new Error("No donor profile loaded") };
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!userProfile) {
+      return { data: null, error: new Error("No profile loaded") };
     }
 
     try {
       const { data, error } = await supabase
-        .from("donors")
+        .from("profiles")
         .update(updates)
-        .eq("id", donorProfile.id)
+        .eq("id", userProfile.id)
         .select()
         .single();
 
       if (data) {
-        setDonorProfile(data);
-      }
-      return { data, error };
-    } catch (error) {
-      return { data: null, error };
-    }
-  };
-
-  const updateAdminProfile = async (updates: Partial<AdminProfile>) => {
-    if (!adminProfile) {
-      return { data: null, error: new Error("No admin profile loaded") };
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from("admins")
-        .update(updates)
-        .eq("id", adminProfile.id)
-        .select()
-        .single();
-
-      if (data) {
-        setAdminProfile(data);
-      }
-      return { data, error };
-    } catch (error) {
-      return { data: null, error };
-    }
-  };
-
-  const updateHospitalStaffProfile = async (
-    updates: Partial<HospitalStaffProfile>,
-  ) => {
-    if (!hospitalStaffProfile) {
-      return {
-        data: null,
-        error: new Error("No hospital staff profile loaded"),
-      };
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from("hospital_staff")
-        .update(updates)
-        .eq("id", hospitalStaffProfile.id)
-        .select()
-        .single();
-
-      if (data) {
-        setHospitalStaffProfile(data);
+        setUserProfile(data);
       }
       return { data, error };
     } catch (error) {
