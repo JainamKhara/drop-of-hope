@@ -108,9 +108,25 @@ interface HybridAuthProviderProps {
 }
 
 export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
-  // Clerk auth for donors
-  const { isLoaded, isSignedIn, signOut: clerkSignOut } = useClerkAuth();
-  const { user: clerkUser } = useUser();
+  // Check if Clerk is available
+  let clerkAuth: any = null;
+  let clerkUser: any = null;
+  let isClerkAvailable = false;
+
+  try {
+    clerkAuth = useClerkAuth();
+    clerkUser = useUser().user;
+    isClerkAvailable = true;
+  } catch (error) {
+    // Clerk is not available (invalid key or not configured)
+    console.warn("Clerk is not available:", error);
+    isClerkAvailable = false;
+  }
+
+  // Use Clerk data if available, otherwise use fallback values
+  const { isLoaded, isSignedIn, signOut: clerkSignOut } = isClerkAvailable
+    ? clerkAuth
+    : { isLoaded: true, isSignedIn: false, signOut: async () => {} };
   
   // Supabase auth for admins and hospital staff
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
