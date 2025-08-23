@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
 import HospitalLogin from "./pages/HospitalLogin";
 import Register from "./pages/Register";
+import DonorLogin from "./pages/DonorLogin";
+import DonorRegister from "./pages/DonorRegister";
 import DonorDashboard from "./pages/DonorDashboard";
 import BloodDrives from "./pages/BloodDrives";
 import BookAppointment from "./pages/BookAppointment";
