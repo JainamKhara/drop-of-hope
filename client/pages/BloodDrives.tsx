@@ -439,7 +439,7 @@ export default function BloodDrives() {
         )}
 
         {/* Call to Action for Creating Drives */}
-        {user && profile?.role === "admin" && (
+        {adminProfile && (
           <Card className="mt-8 border-0 shadow-md bg-hope-pink dark:bg-hope-coral">
             <CardContent className="text-center py-8">
               <h3 className="text-xl font-semibold text-hope-red mb-2">
