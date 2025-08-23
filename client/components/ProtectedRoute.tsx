@@ -1,10 +1,10 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useHybridAuth, UserRole } from "@/contexts/HybridAuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: ("donor" | "admin" | "hospital")[];
+  allowedRoles: UserRole[];
   redirectTo?: string;
 }
 
@@ -13,7 +13,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles,
   redirectTo,
 }) => {
-  const { user, profile, loading } = useAuth();
+  const { userRole, loading, isSignedIn } = useHybridAuth();
 
   // Show loading state while checking authentication
   if (loading) {
@@ -30,17 +30,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Redirect to login if not authenticated
-  if (!user || !profile) {
-    return <Navigate to="/login" replace />;
+  if (!isSignedIn || !userRole) {
+    return <Navigate to="/donor/login" replace />;
   }
 
   // Check if user role is allowed
-  if (!allowedRoles.includes(profile.role)) {
+  if (!allowedRoles.includes(userRole)) {
     // Redirect to appropriate dashboard based on user's actual role
     const userDashboard =
-      profile.role === "admin"
+      userRole === "admin"
         ? "/admin"
-        : profile.role === "hospital"
+        : userRole === "hospital"
           ? "/hospital-portal"
           : "/dashboard";
 
@@ -68,7 +68,7 @@ export const DonorOnlyRoute: React.FC<{ children: React.ReactNode }> = ({
 export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user, profile, loading } = useAuth();
+  const { userRole, loading, isSignedIn } = useHybridAuth();
 
   if (loading) {
     return (
@@ -83,8 +83,8 @@ export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({
     );
   }
 
-  if (!user || !profile) {
-    return <Navigate to="/login" replace />;
+  if (!isSignedIn || !userRole) {
+    return <Navigate to="/donor/login" replace />;
   }
 
   return <>{children}</>;
