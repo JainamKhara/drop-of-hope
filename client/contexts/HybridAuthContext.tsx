@@ -118,7 +118,8 @@ interface HybridAuthProviderProps {
 export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   // Check if Clerk publishable key is configured
   const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-  const isClerkConfigured = clerkPublishableKey && clerkPublishableKey.startsWith('pk_');
+  const isClerkConfigured =
+    clerkPublishableKey && clerkPublishableKey.startsWith("pk_");
 
   // Only use Clerk hooks if properly configured
   let clerkAuth: any = null;

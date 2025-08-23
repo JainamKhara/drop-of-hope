@@ -85,7 +85,9 @@ function ClerkUnavailableMessage() {
             <li>Go to your Clerk Dashboard (create free account if needed)</li>
             <li>Create a new application or select existing one</li>
             <li>Navigate to API Keys section</li>
-            <li>Copy your Publishable Key (starts with pk_test_ or pk_live_)</li>
+            <li>
+              Copy your Publishable Key (starts with pk_test_ or pk_live_)
+            </li>
             <li>Update the VITE_CLERK_PUBLISHABLE_KEY environment variable</li>
             <li>Restart the development server</li>
           </ol>
