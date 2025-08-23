@@ -43,12 +43,7 @@ export default function DonorDashboard() {
   );
   const [loadingData, setLoadingData] = useState(true);
 
-  // Redirect to login if not authenticated
-  React.useEffect(() => {
-    if (!loading && !isSignedIn) {
-      navigate("/donor/login");
-    }
-  }, [isSignedIn, loading, navigate]);
+  // Note: Authentication is handled by DonorOnlyRoute wrapper
 
   // Load dashboard data
   useEffect(() => {
@@ -122,8 +117,18 @@ export default function DonorDashboard() {
     );
   }
 
-  if (!isSignedIn || !donorProfile) {
-    return null;
+  // Note: isSignedIn check is handled by DonorOnlyRoute wrapper
+  if (!donorProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-6 h-6 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Setting up your profile...</p>
+        </div>
+      </div>
+    );
   }
 
   const { stats, appointments, donations, rewards, upcomingDrives } =

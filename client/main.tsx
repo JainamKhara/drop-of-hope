@@ -6,20 +6,28 @@ import "./global.css";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+// List of known invalid or expired keys
+const INVALID_KEYS = [
+  "pk_test_example",
+  // Removed user's key to test validity
+];
+
 // Check if key exists and looks valid (starts with pk_)
 const isValidClerkKey =
   PUBLISHABLE_KEY &&
   PUBLISHABLE_KEY.startsWith("pk_") &&
   PUBLISHABLE_KEY.length > 20 &&
   !PUBLISHABLE_KEY.includes("__") && // Not placeholder
-  PUBLISHABLE_KEY !== "pk_test_dHJ1c3RlZC1jcmFuZS01NC5jbGVyay5hY2NvdW50cy5kZXY"; // Not the invalid key
+  !PUBLISHABLE_KEY.includes("your_") && // Not placeholder
+  !INVALID_KEYS.includes(PUBLISHABLE_KEY); // Not in blacklist
 
 console.log("Clerk Key Status:", {
   exists: !!PUBLISHABLE_KEY,
   length: PUBLISHABLE_KEY?.length,
   startsWithPk: PUBLISHABLE_KEY?.startsWith("pk_"),
   isValid: isValidClerkKey,
-  preview: PUBLISHABLE_KEY?.slice(0, 20) + "...",
+  isBlacklisted: PUBLISHABLE_KEY ? INVALID_KEYS.includes(PUBLISHABLE_KEY) : false,
+  preview: PUBLISHABLE_KEY ? PUBLISHABLE_KEY.slice(0, 20) + "..." : "None",
 });
 
 const rootElement = document.getElementById("root");
@@ -50,5 +58,24 @@ if (isValidClerkKey) {
   console.warn(
     "Please get a valid key from: https://dashboard.clerk.com/last-active?path=api-keys",
   );
+  console.warn("Current key:", PUBLISHABLE_KEY || "Not set");
+
+  if (PUBLISHABLE_KEY && INVALID_KEYS.includes(PUBLISHABLE_KEY)) {
+    console.warn("❌ This key is known to be invalid/expired. Please get a new one.");
+  }
+
+  console.log(`
+🚀 To enable donor authentication:
+1. Visit: https://dashboard.clerk.com
+2. Create/sign in to your account
+3. Create a new application
+4. Copy the Publishable Key
+5. Set VITE_CLERK_PUBLISHABLE_KEY environment variable
+6. Restart the dev server
+
+📝 The app will run in fallback mode until Clerk is configured.
+✅ Admin and Hospital logins still work (they use Supabase).
+  `);
+
   root.render(<App />);
 }

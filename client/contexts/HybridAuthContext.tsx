@@ -116,19 +116,25 @@ interface HybridAuthProviderProps {
 }
 
 export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
-  // Check if Clerk is available
+  // Check if Clerk publishable key is configured
+  const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  const isClerkConfigured = clerkPublishableKey && clerkPublishableKey.startsWith('pk_');
+
+  // Only use Clerk hooks if properly configured
   let clerkAuth: any = null;
   let clerkUser: any = null;
   let isClerkAvailable = false;
 
-  try {
-    clerkAuth = useClerkAuth();
-    clerkUser = useUser().user;
-    isClerkAvailable = true;
-  } catch (error) {
-    // Clerk is not available (invalid key or not configured)
-    console.warn("Clerk is not available:", error);
-    isClerkAvailable = false;
+  if (isClerkConfigured) {
+    try {
+      clerkAuth = useClerkAuth();
+      clerkUser = useUser().user;
+      isClerkAvailable = true;
+    } catch (error) {
+      // Only catch configuration errors, not runtime auth errors
+      console.warn("Clerk configuration error:", error);
+      isClerkAvailable = false;
+    }
   }
 
   // Use Clerk data if available, otherwise use fallback values
@@ -200,12 +206,12 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     }
   }, [isLoaded, isSignedIn, clerkUser]);
 
-  // Set loading to false when either auth system is loaded
+  // Set loading to false when auth system is loaded or when Clerk is not configured
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded || !isClerkConfigured) {
       setLoading(false);
     }
-  }, [isLoaded]);
+  }, [isLoaded, isClerkConfigured]);
 
   const loadDonorProfile = async (clerkUserId: string) => {
     try {

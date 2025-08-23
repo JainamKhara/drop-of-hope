@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { SignIn, useAuth } from "@clerk/clerk-react";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -53,8 +54,8 @@ function ClerkLoginForm() {
             privacyPageUrl: "/privacy",
           },
         }}
-        redirectUrl="/dashboard"
         afterSignInUrl="/dashboard"
+        signUpUrl="/donor/register"
       />
     </div>
   );
@@ -81,10 +82,12 @@ function ClerkUnavailableMessage() {
         <div className="space-y-3 text-sm">
           <p className="font-medium text-red-800">To fix this:</p>
           <ol className="list-decimal list-inside space-y-2 text-red-700">
-            <li>Go to your Clerk Dashboard</li>
+            <li>Go to your Clerk Dashboard (create free account if needed)</li>
+            <li>Create a new application or select existing one</li>
             <li>Navigate to API Keys section</li>
-            <li>Copy your Publishable Key</li>
+            <li>Copy your Publishable Key (starts with pk_test_ or pk_live_)</li>
             <li>Update the VITE_CLERK_PUBLISHABLE_KEY environment variable</li>
+            <li>Restart the development server</li>
           </ol>
         </div>
 
@@ -127,6 +130,8 @@ function ClerkUnavailableMessage() {
 }
 
 export default function DonorLogin() {
+  const { userRole, isSignedIn, loading } = useHybridAuth();
+
   // Check if we're in a Clerk context
   let isClerkAvailable = false;
   let clerkError = null;
@@ -138,6 +143,18 @@ export default function DonorLogin() {
   } catch (error) {
     clerkError = error;
     isClerkAvailable = false;
+    console.warn("Clerk login unavailable:", error);
+  }
+
+  // Redirect if already authenticated as a donor
+  if (!loading && isSignedIn && userRole === "donor") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Redirect other user types to their dashboards
+  if (!loading && isSignedIn && userRole) {
+    const dashboard = userRole === "admin" ? "/admin" : "/hospital-portal";
+    return <Navigate to={dashboard} replace />;
   }
 
   return (
