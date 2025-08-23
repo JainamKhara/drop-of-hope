@@ -92,8 +92,8 @@ export default function DonorDashboard() {
         upcomingDrives,
         stats: {
           totalDonations: donations.length,
-          totalPoints: donorProfile?.points || 0,
-          level: donorProfile?.level || 1,
+          totalPoints: userProfile?.points || 0,
+          level: userProfile?.level || 1,
           daysUntilNextDonation,
         },
       });
