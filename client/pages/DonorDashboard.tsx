@@ -43,12 +43,7 @@ export default function DonorDashboard() {
   );
   const [loadingData, setLoadingData] = useState(true);
 
-  // Redirect to login if not authenticated
-  React.useEffect(() => {
-    if (!loading && !isSignedIn) {
-      navigate("/donor/login");
-    }
-  }, [isSignedIn, loading, navigate]);
+  // Note: Authentication is handled by DonorOnlyRoute wrapper
 
   // Load dashboard data
   useEffect(() => {
