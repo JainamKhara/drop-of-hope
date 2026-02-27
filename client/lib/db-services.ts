@@ -66,6 +66,17 @@ export const driveService = {
   },
 
   /**
+   * Get all drives for admin (including inactive)
+   */
+  getAdminAll: async () => {
+    const { data, error } = await supabase
+      .from('drives')
+      .select('*')
+      .order('start_date', { ascending: false });
+    return { data, error };
+  },
+
+  /**
    * Get drives count
    */
   getCount: async (activeOnly: boolean = false) => {
@@ -296,7 +307,7 @@ export const appointmentService = {
     const { data, error } = await supabase
       .from('appointments')
       .update({ 
-        status: 'scheduled',
+        status: 'completed',
         notes: notes || undefined,
         updated_at: new Date().toISOString() 
       })
@@ -650,11 +661,7 @@ export const bloodRequestService = {
   approve: async (id: string, notes?: string) => {
     const { data, error } = await supabase
       .from('blood_requests')
-      .update({ 
-        status: 'approved',
-        reason: notes || 'Request approved',
-        updated_at: new Date().toISOString() 
-      })
+      .update({ status: 'fulfilled' })
       .eq('id', id)
       .select()
       .single();
@@ -667,11 +674,7 @@ export const bloodRequestService = {
   reject: async (id: string, reason?: string) => {
     const { data, error } = await supabase
       .from('blood_requests')
-      .update({ 
-        status: 'rejected',
-        notes: reason || 'Request rejected by administrator',
-        updated_at: new Date().toISOString() 
-      })
+      .update({ status: 'cancelled' })
       .eq('id', id)
       .select()
       .single();

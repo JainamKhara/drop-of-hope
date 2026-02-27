@@ -182,7 +182,7 @@ export default function AdminDashboard() {
       ] = await Promise.all([
         statsService.getAdminStats(),
         donorService.getRecent(10),
-        driveService.getUpcoming(10),
+        driveService.getAdminAll(),
         hospitalService.getAll(),
         appointmentService.getAll(),
         bloodRequestService.getAll(),
@@ -223,16 +223,28 @@ export default function AdminDashboard() {
       // Update drives list
       if (drivesResult.data) {
         setBloodDrives(
-          drivesResult.data.map((drive: any) => ({
-            id: drive.id,
-            name: drive.name,
-            organizer: drive.profiles?.name || "Unknown",
-            date: drive.start_date,
-            location: drive.location,
-            capacity: drive.capacity,
-            registered: drive.registered_count || 0,
-            status: drive.is_active ? "active" : "inactive",
-          })),
+          drivesResult.data.map((drive: any) => {
+            // Compute real registered count from appointments
+            const registeredCount = appointmentsResult.data
+              ? appointmentsResult.data.filter(
+                  (apt: any) =>
+                    apt.drive_id === drive.id &&
+                    apt.status !== "cancelled" &&
+                    apt.status !== "no_show",
+                ).length
+              : drive.registered_count || 0;
+
+            return {
+              id: drive.id,
+              name: drive.name,
+              organizer: drive.profiles?.name || "Unknown",
+              date: drive.start_date,
+              location: drive.location,
+              capacity: drive.capacity,
+              registered: registeredCount,
+              status: drive.is_active ? "active" : "inactive",
+            };
+          }),
         );
       }
 
@@ -781,11 +793,13 @@ export default function AdminDashboard() {
                             className={
                               appointment.status === "scheduled"
                                 ? "bg-warning/10 text-warning"
-                                : appointment.status === "completed"
+                                : appointment.status === "confirmed"
                                   ? "bg-success/10 text-success"
-                                  : appointment.status === "cancelled"
-                                    ? "bg-destructive/10 text-destructive"
-                                    : "bg-muted"
+                                  : appointment.status === "completed"
+                                    ? "bg-blue-500/10 text-blue-600"
+                                    : appointment.status === "cancelled"
+                                      ? "bg-destructive/10 text-destructive"
+                                      : "bg-muted"
                             }
                           >
                             {appointment.status}
@@ -915,13 +929,11 @@ export default function AdminDashboard() {
                             className={
                               request.status === "pending"
                                 ? "bg-warning/10 text-warning"
-                                : request.status === "approved"
+                                : request.status === "fulfilled"
                                   ? "bg-success/10 text-success"
-                                  : request.status === "rejected"
+                                  : request.status === "cancelled"
                                     ? "bg-destructive/10 text-destructive"
-                                    : request.status === "fulfilled"
-                                      ? "bg-blue-500/10 text-blue-600"
-                                      : "bg-muted"
+                                    : "bg-muted"
                             }
                           >
                             {request.status}

@@ -127,7 +127,7 @@ export default function BookAppointment() {
 
     // Parse times - handle both HH:mm and HH:mm:ss formats from the database
     const today = new Date();
-    const startTimeStr = drive.start_time?.substring(0, 5) || "09:00"; 
+    const startTimeStr = drive.start_time?.substring(0, 5) || "09:00";
     const endTimeStr = drive.end_time?.substring(0, 5) || "17:00";
 
     const startTime = parse(startTimeStr, "HH:mm", today);
@@ -272,11 +272,13 @@ export default function BookAppointment() {
       setTimeout(() => {
         navigate("/appointments");
       }, 500);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating appointment:", error);
       toast({
         title: "Booking Failed",
-        description: "Failed to book your appointment. Please try again.",
+        description:
+          error?.message ||
+          "Failed to book your appointment. Please try again.",
         variant: "destructive",
       });
     } finally {

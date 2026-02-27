@@ -395,7 +395,7 @@ export default function HospitalPortal() {
     try {
       const { error } = await bloodRequestService.updateStatus(
         editingRequest.id,
-        editingRequest.urgency === "cancelled" ? "cancelled" : "pending",
+        editingRequest.urgency === "cancelled" ? "rejected" : "pending",
       );
       if (error) throw error;
       toast({
@@ -422,7 +422,7 @@ export default function HospitalPortal() {
     try {
       const { error } = await bloodRequestService.updateStatus(
         requestId,
-        "cancelled",
+        "rejected",
       );
       if (error) throw error;
       toast({
