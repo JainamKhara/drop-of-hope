@@ -200,9 +200,8 @@ npm run build
 
 Have questions or want to collaborate?
 
-- **Email**: help@dropofhope.org
-- **Phone**: 1-800-DONATE
+- **Email**: kharajaynam@gmail.com
+- **Phone**: +91 7779069774
 - **Repository**: [Drop of Hope GitHub](https://github.com/Jainam116/drop-of-hope)
 
 ---
-*© 2024 Drop of Hope. All rights reserved.*
