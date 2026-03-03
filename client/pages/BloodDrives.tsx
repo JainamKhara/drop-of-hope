@@ -6,7 +6,16 @@ import { driveService } from "@/lib/db-services";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -31,8 +40,11 @@ import {
   ArrowLeft,
   Navigation,
   RefreshCw,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface DriveWithDetails extends Drive {
   hospitals?: { name: string; city: string; state: string };
@@ -41,6 +53,7 @@ interface DriveWithDetails extends Drive {
 
 export default function BloodDrives() {
   const { donorProfile, adminProfile, isSignedIn } = useHybridAuth();
+  const { toast } = useToast();
   const [drives, setDrives] = useState<DriveWithDetails[]>([]);
   const [filteredDrives, setFilteredDrives] = useState<DriveWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +61,11 @@ export default function BloodDrives() {
   const [selectedBloodType, setSelectedBloodType] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [cityFilter, setCityFilter] = useState("");
+
+  // Feedback modal state
+  const [feedbackDriveId, setFeedbackDriveId] = useState<string | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
 
   // Load drives from database on mount
   useEffect(() => {
@@ -394,6 +412,23 @@ export default function BloodDrives() {
                           <Navigation className="w-4 h-4" />
                         </Button>
                       )}
+                      {/* Feedback button for past/completed drives */}
+                      {drive.end_date &&
+                        new Date(drive.end_date) < new Date() &&
+                        isSignedIn && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title="Leave Feedback"
+                            onClick={() => {
+                              setFeedbackDriveId(drive.id);
+                              setFeedbackRating(0);
+                              setFeedbackText("");
+                            }}
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </Button>
+                        )}
                     </div>
                   </div>
                 </CardContent>
@@ -438,6 +473,75 @@ export default function BloodDrives() {
           </Card>
         )}
       </div>
+
+      {/* Feedback Dialog */}
+      <Dialog
+        open={!!feedbackDriveId}
+        onOpenChange={(open) => !open && setFeedbackDriveId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-hope-red" />
+              Leave Your Feedback
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label className="text-sm font-medium">Your Rating</Label>
+              <div className="flex gap-1 mt-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setFeedbackRating(star)}
+                    className="focus:outline-none"
+                  >
+                    <Star
+                      className={`w-7 h-7 transition-colors ${
+                        star <= feedbackRating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="feedback-text" className="text-sm font-medium">
+                Comments (optional)
+              </Label>
+              <Textarea
+                id="feedback-text"
+                placeholder="Share your experience at this blood drive..."
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                rows={4}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFeedbackDriveId(null)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-hope-red hover:bg-hope-red/90"
+              disabled={feedbackRating === 0}
+              onClick={() => {
+                toast({
+                  title: "Feedback submitted!",
+                  description: `Thank you for your ${feedbackRating}-star rating.`,
+                });
+                setFeedbackDriveId(null);
+              }}
+            >
+              Submit Feedback
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

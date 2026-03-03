@@ -27,6 +27,7 @@ import {
   inventoryService,
   bloodRequestService,
   appointmentService,
+  driveService,
 } from "@/lib/db-services";
 import {
   Heart,
@@ -51,8 +52,22 @@ import {
   Edit,
   Ban,
   Droplets,
+  Printer,
 } from "lucide-react";
 import { format, addDays } from "date-fns";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -92,6 +107,7 @@ export default function HospitalPortal() {
   );
   const [bloodRequests, setBloodRequests] = useState<BloodRequestItem[]>([]);
   const [donorAppointments, setDonorAppointments] = useState<any[]>([]);
+  const [hospitalDrives, setHospitalDrives] = useState<any[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -136,12 +152,17 @@ export default function HospitalPortal() {
     try {
       setDataLoading(true);
 
-      const [inventoryResult, requestsResult, appointmentsResult] =
-        await Promise.allSettled([
-          inventoryService.getByHospital(hospitalProfile.id),
-          bloodRequestService.getByHospital(hospitalProfile.id),
-          appointmentService.getByHospital(hospitalProfile.id),
-        ]);
+      const [
+        inventoryResult,
+        requestsResult,
+        appointmentsResult,
+        drivesResult,
+      ] = await Promise.allSettled([
+        inventoryService.getByHospital(hospitalProfile.id),
+        bloodRequestService.getByHospital(hospitalProfile.id),
+        appointmentService.getByHospital(hospitalProfile.id),
+        driveService.getAll(),
+      ]);
 
       // Process inventory data
       const inventoryData =
@@ -218,6 +239,16 @@ export default function HospitalPortal() {
           : null;
       if (appointmentsData) {
         setDonorAppointments(appointmentsData);
+      }
+
+      // Process drives data (filter by this hospital)
+      const drivesData =
+        drivesResult.status === "fulfilled" ? drivesResult.value.data : null;
+      if (drivesData) {
+        const myDrives = drivesData.filter(
+          (d: any) => d.hospital_id === hospitalProfile.id,
+        );
+        setHospitalDrives(myDrives);
       }
     } catch (error) {
       console.error("Error loading hospital data:", error);
@@ -560,12 +591,34 @@ export default function HospitalPortal() {
           </Card>
         </div>
 
+        {/* Low Stock Alert */}
+        {bloodInventory.some((item) => item.status === "critical") && (
+          <Alert className="mb-6 border-destructive/60 bg-destructive/10">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <AlertDescription className="text-destructive font-medium">
+              <strong>Critical Stock Alert:</strong>{" "}
+              {bloodInventory
+                .filter((item) => item.status === "critical")
+                .map((item) => item.type)
+                .join(", ")}{" "}
+              blood{" "}
+              {bloodInventory.filter((i) => i.status === "critical").length ===
+              1
+                ? "type is"
+                : "types are"}{" "}
+              critically low ({"<"}8 units). Please request replenishment
+              immediately.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="inventory">Blood Inventory</TabsTrigger>
             <TabsTrigger value="appointments">Donor Appointments</TabsTrigger>
             <TabsTrigger value="requests">Blood Requests</TabsTrigger>
+            <TabsTrigger value="drives">Blood Drives</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -949,6 +1002,92 @@ export default function HospitalPortal() {
                           <Eye className="w-3 h-3 mr-1" />
                           View Details
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const win = window.open(
+                              "",
+                              "_blank",
+                              "width=700,height=450",
+                            );
+                            if (win) {
+                              win.document
+                                .write(`<html><head><title>Blood Request Slip</title></head><body style="font-family:sans-serif;padding:24px">
+                                <h2 style="color:#e74c3c">Drop of Hope — Blood Request Slip</h2>
+                                <hr/>
+                                <p><strong>Request ID:</strong> ${request.id}</p>
+                                <p><strong>Blood Type:</strong> ${request.bloodType}</p>
+                                <p><strong>Units:</strong> ${request.units}</p>
+                                <p><strong>Urgency:</strong> ${request.urgency.toUpperCase()}</p>
+                                <p><strong>Department:</strong> ${request.department}</p>
+                                <p><strong>Requested By:</strong> ${request.requestedBy}</p>
+                                <p><strong>Status:</strong> ${request.status}</p>
+                                <p><strong>Notes:</strong> ${request.notes || "—"}</p>
+                              </body></html>`);
+                              win.document.close();
+                              win.print();
+                            }
+                          }}
+                        >
+                          <Printer className="w-3 h-3 mr-1" />
+                          Print
+                        </Button>
+                      </div>
+
+                      {/* Request Status Tracker */}
+                      <div className="mt-3 pt-3 border-t">
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Status Tracker
+                        </p>
+                        <div className="flex items-center gap-1">
+                          {[
+                            "pending",
+                            "approved",
+                            "processing",
+                            "fulfilled",
+                          ].map((step, idx, arr) => {
+                            const order = arr.indexOf(request.status);
+                            const stepIdx = idx;
+                            const isDone = stepIdx <= order;
+                            const isActive = step === request.status;
+                            return (
+                              <React.Fragment key={step}>
+                                <div
+                                  className={`flex flex-col items-center flex-1`}
+                                >
+                                  <div
+                                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                      isDone
+                                        ? "bg-hope-red text-white"
+                                        : "bg-muted text-muted-foreground"
+                                    }`}
+                                  >
+                                    {stepIdx + 1}
+                                  </div>
+                                  <span
+                                    className={`text-xs mt-1 capitalize ${
+                                      isActive
+                                        ? "text-hope-red font-semibold"
+                                        : "text-muted-foreground"
+                                    }`}
+                                  >
+                                    {step}
+                                  </span>
+                                </div>
+                                {idx < arr.length - 1 && (
+                                  <div
+                                    className={`flex-1 h-0.5 mb-4 ${
+                                      stepIdx < order
+                                        ? "bg-hope-red"
+                                        : "bg-muted"
+                                    }`}
+                                  />
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -957,34 +1096,223 @@ export default function HospitalPortal() {
             </Card>
           </TabsContent>
 
+          {/* Blood Drives Tab */}
+          <TabsContent value="drives" className="space-y-6 mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Calendar className="w-5 h-5" />
+                  <span>Blood Drives</span>
+                  <Badge className="ml-2">{hospitalDrives.length} total</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {hospitalDrives.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      No blood drives assigned to your hospital yet.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Contact the admin to schedule a drive at your facility.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {hospitalDrives.map((drive: any) => (
+                      <div key={drive.id} className="p-4 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold">{drive.name}</h3>
+                          <Badge
+                            className={
+                              drive.is_active
+                                ? "bg-success/10 text-success"
+                                : "bg-muted"
+                            }
+                          >
+                            {drive.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {drive.start_date
+                              ? format(
+                                  new Date(drive.start_date),
+                                  "MMM dd, yyyy",
+                                )
+                              : "TBD"}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Activity className="w-4 h-4" />
+                            {drive.location}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            {drive.registered_count ?? 0} / {drive.capacity}{" "}
+                            registered
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="h-2 rounded-full bg-hope-red"
+                              style={{
+                                width: `${Math.min(((drive.registered_count ?? 0) / drive.capacity) * 100, 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {Math.round(
+                              ((drive.registered_count ?? 0) / drive.capacity) *
+                                100,
+                            )}
+                            % capacity filled
+                          </p>
+                        </div>
+                        {/* Drive Attendance Report */}
+                        <div className="mt-3 flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const rows = [
+                                [
+                                  "Drive",
+                                  "Date",
+                                  "Location",
+                                  "Registered",
+                                  "Capacity",
+                                  "Status",
+                                ],
+                                [
+                                  drive.name,
+                                  drive.start_date
+                                    ? format(
+                                        new Date(drive.start_date),
+                                        "MMM dd, yyyy",
+                                      )
+                                    : "TBD",
+                                  drive.location,
+                                  drive.registered_count ?? 0,
+                                  drive.capacity,
+                                  drive.is_active ? "Active" : "Inactive",
+                                ],
+                              ];
+                              const csv = rows
+                                .map((r) => r.join(","))
+                                .join("\n");
+                              const blob = new Blob([csv], {
+                                type: "text/csv",
+                              });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement("a");
+                              a.href = url;
+                              a.download = `drive_attendance_${drive.id}.csv`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                            }}
+                            className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                          >
+                            Attendance Report
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Blood Inventory by Type */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle>Usage Trends</CardTitle>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Package className="w-5 h-5" />
+                    <span>Blood Inventory by Type</span>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <Activity className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Chart: Blood usage trends over time
-                    </p>
-                  </div>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={bloodInventory.map((item) => ({
+                        type: item.type,
+                        Units: item.units,
+                        Low: item.low,
+                      }))}
+                      margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="type" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar
+                        dataKey="Units"
+                        fill="#e53e3e"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar dataKey="Low" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
+              {/* Request Status Breakdown */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle>Department Usage</CardTitle>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Activity className="w-5 h-5" />
+                    <span>Request Status Breakdown</span>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Chart: Blood usage by department
-                    </p>
-                  </div>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          {
+                            name: "Pending",
+                            value: bloodRequests.filter(
+                              (r) => r.status === "pending",
+                            ).length,
+                          },
+                          {
+                            name: "Fulfilled",
+                            value: bloodRequests.filter(
+                              (r) => r.status === "fulfilled",
+                            ).length,
+                          },
+                          {
+                            name: "Cancelled",
+                            value: bloodRequests.filter(
+                              (r) => r.status === "cancelled",
+                            ).length,
+                          },
+                        ].filter((d) => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={85}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={({ name, percent }) =>
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
+                        labelLine={false}
+                      >
+                        <Cell fill="#f59e0b" />
+                        <Cell fill="#22c55e" />
+                        <Cell fill="#ef4444" />
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>

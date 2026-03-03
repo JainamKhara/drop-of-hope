@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ChatbotWidget from "@/components/ChatbotWidget";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import {
   Heart,
   MapPin,
@@ -77,6 +78,9 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+      {/* Announcement Banner */}
+      <AnnouncementBanner />
+
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">

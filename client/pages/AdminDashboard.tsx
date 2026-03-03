@@ -9,6 +9,7 @@ import {
   appointmentService,
   bloodRequestService,
 } from "@/lib/db-services";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +39,7 @@ import {
   ArrowLeft,
   Users,
   Calendar,
+  CalendarDays,
   MapPin,
   TrendingUp,
   AlertTriangle,
@@ -65,8 +67,22 @@ import {
   Edit,
   Droplets,
   Phone,
+  Award,
 } from "lucide-react";
 import { format, subDays } from "date-fns";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 
 interface AnalyticsData {
   totalDonors: number;
@@ -108,6 +124,11 @@ export default function AdminDashboard() {
   const [bloodRequests, setBloodRequests] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const { toast } = useToast();
+
+  // Announcement state
+  const [announcementMsg, setAnnouncementMsg] = useState("");
+  const [announcementLink, setAnnouncementLink] = useState("");
+  const [announcementSaving, setAnnouncementSaving] = useState(false);
 
   // Dialog states
   const [isDriveDialogOpen, setIsDriveDialogOpen] = useState(false);
@@ -641,7 +662,7 @@ export default function AdminDashboard() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Activity */}
+              {/* Recent Activity — real data from appointments */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
@@ -650,40 +671,59 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="w-2 h-2 bg-hope-red rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          New donor registration: Sarah Kim
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          5 minutes ago
-                        </p>
+                  <div className="space-y-3">
+                    {appointments.slice(0, 5).map((apt: any) => (
+                      <div
+                        key={apt.id}
+                        className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                      >
+                        <div className="w-2 h-2 bg-hope-red rounded-full flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {apt.donors?.name || "Donor"} booked{" "}
+                            {apt.drives?.name || "a drive"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {apt.appointment_date
+                              ? format(
+                                  new Date(apt.appointment_date),
+                                  "MMM d, yyyy",
+                                )
+                              : "Upcoming"}{" "}
+                            · {apt.status}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="text-xs flex-shrink-0"
+                        >
+                          {apt.donors?.blood_type || "?"}
+                        </Badge>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="w-2 h-2 bg-success rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          Blood drive completed: Downtown Center
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          2 hours ago
-                        </p>
+                    ))}
+                    {bloodRequests.slice(0, 3).map((req: any) => (
+                      <div
+                        key={req.id}
+                        className="flex items-center space-x-3 p-3 bg-warning/10 rounded-lg"
+                      >
+                        <div className="w-2 h-2 bg-warning rounded-full flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            Blood request · {req.blood_type} ·{" "}
+                            {req.quantity_units} units
+                          </p>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {req.urgency} priority · {req.status}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="w-2 h-2 bg-warning rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          Urgent blood request: City Hospital
+                    ))}
+                    {appointments.length === 0 &&
+                      bloodRequests.length === 0 && (
+                        <p className="text-muted-foreground text-sm text-center py-4">
+                          No recent activity
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          4 hours ago
-                        </p>
-                      </div>
-                    </div>
+                      )}
                   </div>
                 </CardContent>
               </Card>
@@ -693,41 +733,172 @@ export default function AdminDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <AlertTriangle className="w-5 h-5" />
-                    <span>Urgent Requests</span>
+                    <span>Urgent Blood Requests</span>
+                    <Badge className="ml-2 bg-destructive/10 text-destructive">
+                      {
+                        bloodRequests.filter(
+                          (r: any) =>
+                            r.urgency === "critical" || r.urgency === "high",
+                        ).length
+                      }
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {hospitals
-                      .filter((h) => h.urgency === "high")
-                      .map((hospital) => (
-                        <Alert key={hospital.id}>
-                          <AlertTriangle className="h-4 w-4" />
+                    {bloodRequests
+                      .filter(
+                        (r: any) =>
+                          r.urgency === "critical" || r.urgency === "high",
+                      )
+                      .slice(0, 5)
+                      .map((req: any) => (
+                        <Alert key={req.id} className="border-destructive/30">
+                          <AlertTriangle className="h-4 w-4 text-destructive" />
                           <AlertDescription>
-                            <strong>{hospital.name}</strong> urgently needs{" "}
-                            {hospital.currentNeed} blood type. Contact:{" "}
-                            {hospital.contact}
+                            <strong>{req.blood_type}</strong> —{" "}
+                            {req.quantity_units} units needed.{" "}
+                            <span className="capitalize text-muted-foreground">
+                              {req.urgency} priority · {req.status}
+                            </span>
                           </AlertDescription>
                         </Alert>
                       ))}
-                    {hospitals
-                      .filter((h) => h.urgency === "medium")
-                      .map((hospital) => (
-                        <div
-                          key={hospital.id}
-                          className="p-3 bg-warning/10 border border-warning/20 rounded-lg"
-                        >
-                          <p className="text-sm font-medium">{hospital.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Needs {hospital.currentNeed} • Contact:{" "}
-                            {hospital.contact}
-                          </p>
-                        </div>
-                      ))}
+                    {bloodRequests.filter(
+                      (r: any) =>
+                        r.urgency === "critical" || r.urgency === "high",
+                    ).length === 0 && (
+                      <p className="text-muted-foreground text-sm text-center py-4">
+                        No urgent requests right now
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Top Donors Leaderboard */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-amber-500" />
+                  <span>Top Donors Leaderboard</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[...recentDonors]
+                    .sort((a, b) => b.donations - a.donations)
+                    .slice(0, 10)
+                    .map((donor, index) => (
+                      <div
+                        key={donor.id}
+                        className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                            index === 0
+                              ? "bg-amber-400 text-white"
+                              : index === 1
+                                ? "bg-slate-400 text-white"
+                                : index === 2
+                                  ? "bg-orange-400 text-white"
+                                  : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                          {donor.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{donor.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {donor.bloodType} · {donor.status}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-bold text-hope-red">
+                            {donor.donations}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            donations
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  {recentDonors.length === 0 && (
+                    <p className="text-muted-foreground text-center py-8">
+                      No donor data yet
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            {/* Announcement Management */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Bell className="w-5 h-5 text-hope-red" />
+                  <span>Announcement Banner</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="ann-msg">Message</Label>
+                    <Input
+                      id="ann-msg"
+                      placeholder="e.g. Urgent blood drive this Saturday at City Hospital!"
+                      value={announcementMsg}
+                      onChange={(e) => setAnnouncementMsg(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="ann-link">Link (optional)</Label>
+                    <Input
+                      id="ann-link"
+                      placeholder="e.g. /drives"
+                      value={announcementLink}
+                      onChange={(e) => setAnnouncementLink(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button
+                    disabled={!announcementMsg.trim() || announcementSaving}
+                    onClick={async () => {
+                      setAnnouncementSaving(true);
+                      await supabase
+                        .from("announcements")
+                        .update({ is_active: false })
+                        .eq("is_active", true);
+                      await supabase.from("announcements").insert([
+                        {
+                          message: announcementMsg.trim(),
+                          link: announcementLink.trim() || null,
+                          is_active: true,
+                        },
+                      ]);
+                      setAnnouncementSaving(false);
+                      setAnnouncementMsg("");
+                      setAnnouncementLink("");
+                      toast({
+                        title: "Announcement Published",
+                        description: "Banner is now live on the homepage.",
+                      });
+                    }}
+                    className="bg-hope-red hover:bg-hope-red/90 text-white"
+                  >
+                    {announcementSaving ? "Publishing..." : "Publish Banner"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Publishing a new banner will automatically deactivate any
+                    currently active announcement.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Appointments Management Tab */}
@@ -1030,8 +1201,41 @@ export default function AdminDashboard() {
 
             {/* Donors List */}
             <Card className="border-0 shadow-lg">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Donors</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const header =
+                      "Name,Blood Type,Email,City,Donations,Status\n";
+                    const rows = recentDonors
+                      .map((d) =>
+                        [
+                          d.name,
+                          d.bloodType,
+                          d.email || "",
+                          d.city || "",
+                          d.donations,
+                          d.status,
+                        ].join(","),
+                      )
+                      .join("\n");
+                    const blob = new Blob([header + rows], {
+                      type: "text/csv",
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `donors_${new Date().toISOString().split("T")[0]}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -1084,6 +1288,107 @@ export default function AdminDashboard() {
 
           {/* Blood Drives Tab */}
           <TabsContent value="drives" className="space-y-6 mt-6">
+            {/* Blood Drive Calendar */}
+            {(() => {
+              const now = new Date();
+              const year = now.getFullYear();
+              const month = now.getMonth();
+              const monthName = now.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              });
+              const firstDay = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+              // Build set of days that have drives
+              const driveDays = new Set<number>();
+              bloodDrives.forEach((drive: any) => {
+                if (drive.start_date) {
+                  const d = new Date(drive.start_date);
+                  if (d.getFullYear() === year && d.getMonth() === month) {
+                    driveDays.add(d.getDate());
+                  }
+                }
+              });
+
+              const cells: (number | null)[] = [
+                ...Array(firstDay).fill(null),
+                ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+              ];
+              // Pad to complete week rows
+              while (cells.length % 7 !== 0) cells.push(null);
+
+              return (
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <CalendarDays className="w-5 h-5 text-hope-red" />
+                      <span>Blood Drive Calendar — {monthName}</span>
+                      <Badge className="ml-2">
+                        {driveDays.size} drive days
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                        (d) => (
+                          <div key={d} className="font-semibold py-1">
+                            {d}
+                          </div>
+                        ),
+                      )}
+                    </div>
+                    <div className="grid grid-cols-7 gap-1">
+                      {cells.map((day, idx) => {
+                        const hasDrive = day !== null && driveDays.has(day);
+                        const isToday = day === now.getDate();
+                        return (
+                          <div
+                            key={idx}
+                            className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-sm transition-colors ${
+                              day === null
+                                ? ""
+                                : hasDrive
+                                  ? "bg-hope-red/10 border border-hope-red/30 font-semibold text-hope-red cursor-pointer hover:bg-hope-red/20"
+                                  : isToday
+                                    ? "bg-muted font-bold ring-1 ring-hope-red"
+                                    : "hover:bg-muted/50"
+                            }`}
+                            title={
+                              hasDrive
+                                ? bloodDrives
+                                    .filter((dr: any) => {
+                                      if (!dr.start_date) return false;
+                                      const d = new Date(dr.start_date);
+                                      return (
+                                        d.getFullYear() === year &&
+                                        d.getMonth() === month &&
+                                        d.getDate() === day
+                                      );
+                                    })
+                                    .map((dr: any) => dr.name)
+                                    .join(", ")
+                                : undefined
+                            }
+                          >
+                            {day}
+                            {hasDrive && (
+                              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-hope-red rounded-full" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Red days have scheduled blood drives. Hover a day to see
+                      drive names.
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -1269,72 +1574,140 @@ export default function AdminDashboard() {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Chart placeholders */}
+              {/* Donors by Blood Type */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <BarChart3 className="w-5 h-5" />
-                    <span>Donation Trends</span>
+                    <span>Donors by Blood Type</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <LineChart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Chart: Monthly donation trends over time
-                    </p>
-                  </div>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={Object.entries(
+                        recentDonors.reduce(
+                          (acc: Record<string, number>, d) => {
+                            acc[d.bloodType] = (acc[d.bloodType] || 0) + 1;
+                            return acc;
+                          },
+                          {},
+                        ),
+                      ).map(([type, count]) => ({ type, count }))}
+                      margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="type" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar
+                        dataKey="count"
+                        name="Donors"
+                        fill="#e53e3e"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
+              {/* Blood Request Status Breakdown */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <PieChart className="w-5 h-5" />
-                    <span>Blood Type Distribution</span>
+                    <Activity className="w-5 h-5" />
+                    <span>Blood Request Status</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <PieChart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Chart: Blood type distribution among donors
-                    </p>
-                  </div>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={[
+                          {
+                            name: "Pending",
+                            value: bloodRequests.filter(
+                              (r: any) => r.status === "pending",
+                            ).length,
+                          },
+                          {
+                            name: "Fulfilled",
+                            value: bloodRequests.filter(
+                              (r: any) => r.status === "fulfilled",
+                            ).length,
+                          },
+                          {
+                            name: "Cancelled",
+                            value: bloodRequests.filter(
+                              (r: any) => r.status === "cancelled",
+                            ).length,
+                          },
+                        ].filter((d) => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={85}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={({ name, percent }) =>
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
+                        labelLine={false}
+                      >
+                        <Cell fill="#f59e0b" />
+                        <Cell fill="#22c55e" />
+                        <Cell fill="#ef4444" />
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
+              {/* Drive Capacity Overview */}
+              <Card className="border-0 shadow-lg col-span-full">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <TrendingUp className="w-5 h-5" />
-                    <span>Growth Metrics</span>
+                    <span>Drive Capacity vs Registrations</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Chart: Platform growth and engagement metrics
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Users className="w-5 h-5" />
-                    <span>Geographic Distribution</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Map: Donor distribution by geographic region
-                    </p>
-                  </div>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={bloodDrives.slice(0, 8).map((d: any) => ({
+                        name:
+                          d.name.length > 18
+                            ? d.name.slice(0, 16) + "…"
+                            : d.name,
+                        Capacity: d.capacity,
+                        Registered: d.registered,
+                      }))}
+                      margin={{ top: 5, right: 10, left: -20, bottom: 40 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 11 }}
+                        angle={-30}
+                        textAnchor="end"
+                      />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar
+                        dataKey="Capacity"
+                        fill="#e2e8f0"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="Registered"
+                        fill="#e53e3e"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
@@ -1861,4 +2234,61 @@ export default function AdminDashboard() {
       </Dialog>
     </div>
   );
+}
+
+// Sub-component for announcement management inside Admin Dashboard
+export function AnnouncementManager() {
+  const [message, setMessage] = React.useState("");
+  const [link, setLink] = React.useState("");
+  const [announcements, setAnnouncements] = React.useState<any[]>([]);
+  const [saving, setSaving] = React.useState(false);
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    supabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5)
+      .then(({ data }) => setAnnouncements(data || []));
+  }, []);
+
+  const handleCreate = async () => {
+    if (!message.trim()) return;
+    setSaving(true);
+    // Deactivate all others first
+    await supabase
+      .from("announcements")
+      .update({ is_active: false })
+      .eq("is_active", true);
+    const { data, error } = await supabase
+      .from("announcements")
+      .insert([
+        { message: message.trim(), link: link.trim() || null, is_active: true },
+      ])
+      .select()
+      .single();
+    setSaving(false);
+    if (!error && data) {
+      setAnnouncements((prev) => [data, ...prev]);
+      setMessage("");
+      setLink("");
+      toast({
+        title: "Announcement Published",
+        description: "The banner is now live on the homepage.",
+      });
+    }
+  };
+
+  const handleToggle = async (id: string, current: boolean) => {
+    await supabase
+      .from("announcements")
+      .update({ is_active: !current })
+      .eq("id", id);
+    setAnnouncements((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, is_active: !current } : a)),
+    );
+  };
+
+  return null; // Rendered inline in AdminDashboard overview, see above
 }

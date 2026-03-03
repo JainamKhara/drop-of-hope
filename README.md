@@ -8,32 +8,21 @@ A comprehensive, modern web-based blood donation management platform connecting 
 
 ## 📋 Table of Contents
 
-- [Drop of Hope ❤️🩸](#drop-of-hope-️)
-  - [📋 Table of Contents](#-table-of-contents)
-  - [💡 About the Project](#-about-the-project)
-  - [🚀 Key Features \& Functionalities](#-key-features--functionalities)
-    - [🩸 For Donors](#-for-donors)
-    - [🏥 For Hospitals](#-for-hospitals)
-    - [👨‍💼 For Administrators](#-for-administrators)
-    - [🤖 General Features](#-general-features)
-  - [🛠️ Technology Stack](#️-technology-stack)
-    - [Frontend](#frontend)
-    - [Backend \& Auth](#backend--auth)
-  - [🔐 Authentication Architecture](#-authentication-architecture)
-  - [📁 Project Structure](#-project-structure)
-  - [🚀 Getting Started](#-getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Environment Variables](#environment-variables)
-    - [Installation \& Execution](#installation--execution)
-  - [🗄️ Database Schema (Supabase)](#️-database-schema-supabase)
-  - [🌐 Deployment](#-deployment)
-  - [🤝 Contact](#-contact)
+- [About the Project](#-about-the-project)
+- [Key Features & Functionalities](#-key-features--functionalities)
+- [Technology Stack](#️-technology-stack)
+- [Authentication Architecture](#-authentication-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Database Schema](#️-database-schema-supabase)
+- [Deployment](#-deployment)
+- [Contact](#-contact)
 
 ---
 
 ## 💡 About the Project
 
-**Drop of Hope** was built to solve the communication gap between individuals willing to donate blood and the hospitals or organizations in desperate need of it. 
+**Drop of Hope** was built to solve the communication gap between individuals willing to donate blood and the hospitals or organizations in desperate need of it.
 
 By gamifying the donor experience and providing powerful oversight tools to administrators and medical centers, Drop of Hope encourages repeat donations, ensures that blood drives are well-attended, and maintains highly accurate, real-time inventory tracking for critical patient care.
 
@@ -42,29 +31,66 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ## 🚀 Key Features & Functionalities
 
 ### 🩸 For Donors
-- **Interactive Dashboard:** Get a personalized overview of your donation history, total points earned, and upcoming appointments.
-- **Find Blood Drives:** Discover nearby donation events using location filtering and mapping.
-- **Book Appointments:** Seamlessly schedule donation slots with calendar integration to avoid waiting in line.
-- **Appointment Management:** View, easily reschedule, or cancel existing bookings through the "My Appointments" hub.
-- **Profile Management:** Maintain up-to-date personal information, including blood type, contact details, and eligibility status.
-- **Rewards System (Gamification):** Earn points for every donation, unlock exclusive badges, and climb levels to encourage ongoing participation.
-- **Community Feed:** Engage with a social feed tailored for donors—share stories, post pictures, and like/comment on community posts.
+
+| Feature | Description |
+|---|---|
+| **Interactive Dashboard** | Personalized overview showing donation history, points, upcoming appointments, and a *Days Since Last Donation* countdown widget |
+| **Find Blood Drives** | Discover nearby donation events with search, city, blood type, and date filters |
+| **Book Appointments** | Schedule donation slots with calendar integration |
+| **Appointment Management** | View, reschedule, or cancel bookings; generate a **Print Appointment Slip** for any upcoming appointment |
+| **Profile Management** | Update personal info, blood type, contact details, eligibility status, and **Emergency Contact** details (name, phone, relation) |
+| **Rewards System (Gamification)** | Earn points, unlock badges, climb levels — **Share any badge** via Web Share API or clipboard fallback |
+| **Community Feed** | Social feed to share stories, post pictures, like and comment |
+| **Donation History Export** | Download full donation history as a CSV file directly from the Profile donations tab |
+| **Blood Type Info Page** | Dedicated `/blood-types` page with blood type compatibility chart and donation facts |
+| **Donation Tips & FAQs** | `/tips` page with categorized pre/post donation care tips and accordion FAQ |
+| **Feedback Form** | Star-rating + comment dialog for past blood drives — appears on completed drives in the Blood Drives listing |
+| **Forgot Password** | `/forgot-password` page that sends a Supabase password reset email |
+
+---
 
 ### 🏥 For Hospitals
-- **Hospital Portal:** A dedicated control center to manage critical blood stock and requests.
-- **Blood Requests:** Generate urgent, high-priority, or routine requisitions for specific blood types (`A+`, `O-`, etc.).
-- **Inventory Management:** Track available blood units in real-time, preventing shortages and minimizing expiration waste.
-- **Drive Organizations:** Plan, organize, and publish new blood drive events to attract the local community.
+
+| Feature | Description |
+|---|---|
+| **Hospital Portal** | Dedicated control center with tabs: Inventory, Blood Requests, Appointments, Blood Drives, Analytics |
+| **Blood Requests** | Create urgent, high-priority, or routine requisitions for specific blood types |
+| **Inventory Management** | Track available blood units in real-time; see per-blood-type unit counts and status badges |
+| **Low Stock Alert** | Red alert banner automatically fires when any blood type falls critically low |
+| **Blood Inventory Chart** | Analytics tab contains a Recharts PieChart showing inventory distribution by blood type |
+| **Drive Management** | View blood drives assigned to the hospital with capacity progress bars |
+| **Drive Attendance Report** | Download a CSV attendance report for any specific drive directly from the Drives tab |
+| **Request Status Tracker** | 4-step inline stepper per request (Pending → Approved → Processing → Fulfilled) |
+| **Print Blood Request** | Opens a formatted print slip for any blood request in a new browser window |
+| **Hospital Profile Page** | Public-facing `/hospital/:id` page showing hospital info, contact details, and services |
+
+---
 
 ### 👨‍💼 For Administrators
-- **Admin Dashboard:** Gain system-wide analytics, metrics, and complete oversight.
-- **User Management:** Quickly view lists of all donors and hospitals. Perform moderation or account management as necessary.
-- **Drive & Request Approval:** Review, approve, or reject blood drive requests and incoming urgent hospital blood requisitions.
-- **Data Analytics:** Access rich data visualization and charts regarding lives impacted, active donors, and historical donation trends.
 
-### 🤖 General Features
-- **AI Chatbot Assistant:** A built-in, floating chatbot widget available on all pages to answer user questions about donation eligibility, the booking process, and how the rewards system works.
-- **Modern UI/UX:** A beautiful, responsive interface built with TailwindCSS, utilizing accessible components (Radix UI/shadcn) for a frictionless user journey.
+| Feature | Description |
+|---|---|
+| **Admin Dashboard** | 7-tab system-wide analytics and oversight dashboard |
+| **User Management** | View, add, edit, and manage all donors and hospital accounts with full CRUD |
+| **Drive & Request Approval** | Review, approve, or reject blood drive requests and hospital blood requisitions |
+| **Data Analytics** | Recharts charts: Donors by Blood Type (BarChart), Blood Request Status (PieChart), Drive Capacity vs Registrations (BarChart) |
+| **Monthly Statistics** | Donation count this month shown in the overview stats grid |
+| **Top Donors Leaderboard** | Ranked list of top 10 donors by total donations count |
+| **Export User List** | Download all donor data as a CSV from the Donors tab |
+| **System Activity Log** | Recent activity table populated live from DB appointments and blood requests |
+| **Announcement Banner** | Create and activate a prominent banner visible sitewide; managed via Supabase `announcements` table |
+| **Blood Drive Calendar** | Monthly calendar grid in the Drives tab — highlights days with scheduled drives and shows drive names on hover |
+
+---
+
+### 🤖 General & UI/UX Features
+
+| Feature | Description |
+|---|---|
+| **AI Chatbot Assistant** | Built-in floating chatbot with keyword matching, quick-action suggestion buttons on every page |
+| **Contact Us Form** | Contact form wired to Supabase `contacts` table — messages are stored and accessible to admins |
+| **Dark Mode Toggle** | Navbar toggle button switches between light and dark themes with localStorage persistence |
+| **Responsive Design** | Mobile-first TailwindCSS layouts with `md:` and `lg:` breakpoints throughout |
 
 ---
 
@@ -73,33 +99,35 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ### Frontend
 - **Framework:** React 18
 - **Language:** TypeScript
-- **Tooling:** Vite (Lightning-fast dev server and bundler)
+- **Tooling:** Vite (lightning-fast dev server and bundler)
 - **Styling:** TailwindCSS
-- **UI Components:** shadcn/ui & Radix UI (Accessible primitive components)
+- **UI Components:** shadcn/ui & Radix UI
 - **Routing:** React Router DOM
 - **State Management:** TanStack Query (React Query)
 - **Data Visualization:** Recharts
 - **Icons:** Lucide React
+- **Date Utilities:** date-fns
 
 ### Backend & Auth
-- **BaaS (Backend as a Service):** Supabase (PostgreSQL Database & API generation)
-- **Donor Authentication:** Clerk (Modern, secure auth provider with social logins)
-- **Admin/Hospital Auth:** Direct Supabase Authentication (Session persistence)
+- **BaaS:** Supabase (PostgreSQL database & auto-generated REST API)
+- **Donor Authentication:** Clerk (social logins, session management)
+- **Admin/Hospital Auth:** Direct Supabase authentication
 - **API Framing:** Express (Node.js)
 
 ---
 
 ## 🔐 Authentication Architecture
 
-The platform uniquely utilizes a **Hybrid Authentication** model to balance security and ease of use:
+The platform uses a **Hybrid Authentication** model:
 
-1. **Clerk Authentication (For Donors):** 
-   - Handles donor sign-ups, sign-ins, and session management.
-   - Provides out-of-the-box support for profile pictures and social logins.
-   - Automatically synchronizes authenticated user data down to the Supabase `donors` table securely.
-2. **Direct Supabase Auth (For Admins & Hospitals):**
-   - Credentials safely stored inside the `admins` and `hospitals` PostgreSQL tables.
-   - Access verified directly without external dependencies, focusing on strict internal control.
+1. **Clerk Authentication (Donors)**
+   - Handles donor sign-ups, sign-ins, and session management
+   - Social login support (Google, GitHub, etc.)
+   - Auto-syncs authenticated user data to the Supabase `donors` table
+
+2. **Direct Supabase Auth (Admins & Hospitals)**
+   - Credentials stored in `admins` and `hospitals` PostgreSQL tables
+   - Verified directly without external dependencies for strict internal control
 
 ---
 
@@ -107,38 +135,52 @@ The platform uniquely utilizes a **Hybrid Authentication** model to balance secu
 
 ```text
 drop-of-hope/
-├── client/                 # Frontend React application workspace
-│   ├── components/         # Reusable UI components (shadcn/ui, Chatbot, Nav)
+├── client/                 # Frontend React application
+│   ├── components/         # Reusable UI components (shadcn/ui, Chatbot, Nav, AnnouncementBanner)
 │   ├── contexts/           # Global State (HybridAuthContext)
-│   ├── hooks/              # Custom React hooks
-│   ├── lib/                # Database services (db-services.ts) & Utilities
-│   ├── pages/              # Application views (Dashboards, Booking forms, Auth)
-│   └── App.tsx             # Root component and Routing definitions
+│   ├── hooks/              # Custom React hooks (use-toast, etc.)
+│   ├── lib/                # Database services (db-services.ts) & Supabase client
+│   ├── pages/              # Application views
+│   │   ├── AdminDashboard.tsx      # 7-tab admin panel
+│   │   ├── HospitalPortal.tsx      # Hospital management center
+│   │   ├── Profile.tsx             # Donor profile & donation history
+│   │   ├── DonorDashboard.tsx      # Donor home with stats widget
+│   │   ├── BloodDrives.tsx         # Drive discovery + feedback form
+│   │   ├── BookAppointment.tsx     # Drive slot booking
+│   │   ├── MyAppointments.tsx      # Booking management + print slip
+│   │   ├── Rewards.tsx             # Gamification + badge sharing
+│   │   ├── Community.tsx           # Social feed
+│   │   ├── BloodTypes.tsx          # Blood type info page
+│   │   ├── DonationTips.tsx        # Tips & FAQs page
+│   │   ├── HospitalProfile.tsx     # Public hospital profile
+│   │   ├── ForgotPassword.tsx      # Password reset page
+│   │   └── Contact.tsx             # Contact form → Supabase
+│   └── App.tsx             # Root component and routing
 ├── server/                 # Backend Node/Express scaffolding
 │   ├── index.ts            # Server entry point
 │   └── routes/             # API routing configurations
-├── shared/                 # Shared TypeScript interfaces (Client/Server)
-└── public/                 # Static graphical assets (Favicons, placeholders)
+├── shared/                 # Shared TypeScript interfaces
+├── FEATURES.csv            # Full feature tracking spreadsheet
+└── public/                 # Static assets
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
-- Node.js (v18 or higher recommended)
+- Node.js v18 or higher
 - `npm` or `pnpm` package manager
 
 ### Environment Variables
-You will need to create a `.env` file at the root of the project with the following configuration:
+
+Create a `.env` file at the project root:
 
 ```env
-# Clerk Authentication (Get from clerk.com dashboard)
+# Clerk Authentication (get from clerk.com dashboard)
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
 
-# Supabase Configuration (Get from supabase.com dashboard)
+# Supabase Configuration (get from supabase.com dashboard)
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
@@ -154,43 +196,42 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   pnpm install
    ```
 
 3. **Start the development server**
    ```bash
    npm run dev
-   # or
-   pnpm dev
    ```
-   The application will be running locally (usually at `http://localhost:5173` or `http://localhost:8080`).
+   The app will be available at `http://localhost:5173` or `http://localhost:8080`.
 
 ---
 
 ## 🗄️ Database Schema (Supabase)
 
-The PostgreSQL database powering the backend relies on the following core entities:
+The PostgreSQL database relies on these core tables:
 
-- `donors`: Donor profiles synced automatically from Clerk.
-- `admins` / `hospitals`: Internal secure access credentials.
-- `drives`: Locations, times, and organizers for physical blood donation events.
-- `appointments`: The connection linking a `donor` to a specific `drive`.
-- `donations`: Verified records of completed blood offerings.
-- `blood_requests`: Requisitions made by hospitals for fulfillment.
-- `blood_inventory`: Live tracking database for the hospital's current stock (A+, B-, O+, etc.).
-- `rewards`: Gamification points and threshold unlocks.
-- `community_posts` / `community_comments` / `community_likes`: Relational tables managing the social feed.
+| Table | Purpose |
+|---|---|
+| `donors` | Donor profiles synced from Clerk |
+| `admins` / `hospitals` | Internal secure access credentials |
+| `drives` | Blood drive events (location, times, capacity) |
+| `appointments` | Links donors to specific drives |
+| `donations` | Verified records of completed donations |
+| `blood_requests` | Hospital requisitions for blood types |
+| `blood_inventory` | Real-time hospital blood stock per type |
+| `rewards` | Gamification points and badge thresholds |
+| `community_posts` / `community_comments` / `community_likes` | Social feed relational tables |
+| `announcements` | Sitewide announcement banners managed by admins |
+| `contacts` | Messages submitted via the Contact Us form |
 
 ---
 
 ## 🌐 Deployment
 
-The workspace is configured to be easily deployable to edge environments like Netlify. It includes pre-configured `netlify.toml` build commands.
+The workspace is configured for deployment to edge environments like Netlify via `netlify.toml`.
 
-**To manually build for production:**
+**Build for production:**
 ```bash
-# Builds both the client SPA and the server bundle
 npm run build
 ```
 

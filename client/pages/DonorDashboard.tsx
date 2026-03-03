@@ -182,6 +182,56 @@ export default function DonorDashboard() {
           </p>
         </div>
 
+        {/* Donation Counter Widget */}
+        {stats.daysUntilNextDonation === 0 ? (
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-hope-red to-red-600 text-white flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <Heart className="w-6 h-6 text-white fill-current" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">You can donate today!</p>
+                <p className="text-white/80 text-sm">
+                  Your next donation can save up to 3 lives.
+                </p>
+              </div>
+            </div>
+            <a href="/drives">
+              <button className="bg-white text-hope-red font-semibold px-5 py-2 rounded-lg text-sm hover:bg-white/90 transition-colors">
+                Find a Drive
+              </button>
+            </a>
+          </div>
+        ) : (
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-slate-100 to-blue-50 dark:from-slate-800 dark:to-slate-700 border border-blue-100 dark:border-slate-600 flex items-center gap-4 shadow-sm">
+            <div className="w-14 h-14 bg-hope-red/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <CalendarIcon className="w-7 h-7 text-hope-red" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground">
+                Days since last donation
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-hope-red">
+                  {56 - stats.daysUntilNextDonation}
+                </span>
+                <span className="text-muted-foreground text-sm">days ago</span>
+                <span className="ml-auto text-sm font-medium text-amber-600 dark:text-amber-400">
+                  {stats.daysUntilNextDonation} days until eligible
+                </span>
+              </div>
+              <div className="mt-1 h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                <div
+                  className="h-2 bg-hope-red rounded-full transition-all"
+                  style={{
+                    width: `${Math.min(((56 - stats.daysUntilNextDonation) / 56) * 100, 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-0 shadow-md">

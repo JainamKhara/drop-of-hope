@@ -18,6 +18,7 @@ import {
   AlertCircle,
   Plus,
   RefreshCw,
+  Printer,
 } from "lucide-react";
 import { format, isAfter, isBefore, addDays } from "date-fns";
 import { useHybridAuth, DonorProfile } from "@/contexts/HybridAuthContext";
@@ -139,8 +140,31 @@ export default function MyAppointments() {
   const handleRescheduleAppointment = (id: string) => {
     const appointment = appointments.find((apt) => apt.id === id);
     if (appointment) {
-      // Navigate to drives page to book a new appointment
       window.location.href = "/drives";
+    }
+  };
+
+  const handlePrintSlip = (appointment: AppointmentDisplay) => {
+    const slipHtml = `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:2px solid #e74c3c;border-radius:12px">
+        <h2 style="color:#e74c3c;margin-bottom:8px">Drop of Hope — Appointment Slip</h2>
+        <hr style="border-color:#e74c3c;margin-bottom:16px"/>
+        <p><strong>Drive:</strong> ${appointment.driveName}</p>
+        <p><strong>Date:</strong> ${format(new Date(appointment.date), "EEEE, MMM dd, yyyy")}</p>
+        <p><strong>Time:</strong> ${appointment.time}</p>
+        <p><strong>Location:</strong> ${appointment.location}</p>
+        <p><strong>Address:</strong> ${appointment.address}</p>
+        ${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ""}
+        <p style="margin-top:16px;color:#888;font-size:12px">Appointment ID: ${appointment.id}</p>
+      </div>
+    `;
+    const win = window.open("", "_blank", "width=700,height=500");
+    if (win) {
+      win.document.write(
+        `<html><head><title>Appointment Slip</title></head><body>${slipHtml}</body></html>`,
+      );
+      win.document.close();
+      win.print();
     }
   };
 
@@ -394,6 +418,14 @@ export default function MyAppointments() {
                             }
                           >
                             Cancel
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1 border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                            onClick={() => handlePrintSlip(appointment)}
+                          >
+                            <Printer className="w-4 h-4 mr-1" />
+                            Print Slip
                           </Button>
                           <Button
                             className="flex-1 bg-hope-red hover:bg-hope-red/90"

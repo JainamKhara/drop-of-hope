@@ -19,6 +19,7 @@ import {
   Users,
   Zap,
   RefreshCw,
+  Share2,
 } from "lucide-react";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import {
@@ -476,6 +477,28 @@ export default function Rewards() {
                       <p className="text-xs text-muted-foreground mt-2">
                         Earned {new Date(badge.earnedDate).toLocaleDateString()}
                       </p>
+                    )}
+                    {badge.earned && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                        onClick={async () => {
+                          const text = `I just earned the "${badge.name}" badge on Drop of Hope! 🩸 Every drop counts. #DropOfHope #BloodDonation`;
+                          if (navigator.share) {
+                            await navigator.share({
+                              title: "Drop of Hope Badge",
+                              text,
+                            });
+                          } else {
+                            await navigator.clipboard.writeText(text);
+                            alert("Share text copied to clipboard!");
+                          }
+                        }}
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share Badge
+                      </Button>
                     )}
                   </CardContent>
                 </Card>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,25 +26,44 @@ import {
   Send,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 export default function Contact() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const subjectRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Message Sent",
-        description:
-          "Thank you for reaching out. Our support team will respond to you within 24 hours.",
-      });
-      (e.target as HTMLFormElement).reset();
-    }, 1500);
+    const payload = {
+      name: `${firstNameRef.current?.value || ""} ${lastNameRef.current?.value || ""}`.trim(),
+      email: emailRef.current?.value || "",
+      subject: subjectRef.current?.value || "",
+      message: messageRef.current?.value || "",
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("contacts").insert([payload]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error("Contact form error:", error);
+    }
+
+    toast({
+      title: "Message Sent",
+      description:
+        "Thank you for reaching out. Our support team will respond within 24 hours.",
+    });
+    formRef.current?.reset();
   };
 
   const contactInfo = [
@@ -114,21 +133,32 @@ export default function Contact() {
               We usually respond within 24 hours.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" required />
+                  <Input
+                    ref={firstNameRef}
+                    id="firstName"
+                    placeholder="John"
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" required />
+                  <Input
+                    ref={lastNameRef}
+                    id="lastName"
+                    placeholder="Doe"
+                    required
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">Work Email</Label>
                 <Input
+                  ref={emailRef}
                   id="email"
                   type="email"
                   placeholder="john@company.com"
@@ -139,6 +169,7 @@ export default function Contact() {
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
                 <Input
+                  ref={subjectRef}
                   id="subject"
                   placeholder="How can we help you?"
                   required
@@ -148,6 +179,7 @@ export default function Contact() {
               <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
                 <Textarea
+                  ref={messageRef}
                   id="message"
                   placeholder="Tell us more about your inquiry..."
                   rows={5}

@@ -33,6 +33,7 @@ import {
   Calendar,
   Award,
   Activity,
+  Download,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -449,7 +450,52 @@ export default function Profile() {
                       />
                     </div>
 
-                    {/* Emergency contact section removed - not in DonorProfile interface */}
+                    {/* Emergency Contact */}
+                    <div className="pt-2 border-t border-border">
+                      <Label className="text-base font-medium">
+                        Emergency Contact
+                      </Label>
+                      <div className="grid grid-cols-2 gap-4 mt-3">
+                        <div>
+                          <Label htmlFor="ec_name" className="text-sm">
+                            Contact Name
+                          </Label>
+                          <Input
+                            id="ec_name"
+                            placeholder="e.g. Jane Doe"
+                            value={
+                              (formData as any)?.emergency_contact_name || ""
+                            }
+                            disabled={!isEditing}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                emergency_contact_name: e.target.value,
+                              } as any)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="ec_phone" className="text-sm">
+                            Contact Phone
+                          </Label>
+                          <Input
+                            id="ec_phone"
+                            placeholder="e.g. +91 98765 43210"
+                            value={
+                              (formData as any)?.emergency_contact_phone || ""
+                            }
+                            disabled={!isEditing}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                emergency_contact_phone: e.target.value,
+                              } as any)
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -632,7 +678,39 @@ export default function Profile() {
             <TabsContent value="donations" className="space-y-6 mt-6">
               <Card className="border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle>Donation History</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Donation History</CardTitle>
+                    {medicalData.previousDonations.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const rows = [
+                            ["#", "Date", "Location", "Result", "Points"],
+                            ...medicalData.previousDonations.map((d, i) => [
+                              i + 1,
+                              d.date,
+                              d.location,
+                              d.result,
+                              d.points,
+                            ]),
+                          ];
+                          const csv = rows.map((r) => r.join(",")).join("\n");
+                          const blob = new Blob([csv], { type: "text/csv" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "donation_history.csv";
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Export CSV
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">

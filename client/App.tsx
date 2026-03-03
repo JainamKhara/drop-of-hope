@@ -30,6 +30,10 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import HospitalLogin from "./pages/HospitalLogin";
+import BloodTypes from "./pages/BloodTypes";
+import DonationTips from "./pages/DonationTips";
+import ForgotPassword from "./pages/ForgotPassword";
+import HospitalProfile from "./pages/HospitalProfile";
 
 import {
   AdminOnlyRoute,
@@ -181,6 +185,10 @@ const AppContent = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/blood-types" element={<BloodTypes />} />
+          <Route path="/tips" element={<DonationTips />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/hospital/:id" element={<HospitalProfile />} />
 
           {/* ✅ Catch-all */}
           <Route path="*" element={<NotFound />} />
