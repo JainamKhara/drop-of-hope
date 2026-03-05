@@ -29,17 +29,18 @@ Admin,User Management,View donors hospitals and manage accounts,OLD,Complete,Don
 Admin,Drive Approval,Review and approve blood drive requests,OLD,Complete,AdminDashboard.tsx — Approve/Reject buttons fully wired on Blood Requests tab
 Admin,Reports & Analytics,Data visualization with charts (Recharts),OLD,Complete,AdminDashboard.tsx — real Recharts charts: Donors by Blood Type + Blood Request Status + Drive Capacity
 Admin,Monthly Statistics,Simple card showing this months donations count,NEW,Complete,AdminDashboard.tsx — donationsThisMonth stat card in overview stats grid
-Admin,Top Donors Leaderboard,Show top 10 donors by donation count,NEW,Complete,AdminDashboard.tsx — Top Donors leaderboard card in overview tab
-Admin,Export User List,Download CSV of all donors/hospitals,NEW,Complete,AdminDashboard.tsx — Export CSV button in donors tab downloads donor data
+Admin,Top Donors Leaderboard,Show top donors ranked by points,NEW,Complete,AdminDashboard.tsx — dedicated getLeaderboard() query (top 20 by points desc) shown as ranked list with pts + level
+Admin,Export Full Report,Download comprehensive platform CSV report,NEW,Complete,AdminDashboard.tsx — Export Report button generates 4-section CSV: Platform Summary / Top Donors / Blood Drives / Blood Requests
+Admin,Export User List,Download CSV of all donors,NEW,Complete,AdminDashboard.tsx — Export CSV button in donors tab downloads donor data
 Admin,System Activity Log,Simple table showing recent actions,NEW,Complete,AdminDashboard.tsx — System Activity section populated from real DB appointments + blood requests
 Admin,Announcement Banner,Add a text banner visible to all users on homepage,NEW,Complete,AnnouncementBanner.tsx on Index.tsx + Supabase announcements table + Admin UI in AdminDashboard
-Admin,Blood Drive Calendar,Monthly calendar view of all scheduled drives,NEW,Complete,AdminDashboard.tsx — calendar grid card in drives tab with drive indicators per day
+Admin,Blood Drive Calendar,Monthly calendar view of all scheduled drives,NEW,Complete,AdminDashboard.tsx — calendar grid card in drives tab with red dot indicators + drive name on hover
 AI & Support,AI Chatbot,Built-in chatbot widget for user assistance,OLD,Complete,ChatbotWidget.tsx — fully functional rule-based chatbot with keyword matching
 AI & Support,Quick Action Buttons,Common tasks shortcuts in chatbot,OLD,Complete,Chatbot shows inline suggestion buttons after each bot response
 AI & Support,Contact Us Form,Simple form that stores messages in database,NEW,Complete,Contact.tsx — form wired to Supabase contacts table via supabase.insert
 Auth & Security,Clerk Auth (Donors),Modern auth with social login,OLD,Complete,Clerk fully integrated in main.tsx + HybridAuthContext
 Auth & Security,Supabase Auth (Admin/Hospital),Direct credential login,OLD,Complete,AdminLogin.tsx + HospitalLogin.tsx — Supabase direct credential auth
-Auth & Security,Password Change,Allow users to update their password,NEW,Pending,No password change form implemented — outside current sprint scope
+Auth & Security,Password Change,Allow users to update their password,NEW,Pending,Outside current sprint scope
 Auth & Security,Forgot Password,Simple password reset via email,NEW,Complete,ForgotPassword.tsx — /forgot-password route with Supabase resetPasswordForEmail
 Public Pages,Landing Page,Hero section with stats and features,OLD,Complete,Index.tsx — full landing page with hero + stats + features sections
 Public Pages,About Page,Company information,OLD,Complete,About.tsx — complete company info page
@@ -48,4 +49,4 @@ Public Pages,Terms of Service,Legal terms,OLD,Complete,Terms.tsx — complete le
 Public Pages,Privacy Policy,Privacy information,OLD,Complete,Privacy.tsx — complete privacy policy page
 UI/UX,Responsive Design,Mobile-friendly layout,OLD,Complete,Tailwind responsive classes used throughout — md: lg: breakpoints applied
 UI/UX,Dark Mode Toggle,Switch between light/dark theme,NEW,Complete,Navbar.tsx — dark mode toggle button with localStorage persistence
-UI/UX,Search Donors by Blood Type,Filter donors list by blood type,NEW,Pending,No public donor search by blood type UI — outside current sprint scope
+UI/UX,Search Donors by Blood Type,Filter donors list by blood type,NEW,Pending,Outside current sprint scope

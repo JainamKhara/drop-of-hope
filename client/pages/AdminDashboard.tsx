@@ -118,6 +118,7 @@ export default function AdminDashboard() {
     upcomingAppointments: 0,
   });
   const [recentDonors, setRecentDonors] = useState<any[]>([]);
+  const [leaderboardDonors, setLeaderboardDonors] = useState<any[]>([]);
   const [bloodDrives, setBloodDrives] = useState<any[]>([]);
   const [hospitals, setHospitals] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -196,6 +197,7 @@ export default function AdminDashboard() {
       const [
         statsResult,
         donorsResult,
+        leaderboardResult,
         drivesResult,
         hospitalsResult,
         appointmentsResult,
@@ -203,6 +205,7 @@ export default function AdminDashboard() {
       ] = await Promise.all([
         statsService.getAdminStats(),
         donorService.getRecent(10),
+        donorService.getLeaderboard(20),
         driveService.getAdminAll(),
         hospitalService.getAll(),
         appointmentService.getAll(),
@@ -235,8 +238,27 @@ export default function AdminDashboard() {
             name: donor.name || "Unknown Donor",
             bloodType: donor.blood_type || "Unknown",
             lastDonation: donor.last_donation_date || new Date().toISOString(),
-            status: donor.eligibility_status || "eligible",
-            donations: donor.total_donations || 0,
+            status: donor.is_verified ? "active" : "pending",
+            donations: donor.points || 0,
+            email: donor.email || "",
+            city: donor.city || "",
+          })),
+        );
+      }
+
+      // Update leaderboard — sorted by points desc
+      if (leaderboardResult.data) {
+        setLeaderboardDonors(
+          leaderboardResult.data.map((donor: any) => ({
+            id: donor.id,
+            name: donor.name || "Unknown Donor",
+            bloodType: donor.blood_type || "Unknown",
+            lastDonation: donor.last_donation_date || new Date().toISOString(),
+            status: donor.is_verified ? "active" : "pending",
+            points: donor.points || 0,
+            level: donor.level || 1,
+            email: donor.email || "",
+            city: donor.city || "",
           })),
         );
       }
@@ -559,7 +581,125 @@ export default function AdminDashboard() {
               <Plus className="w-4 h-4 mr-2" />
               Create Blood Drive
             </Button>
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const now = new Date().toISOString().split("T")[0];
+
+                // Section 1: Platform Summary
+                const summary = [
+                  ["DROP OF HOPE — PLATFORM REPORT", now],
+                  [],
+                  ["PLATFORM SUMMARY"],
+                  ["Metric", "Value"],
+                  ["Total Donors", analyticsData.totalDonors],
+                  ["Active Donors", analyticsData.activeDonors],
+                  ["Total Donations", analyticsData.totalDonations],
+                  ["Lives Impacted", analyticsData.livesImpacted],
+                  ["Total Blood Drives", analyticsData.bloodDrives],
+                  ["Active Blood Drives", analyticsData.activeDrives],
+                  ["Hospital Partnerships", analyticsData.partnerships],
+                  ["Donations This Month", analyticsData.donationsThisMonth],
+                  ["Pending Appointments", analyticsData.upcomingAppointments],
+                  [
+                    "Open Blood Requests",
+                    bloodRequests.filter((r: any) => r.status === "pending")
+                      .length,
+                  ],
+                ];
+
+                // Section 2: Top Donors
+                const donorSection = [
+                  [],
+                  ["TOP DONORS LEADERBOARD"],
+                  [
+                    "Rank",
+                    "Name",
+                    "Blood Type",
+                    "City",
+                    "Email",
+                    "Points",
+                    "Level",
+                    "Status",
+                    "Last Donation",
+                  ],
+                  ...leaderboardDonors.map((d, i) => [
+                    i + 1,
+                    d.name,
+                    d.bloodType,
+                    d.city || "",
+                    d.email || "",
+                    d.points,
+                    d.level,
+                    d.status,
+                    d.lastDonation ? d.lastDonation.split("T")[0] : "",
+                  ]),
+                ];
+
+                // Section 3: Blood Drives
+                const drivesSection = [
+                  [],
+                  ["BLOOD DRIVES"],
+                  [
+                    "Name",
+                    "Location",
+                    "Date",
+                    "Capacity",
+                    "Registered",
+                    "Status",
+                  ],
+                  ...bloodDrives.map((d) => [
+                    d.name,
+                    d.location,
+                    d.date || "",
+                    d.capacity,
+                    d.registered ?? 0,
+                    d.status,
+                  ]),
+                ];
+
+                // Section 4: Blood Requests
+                const requestsSection = [
+                  [],
+                  ["BLOOD REQUESTS"],
+                  [
+                    "Hospital",
+                    "Blood Type",
+                    "Units Requested",
+                    "Urgency",
+                    "Status",
+                    "Created",
+                  ],
+                  ...bloodRequests.map((r: any) => [
+                    r.hospitals?.name || "Unknown",
+                    r.blood_type,
+                    r.units_requested,
+                    r.urgency,
+                    r.status,
+                    r.created_at ? r.created_at.split("T")[0] : "",
+                  ]),
+                ];
+
+                const allRows = [
+                  ...summary,
+                  ...donorSection,
+                  ...drivesSection,
+                  ...requestsSection,
+                ];
+                const csv = allRows.map((r) => r.join(",")).join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `drop_of_hope_full_report_${now}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                toast({
+                  title: "Report Exported",
+                  description: "Full platform report downloaded successfully.",
+                });
+              }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export Report
             </Button>
@@ -787,47 +927,44 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[...recentDonors]
-                    .sort((a, b) => b.donations - a.donations)
-                    .slice(0, 10)
-                    .map((donor, index) => (
+                  {[...leaderboardDonors].slice(0, 10).map((donor, index) => (
+                    <div
+                      key={donor.id}
+                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
                       <div
-                        key={donor.id}
-                        className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                          index === 0
+                            ? "bg-amber-400 text-white"
+                            : index === 1
+                              ? "bg-slate-400 text-white"
+                              : index === 2
+                                ? "bg-orange-400 text-white"
+                                : "bg-muted text-muted-foreground"
+                        }`}
                       >
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                            index === 0
-                              ? "bg-amber-400 text-white"
-                              : index === 1
-                                ? "bg-slate-400 text-white"
-                                : index === 2
-                                  ? "bg-orange-400 text-white"
-                                  : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {index + 1}
-                        </div>
-                        <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                          {donor.name.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{donor.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {donor.bloodType} · {donor.status}
-                          </p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="font-bold text-hope-red">
-                            {donor.donations}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            donations
-                          </p>
-                        </div>
+                        {index + 1}
                       </div>
-                    ))}
-                  {recentDonors.length === 0 && (
+                      <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        {donor.name.substring(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{donor.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {donor.bloodType} · {donor.status}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-hope-red">
+                          {donor.points}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          pts · Lv{donor.level}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {leaderboardDonors.length === 0 && (
                     <p className="text-muted-foreground text-center py-8">
                       No donor data yet
                     </p>

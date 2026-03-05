@@ -44,7 +44,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 | **Donation History Export** | Download full donation history as a CSV file directly from the Profile donations tab |
 | **Blood Type Info Page** | Dedicated `/blood-types` page with blood type compatibility chart and donation facts |
 | **Donation Tips & FAQs** | `/tips` page with categorized pre/post donation care tips and accordion FAQ |
-| **Feedback Form** | Star-rating + comment dialog for past blood drives — appears on completed drives in the Blood Drives listing |
+| **Feedback Form** | Star-rating + comment dialog for past blood drives — appears on completed drives |
 | **Forgot Password** | `/forgot-password` page that sends a Supabase password reset email |
 
 ---
@@ -75,11 +75,12 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 | **Drive & Request Approval** | Review, approve, or reject blood drive requests and hospital blood requisitions |
 | **Data Analytics** | Recharts charts: Donors by Blood Type (BarChart), Blood Request Status (PieChart), Drive Capacity vs Registrations (BarChart) |
 | **Monthly Statistics** | Donation count this month shown in the overview stats grid |
-| **Top Donors Leaderboard** | Ranked list of top 10 donors by total donations count |
+| **Top Donors Leaderboard** | Ranked list of top 20 donors sorted by points — shows name, blood type, pts & level badge |
+| **Export Full Report** | 4-section comprehensive CSV: Platform Summary, Top Donors, Blood Drives, Blood Requests |
 | **Export User List** | Download all donor data as a CSV from the Donors tab |
 | **System Activity Log** | Recent activity table populated live from DB appointments and blood requests |
 | **Announcement Banner** | Create and activate a prominent banner visible sitewide; managed via Supabase `announcements` table |
-| **Blood Drive Calendar** | Monthly calendar grid in the Drives tab — highlights days with scheduled drives and shows drive names on hover |
+| **Blood Drive Calendar** | Monthly calendar grid in the Drives tab — highlights days with scheduled drives, hover shows drive names |
 
 ---
 
@@ -88,7 +89,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 | Feature | Description |
 |---|---|
 | **AI Chatbot Assistant** | Built-in floating chatbot with keyword matching, quick-action suggestion buttons on every page |
-| **Contact Us Form** | Contact form wired to Supabase `contacts` table — messages are stored and accessible to admins |
+| **Contact Us Form** | Contact form wired to Supabase `contacts` table — messages stored and accessible to admins |
 | **Dark Mode Toggle** | Navbar toggle button switches between light and dark themes with localStorage persistence |
 | **Responsive Design** | Mobile-first TailwindCSS layouts with `md:` and `lg:` breakpoints throughout |
 
@@ -141,16 +142,16 @@ drop-of-hope/
 │   ├── hooks/              # Custom React hooks (use-toast, etc.)
 │   ├── lib/                # Database services (db-services.ts) & Supabase client
 │   ├── pages/              # Application views
-│   │   ├── AdminDashboard.tsx      # 7-tab admin panel
+│   │   ├── AdminDashboard.tsx      # 7-tab admin panel with leaderboard + full report export
 │   │   ├── HospitalPortal.tsx      # Hospital management center
-│   │   ├── Profile.tsx             # Donor profile & donation history
-│   │   ├── DonorDashboard.tsx      # Donor home with stats widget
+│   │   ├── Profile.tsx             # Donor profile + emergency contacts + donation CSV export
+│   │   ├── DonorDashboard.tsx      # Donor home with days-since-donation widget
 │   │   ├── BloodDrives.tsx         # Drive discovery + feedback form
 │   │   ├── BookAppointment.tsx     # Drive slot booking
 │   │   ├── MyAppointments.tsx      # Booking management + print slip
 │   │   ├── Rewards.tsx             # Gamification + badge sharing
 │   │   ├── Community.tsx           # Social feed
-│   │   ├── BloodTypes.tsx          # Blood type info page
+│   │   ├── BloodTypes.tsx          # Blood type compatibility info page
 │   │   ├── DonationTips.tsx        # Tips & FAQs page
 │   │   ├── HospitalProfile.tsx     # Public hospital profile
 │   │   ├── ForgotPassword.tsx      # Password reset page
@@ -160,7 +161,7 @@ drop-of-hope/
 │   ├── index.ts            # Server entry point
 │   └── routes/             # API routing configurations
 ├── shared/                 # Shared TypeScript interfaces
-├── FEATURES.csv            # Full feature tracking spreadsheet
+├── FEATURES.csv            # Full feature tracking spreadsheet (51 features)
 └── public/                 # Static assets
 ```
 
@@ -212,7 +213,7 @@ The PostgreSQL database relies on these core tables:
 
 | Table | Purpose |
 |---|---|
-| `donors` | Donor profiles synced from Clerk |
+| `donors` | Donor profiles synced from Clerk (id, name, blood_type, points, level, is_verified, city, email) |
 | `admins` / `hospitals` | Internal secure access credentials |
 | `drives` | Blood drive events (location, times, capacity) |
 | `appointments` | Links donors to specific drives |

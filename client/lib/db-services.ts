@@ -815,8 +815,20 @@ export const donorService = {
   getRecent: async (limit: number = 10) => {
     const { data, error } = await supabase
       .from('donors')
-      .select('id, name, blood_type, last_donation_date, points, level, is_verified, created_at')
+      .select('id, name, blood_type, last_donation_date, points, level, is_verified, created_at, email, city')
       .order('created_at', { ascending: false })
+      .limit(limit);
+    return { data, error };
+  },
+
+  /**
+   * Get top donors for leaderboard, sorted by points (proxy for total donations)
+   */
+  getLeaderboard: async (limit: number = 20) => {
+    const { data, error } = await supabase
+      .from('donors')
+      .select('id, name, blood_type, points, level, is_verified, last_donation_date, email, city')
+      .order('points', { ascending: false })
       .limit(limit);
     return { data, error };
   }

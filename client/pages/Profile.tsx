@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { donationService } from "@/lib/db-services";
 
 export default function Profile() {
   const { user } = useUser();
@@ -69,6 +70,8 @@ export default function Profile() {
     previousDonations: [],
     notes: "",
   });
+  const [donations, setDonations] = useState<any[]>([]);
+  const [donationsLoading, setDonationsLoading] = useState(false);
 
   const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
   const states = [
@@ -109,6 +112,14 @@ export default function Profile() {
     }
     if (donorProfile) {
       setFormData(donorProfile);
+      // Fetch real donations from DB
+      if (donorProfile.id) {
+        setDonationsLoading(true);
+        donationService.getByDonor(donorProfile.id).then(({ data }) => {
+          setDonations(data || []);
+          setDonationsLoading(false);
+        });
+      }
     } else {
       // If no profile, set basic info from Clerk user with default values
       setFormData({
@@ -680,19 +691,31 @@ export default function Profile() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Donation History</CardTitle>
-                    {medicalData.previousDonations.length > 0 && (
+                    {donations.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
                           const rows = [
-                            ["#", "Date", "Location", "Result", "Points"],
-                            ...medicalData.previousDonations.map((d, i) => [
+                            [
+                              "#",
+                              "Date",
+                              "Location",
+                              "Blood Type",
+                              "Status",
+                              "Points",
+                              "Quantity (ml)",
+                            ],
+                            ...donations.map((d, i) => [
                               i + 1,
-                              d.date,
-                              d.location,
-                              d.result,
-                              d.points,
+                              d.donation_date
+                                ? d.donation_date.split("T")[0]
+                                : "",
+                              d.drives?.name || d.hospitals?.name || "",
+                              d.blood_type || "",
+                              d.status || "",
+                              d.points_earned || 0,
+                              d.quantity_ml || "",
                             ]),
                           ];
                           const csv = rows.map((r) => r.join(",")).join("\n");
@@ -714,32 +737,70 @@ export default function Profile() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {medicalData.previousDonations.map((donation, index) => (
+                    {donationsLoading && (
+                      <p className="text-muted-foreground text-center py-8">
+                        Loading donation history...
+                      </p>
+                    )}
+                    {!donationsLoading && donations.length === 0 && (
+                      <div className="text-center py-12">
+                        <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                        <p className="font-medium">No donations yet</p>
+                        <p className="text-sm text-muted-foreground">
+                          Your completed donations will appear here.
+                        </p>
+                      </div>
+                    )}
+                    {donations.map((donation, index) => (
                       <div
-                        key={index}
+                        key={donation.id || index}
                         className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
                       >
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center flex-shrink-0">
                             <Heart className="w-5 h-5 text-white fill-current" />
                           </div>
                           <div>
-                            <p className="font-medium">{donation.location}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {format(
-                                new Date(donation.date),
-                                "EEEE, MMMM dd, yyyy",
-                              )}
+                            <p className="font-medium">
+                              {donation.drives?.name ||
+                                donation.hospitals?.name ||
+                                "Donation"}
                             </p>
+                            <p className="text-sm text-muted-foreground">
+                              {donation.donation_date
+                                ? format(
+                                    new Date(donation.donation_date),
+                                    "EEEE, MMMM dd, yyyy",
+                                  )
+                                : "Date unknown"}
+                            </p>
+                            {donation.blood_type && (
+                              <p className="text-xs text-muted-foreground">
+                                Blood Type: {donation.blood_type}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge className="bg-success/10 text-success">
-                            {donation.result}
+                          <Badge
+                            className={`${
+                              donation.status === "completed"
+                                ? "bg-success/10 text-success"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {donation.status || "completed"}
                           </Badge>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            +{donation.points} points
-                          </p>
+                          {donation.points_earned != null && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              +{donation.points_earned} pts
+                            </p>
+                          )}
+                          {donation.quantity_ml && (
+                            <p className="text-xs text-muted-foreground">
+                              {donation.quantity_ml} ml
+                            </p>
+                          )}
                         </div>
                       </div>
                     ))}
