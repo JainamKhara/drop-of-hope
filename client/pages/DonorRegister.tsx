@@ -126,24 +126,29 @@ function ClerkUnavailableMessage() {
 
 export default function DonorRegister() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-hope-red mb-2">
+    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background overflow-y-auto">
+      <div className="container mx-auto px-4 py-6 md:py-12">
+        <div className="w-full max-w-md mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-hope-red mb-2">
               Join Drop of Hope
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm md:text-base">
               Create your donor account and start saving lives
             </p>
           </div>
 
           {/* ✅ If Clerk configured → show SignUp, else fallback */}
-          {isClerkAvailable ? <ClerkSignUpForm /> : <ClerkUnavailableMessage />}
+          <div className="w-full">
+            {isClerkAvailable ? (
+              <ClerkSignUpForm />
+            ) : (
+              <ClerkUnavailableMessage />
+            )}
+          </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-muted-foreground mb-4">
+          <div className="mt-6 text-center pb-8">
+            <p className="text-muted-foreground mb-4 text-sm">
               Already have an account?{" "}
               <Link
                 to="/donor/login"
@@ -153,7 +158,7 @@ export default function DonorRegister() {
               </Link>
             </p>
 
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-4 text-sm">
               Not a donor?{" "}
               <Link
                 to="/admin/login"
@@ -170,7 +175,7 @@ export default function DonorRegister() {
               </Link>
             </p>
 
-            <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="space-y-1 text-xs text-muted-foreground">
               <p>By creating an account, you agree to our</p>
               <div className="space-x-4">
                 <Link
@@ -191,8 +196,6 @@ export default function DonorRegister() {
           </div>
         </div>
       </div>
-
-      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-hope-pink/30 to-transparent pointer-events-none" />
     </div>
   );
 }

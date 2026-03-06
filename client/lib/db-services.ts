@@ -451,27 +451,37 @@ export const rewardService = {
 
 export const communityService = {
   /**
-   * Get community posts with author info
+   * Get community posts — fetches posts then enriches with donor info
+   * (avoids FK join which requires a DB foreign key constraint)
    */
   getPosts: async (limit: number = 20) => {
-    const { data, error } = await supabase
+    const { data: posts, error } = await supabase
       .from('community_posts')
-      .select(`
-        *,
-        donors:author_id (id, name, blood_type, level, profile_pic_url, points)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
-    return { data, error };
+
+    if (error || !posts?.length) return { data: posts || [], error };
+
+    // Get unique author IDs and fetch donor info in one query
+    const authorIds = [...new Set(posts.map((p: any) => p.author_id).filter(Boolean))];
+    const { data: donors } = await supabase
+      .from('donors')
+      .select('id, name, blood_type, level, profile_pic_url, points')
+      .in('id', authorIds);
+
+    const donorMap = Object.fromEntries((donors || []).map((d: any) => [d.id, d]));
+    const enriched = posts.map((p: any) => ({ ...p, donors: donorMap[p.author_id] || null }));
+    return { data: enriched, error: null };
   },
 
   /**
-   * Create a new post
+   * Create a new post — only inserts columns that actually exist
    */
-  createPost: async (post: Omit<CommunityPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'comments_count'>) => {
+  createPost: async (post: { author_id: string; content: string; image_url?: string }) => {
     const { data, error } = await supabase
       .from('community_posts')
-      .insert([{ ...post, likes_count: 0, comments_count: 0 }])
+      .insert([post])
       .select()
       .single();
     return { data, error };
@@ -481,26 +491,40 @@ export const communityService = {
    * Like/unlike a post
    */
   toggleLike: async (postId: string, userId: string) => {
-    // Check if like exists
+    // Check if like already exists
     const { data: existingLike } = await supabase
       .from('community_likes')
       .select('id')
       .eq('post_id', postId)
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (existingLike) {
-      // Unlike
+      // Unlike — delete the like row, then recount likes and update post
       await supabase.from('community_likes').delete().eq('id', existingLike.id);
-      await supabase.rpc('decrement_likes', { post_id: postId });
+      const { count } = await supabase
+        .from('community_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+      await supabase
+        .from('community_posts')
+        .update({ likes_count: count ?? 0 })
+        .eq('id', postId);
       return { liked: false, error: null };
     } else {
-      // Like
+      // Like — insert like row, then recount likes and update post
       const { error } = await supabase
         .from('community_likes')
         .insert([{ post_id: postId, user_id: userId }]);
       if (!error) {
-        await supabase.rpc('increment_likes', { post_id: postId });
+        const { count } = await supabase
+          .from('community_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', postId);
+        await supabase
+          .from('community_posts')
+          .update({ likes_count: count ?? 1 })
+          .eq('id', postId);
       }
       return { liked: true, error };
     }

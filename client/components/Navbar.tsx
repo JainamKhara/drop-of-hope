@@ -80,6 +80,7 @@ const Navbar = () => {
   const navLinks = [
     { label: "About", path: "/about" },
     { label: "Find Drives", path: "/drives" },
+    { label: "Community", path: "/community" },
     { label: "Contact", path: "/contact" },
   ];
 
