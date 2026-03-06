@@ -1,22 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { SignUp } from "@clerk/clerk-react";
+import { Link, Navigate } from "react-router-dom";
+import { SignUp, useAuth } from "@clerk/clerk-react";
+import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heart, ArrowLeft, AlertCircle, ExternalLink } from "lucide-react";
-
-// ✅ Reuse the same key validation logic from main.tsx
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const INVALID_KEYS = ["pk_test_example"];
-
-const isClerkAvailable =
-  PUBLISHABLE_KEY &&
-  PUBLISHABLE_KEY.startsWith("pk_") &&
-  PUBLISHABLE_KEY.length > 20 &&
-  !PUBLISHABLE_KEY.includes("__") &&
-  !PUBLISHABLE_KEY.includes("your_") &&
-  !INVALID_KEYS.includes(PUBLISHABLE_KEY);
+import { Heart, AlertCircle, ExternalLink } from "lucide-react";
 
 function ClerkSignUpForm() {
   return (
@@ -108,7 +97,8 @@ function ClerkUnavailableMessage() {
           </Button>
 
           <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
-            <strong>Current Key:</strong> {PUBLISHABLE_KEY || "Not set"}
+            <strong>Current Key:</strong>{" "}
+            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "Not set"}
           </div>
         </div>
 
@@ -125,6 +115,28 @@ function ClerkUnavailableMessage() {
 }
 
 export default function DonorRegister() {
+  const { userRole, isSignedIn, loading } = useHybridAuth();
+  const { isLoaded: clerkLoaded } = useAuth();
+
+  // Wait for Clerk SDK to initialise at runtime
+  if (!clerkLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Heart className="w-6 h-6 text-white fill-current" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if already signed in as donor
+  if (isSignedIn && userRole === "donor") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background overflow-y-auto">
       <div className="container mx-auto px-4 py-6 md:py-12">
@@ -140,11 +152,7 @@ export default function DonorRegister() {
 
           {/* ✅ If Clerk configured → show SignUp, else fallback */}
           <div className="w-full">
-            {isClerkAvailable ? (
-              <ClerkSignUpForm />
-            ) : (
-              <ClerkUnavailableMessage />
-            )}
+            {clerkLoaded ? <ClerkSignUpForm /> : <ClerkUnavailableMessage />}
           </div>
 
           <div className="mt-6 text-center pb-8">
