@@ -108,7 +108,7 @@ export default function Contact() {
           {contactInfo.map((info, idx) => (
             <Card
               key={idx}
-              className="border-0 shadow-lg hover:shadow-xl transition-shadow"
+              className="border-2 border-[hsl(0,80%,50%)] rounded-sm hover:shadow-none"
             >
               <CardContent className="pt-6">
                 <div
@@ -120,13 +120,15 @@ export default function Contact() {
                 <p className="text-sm text-muted-foreground mb-2">
                   {info.description}
                 </p>
-                <p className="font-medium text-hope-red">{info.value}</p>
+                <p className="font-medium text-[hsl(0,80%,50%)]">
+                  {info.value}
+                </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white dark:bg-card rounded-3xl overflow-hidden shadow-2xl items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white dark:bg-card rounded-none overflow-hidden shadow-none items-stretch">
           <div className="p-8 md:p-12 lg:p-16">
             <h2 className="text-3xl font-bold mb-2">Send us a message</h2>
             <p className="text-muted-foreground mb-8">
@@ -189,7 +191,7 @@ export default function Contact() {
 
               <Button
                 type="submit"
-                className="w-full bg-hope-red hover:bg-hope-red/90 h-12 rounded-xl font-bold transition-all hover:scale-[1.02]"
+                className="w-full bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 h-12 rounded-sm font-bold transition-all hover:scale-[1.02] text-white"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -202,7 +204,7 @@ export default function Contact() {
             </form>
           </div>
 
-          <div className="bg-hope-red p-8 md:p-12 lg:p-16 text-white flex flex-col justify-between">
+          <div className="bg-[hsl(0,80%,50%)] p-8 md:p-12 lg:p-16 text-white flex flex-col justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-8">
                 Connect with our community

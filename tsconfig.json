@@ -40,4 +40,4 @@
     "vite.config.server.ts"
   ],
   "exclude": ["node_modules", "dist"]
-}
+} 

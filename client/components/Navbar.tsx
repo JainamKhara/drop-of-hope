@@ -85,22 +85,22 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur-md dark:bg-card/80 sticky top-0 z-50">
+    <header className="border-b-2 border-[hsl(0,80%,50%)] bg-background dark:bg-background sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 hover:scale-105 transition-transform"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
               <Heart className="w-5 h-5 text-white fill-current" />
             </div>
-            <span className="text-xl font-bold text-hope-red">
+            <span className="font-display font-bold text-lg text-[hsl(0,80%,50%)]">
               Drop of Hope
             </span>
             {userRole === "admin" && (
-              <Badge className="bg-hope-red/10 text-hope-red ml-2 border-none">
+              <Badge className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)] ml-2 border-none">
                 Admin
               </Badge>
             )}
@@ -117,7 +117,7 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className="text-foreground hover:text-hope-red transition-colors font-medium"
+                className="text-foreground font-medium text-sm uppercase hover:border-b-2 hover:border-[hsl(0,80%,50%)] pb-1 transition-all"
               >
                 {link.label}
               </Link>
@@ -129,9 +129,10 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
+              corners="crisp"
               onClick={toggleTheme}
               title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              className="text-muted-foreground hover:text-hope-red"
+              className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
             >
               {isDark ? (
                 <Sun className="w-5 h-5" />
@@ -149,14 +150,16 @@ const Navbar = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-hope-red"
+                        corners="crisp"
+                        className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
                       >
                         <Bell className="w-5 h-5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-hope-red"
+                        corners="crisp"
+                        className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
                       >
                         <Settings className="w-5 h-5" />
                       </Button>
@@ -168,7 +171,7 @@ const Navbar = () => {
                   to={userRole === "donor" ? "/profile" : dashboardLink}
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                 >
-                  <Avatar className="w-8 h-8 border border-hope-red/20">
+                  <Avatar className="w-8 h-8 border-2 border-[hsl(0,80%,50%)] rounded-full">
                     <AvatarImage
                       src={
                         userRole === "donor"
@@ -177,7 +180,7 @@ const Navbar = () => {
                       }
                       alt={displayName}
                     />
-                    <AvatarFallback className="bg-hope-red/10 text-hope-red">
+                    <AvatarFallback className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)]">
                       <User className="w-4 h-4" />
                     </AvatarFallback>
                   </Avatar>
@@ -189,7 +192,8 @@ const Navbar = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="hidden md:flex items-center border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                  corners="crisp"
+                  className="hidden md:flex items-center border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                   onClick={handleSignOut}
                   title="Sign Out"
                 >
@@ -199,11 +203,11 @@ const Navbar = () => {
               </>
             ) : (
               <div className="hidden md:flex items-center space-x-2">
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="sm" corners="crisp" asChild>
                   <Link to="/login">Sign In</Link>
                 </Button>
                 <Button
-                  className="bg-hope-red hover:bg-hope-red/90 text-white"
+                  corners="crisp"
                   size="sm"
                   asChild
                 >
@@ -216,6 +220,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
+              corners="crisp"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
@@ -231,14 +236,14 @@ const Navbar = () => {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-white dark:bg-card">
+        <div className="md:hidden border-t bg-background">
           <div className="container mx-auto px-4 py-4 space-y-4">
             <nav className="flex flex-col space-y-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="text-lg font-medium text-foreground hover:text-hope-red transition-colors"
+                  className="text-lg font-medium text-foreground hover:text-[hsl(0,80%,50%)] uppercase transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -247,7 +252,7 @@ const Navbar = () => {
               {isSignedIn && (
                 <Link
                   to={dashboardLink}
-                  className="text-lg font-medium text-foreground hover:text-hope-red transition-colors"
+                  className="text-lg font-medium text-foreground hover:text-[hsl(0,80%,50%)] uppercase transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
@@ -261,7 +266,7 @@ const Navbar = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10 border border-hope-red/20">
+                    <Avatar className="w-10 h-10 border-2 border-[hsl(0,80%,50%)] rounded-full">
                       <AvatarImage
                         src={
                           userRole === "donor"
@@ -270,7 +275,7 @@ const Navbar = () => {
                         }
                         alt={displayName}
                       />
-                      <AvatarFallback className="bg-hope-red/10 text-hope-red">
+                      <AvatarFallback className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)]">
                         <User className="w-5 h-5" />
                       </AvatarFallback>
                     </Avatar>
@@ -285,7 +290,8 @@ const Navbar = () => {
                 </div>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-center border-hope-red/20 text-hope-red"
+                  corners="crisp"
+                  className="w-full flex items-center justify-center border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)]"
                   onClick={handleSignOut}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
@@ -296,6 +302,7 @@ const Navbar = () => {
               <div className="flex flex-col space-y-2">
                 <Button
                   variant="outline"
+                  corners="crisp"
                   className="w-full"
                   asChild
                   onClick={() => setMobileMenuOpen(false)}
@@ -303,7 +310,8 @@ const Navbar = () => {
                   <Link to="/login">Sign In</Link>
                 </Button>
                 <Button
-                  className="w-full bg-hope-red hover:bg-hope-red/90 text-white"
+                  corners="crisp"
+                  className="w-full"
                   asChild
                   onClick={() => setMobileMenuOpen(false)}
                 >

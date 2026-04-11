@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { notificationService } from "@/lib/db-services";
+import { supabase } from "@/lib/supabase";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 
 interface Notification {
@@ -81,8 +82,10 @@ export default function NotificationCenter() {
 
       try {
         const { data, error } = await notificationService.getByUser(
+          donorProfile.clerk_user_id || "",
           donorProfile.id,
         );
+
         if (data && data.length > 0) {
           const formatted = data.map((n: any) => ({
             id: n.id,
@@ -126,7 +129,10 @@ export default function NotificationCenter() {
     setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
     // Mark all as read in database
     if (donorProfile?.id) {
-      notificationService.markAllAsRead(donorProfile.id);
+      notificationService.markAllAsRead(
+        donorProfile.clerk_user_id || "",
+        donorProfile.id,
+      );
     }
   };
 
@@ -195,7 +201,7 @@ export default function NotificationCenter() {
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="w-5 h-5" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-hope-red text-white text-xs rounded-full">
+            <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-[hsl(0,80%,50%)] text-white text-xs rounded-full">
               {unreadCount > 99 ? "99+" : unreadCount}
             </Badge>
           )}
@@ -203,7 +209,7 @@ export default function NotificationCenter() {
       </PopoverTrigger>
 
       <PopoverContent className="w-96 p-0" align="end" sideOffset={5}>
-        <Card className="border-0 shadow-lg">
+        <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
           <CardHeader className="border-b">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Notifications</CardTitle>
@@ -251,10 +257,10 @@ export default function NotificationCenter() {
                     notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-3 rounded-lg mb-2 border transition-colors ${
+                        className={`p-3 rounded-sm mb-2 border transition-colors ${
                           notification.isRead
                             ? "bg-gray-50 border-gray-100"
-                            : "bg-white border-hope-red/20"
+                            : "bg-white border-[hsl(0,80%,50%)]/20"
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -352,7 +358,7 @@ export default function NotificationCenter() {
                     unreadNotifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className="p-3 rounded-lg mb-2 border bg-white border-hope-red/20"
+                        className="p-3 rounded-sm mb-2 border bg-white border-[hsl(0,80%,50%)]/20"
                       >
                         <div className="flex items-start space-x-3">
                           <div className="flex-shrink-0">
@@ -438,10 +444,10 @@ export default function NotificationCenter() {
                       .map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-3 rounded-lg mb-2 border transition-colors ${
+                          className={`p-3 rounded-sm mb-2 border transition-colors ${
                             notification.isRead
                               ? "bg-gray-50 border-gray-100"
-                              : "bg-white border-hope-red/20"
+                              : "bg-white border-[hsl(0,80%,50%)]/20"
                           }`}
                         >
                           <div className="flex items-start space-x-3">

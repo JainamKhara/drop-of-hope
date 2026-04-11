@@ -2,13 +2,27 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  variant?: "default" | "error" | "success";
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, variant = "default", ...props }, ref) => {
     return (
       <input
         type={type}
         className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          // Base: SHARP EDGES, DARK LABELS, MEDICAL PRECISION
+          "flex h-12 w-full border-2 bg-background px-4 py-3 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          {
+            default:
+              "border-[hsl(0,80%,50%)] focus-visible:border-[hsl(0,80%,50%)] focus-visible:ring-[hsl(0,80%,50%)]/30",
+            error:
+              "border-[hsl(14,100%,50%)] focus-visible:ring-[hsl(14,100%,50%)]/30",
+            success:
+              "border-[hsl(120,71%,43%)] focus-visible:ring-[hsl(120,71%,43%)]/30",
+          }[variant],
+          "rounded-sm", // Crisp edges
           className,
         )}
         ref={ref}

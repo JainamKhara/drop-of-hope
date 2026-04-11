@@ -203,11 +203,11 @@ export default function MyAppointments() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-4">
             My Appointments
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -219,7 +219,7 @@ export default function MyAppointments() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Calendar Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <CalendarIcon className="w-5 h-5" />
@@ -236,18 +236,19 @@ export default function MyAppointments() {
                   }}
                   modifiersClassNames={{
                     hasAppointment:
-                      "bg-hope-red/20 text-hope-red font-semibold border border-hope-red/30",
+                      "bg-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] font-semibold border border-[hsl(0,80%,50%)]/30",
                   }}
                   className="w-full [--cell-size:1.75rem]"
                   classNames={{
                     day_selected:
-                      "bg-hope-red text-white hover:bg-hope-red hover:text-white focus:bg-hope-red focus:text-white",
-                    day_today: "bg-hope-pink/30 text-hope-red font-semibold",
+                      "bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)] hover:text-white focus:bg-[hsl(0,80%,50%)] focus:text-white",
+                    day_today:
+                      "bg-[hsl(0,0%,98%)]/30 text-[hsl(0,80%,50%)] font-semibold",
                   }}
                 />
                 <div className="mt-4 space-y-2 text-xs">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-hope-red rounded-full"></div>
+                    <div className="w-3 h-3 bg-[hsl(0,80%,50%)] rounded-full"></div>
                     <span>Appointment scheduled</span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -259,19 +260,19 @@ export default function MyAppointments() {
             </Card>
 
             {/* Quick Stats */}
-            <Card className="border-0 shadow-lg mt-6">
+            <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mt-6">
               <CardHeader>
                 <CardTitle>Quick Stats</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                  <div className="text-2xl font-bold text-hope-red">
+                <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                  <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                     {upcomingAppointments.length}
                   </div>
                   <div className="text-sm text-muted-foreground">Upcoming</div>
                 </div>
-                <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                  <div className="text-2xl font-bold text-hope-red">
+                <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                  <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                     {
                       pastAppointments.filter(
                         (apt) => apt.status === "completed",
@@ -280,8 +281,8 @@ export default function MyAppointments() {
                   </div>
                   <div className="text-sm text-muted-foreground">Completed</div>
                 </div>
-                <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                  <div className="text-2xl font-bold text-hope-red">
+                <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                  <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                     {pastAppointments.filter(
                       (apt) => apt.status === "completed",
                     ).length * 3}
@@ -308,7 +309,7 @@ export default function MyAppointments() {
 
               <TabsContent value="upcoming" className="space-y-6 mt-6">
                 {upcomingAppointments.length === 0 ? (
-                  <Card className="border-0 shadow-lg">
+                  <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                     <CardContent className="text-center py-12">
                       <CalendarIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-xl font-semibold mb-2">
@@ -319,7 +320,7 @@ export default function MyAppointments() {
                         save lives
                       </p>
                       <Button
-                        className="bg-hope-red hover:bg-hope-red/90"
+                        className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                         asChild
                       >
                         <Link to="/drives">Find Blood Drives</Link>
@@ -328,11 +329,14 @@ export default function MyAppointments() {
                   </Card>
                 ) : (
                   upcomingAppointments.map((appointment) => (
-                    <Card key={appointment.id} className="border-0 shadow-lg">
+                    <Card
+                      key={appointment.id}
+                      className="border-2 border-[hsl(0,80%,50%)] rounded-sm"
+                    >
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div>
-                            <CardTitle className="text-xl text-hope-red">
+                            <CardTitle className="text-xl text-[hsl(0,80%,50%)]">
                               {appointment.driveName}
                             </CardTitle>
                             <p className="text-muted-foreground">
@@ -350,7 +354,7 @@ export default function MyAppointments() {
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="flex items-center space-x-3">
-                            <CalendarIcon className="w-5 h-5 text-hope-red" />
+                            <CalendarIcon className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                             <div>
                               <p className="font-medium">
                                 {format(
@@ -365,7 +369,7 @@ export default function MyAppointments() {
                           </div>
 
                           <div className="flex items-center space-x-3">
-                            <Clock className="w-5 h-5 text-hope-red" />
+                            <Clock className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                             <div>
                               <p className="font-medium">{appointment.time}</p>
                               <p className="text-sm text-muted-foreground">
@@ -375,7 +379,7 @@ export default function MyAppointments() {
                           </div>
 
                           <div className="flex items-start space-x-3">
-                            <MapPin className="w-5 h-5 text-hope-red mt-0.5" />
+                            <MapPin className="w-5 h-5 text-[hsl(0,80%,50%)] mt-0.5" />
                             <div>
                               <p className="font-medium">
                                 {appointment.location}
@@ -421,14 +425,14 @@ export default function MyAppointments() {
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1 border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                            className="flex-1 border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                             onClick={() => handlePrintSlip(appointment)}
                           >
                             <Printer className="w-4 h-4 mr-1" />
                             Print Slip
                           </Button>
                           <Button
-                            className="flex-1 bg-hope-red hover:bg-hope-red/90"
+                            className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                             onClick={() => {
                               const address = encodeURIComponent(
                                 appointment.address,
@@ -450,11 +454,14 @@ export default function MyAppointments() {
 
               <TabsContent value="past" className="space-y-6 mt-6">
                 {pastAppointments.map((appointment) => (
-                  <Card key={appointment.id} className="border-0 shadow-lg">
+                  <Card
+                    key={appointment.id}
+                    className="border-2 border-[hsl(0,80%,50%)] rounded-sm"
+                  >
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-xl text-hope-red">
+                          <CardTitle className="text-xl text-[hsl(0,80%,50%)]">
                             {appointment.driveName}
                           </CardTitle>
                           <p className="text-muted-foreground">
@@ -472,7 +479,7 @@ export default function MyAppointments() {
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="flex items-center space-x-3">
-                          <CalendarIcon className="w-5 h-5 text-hope-red" />
+                          <CalendarIcon className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                           <div>
                             <p className="font-medium">
                               {format(
@@ -487,7 +494,7 @@ export default function MyAppointments() {
                         </div>
 
                         <div className="flex items-start space-x-3">
-                          <MapPin className="w-5 h-5 text-hope-red mt-0.5" />
+                          <MapPin className="w-5 h-5 text-[hsl(0,80%,50%)] mt-0.5" />
                           <div>
                             <p className="font-medium">
                               {appointment.location}
@@ -500,7 +507,7 @@ export default function MyAppointments() {
 
                         {appointment.status === "completed" && (
                           <div className="flex items-center space-x-3">
-                            <Heart className="w-5 h-5 text-hope-red fill-current" />
+                            <Heart className="w-5 h-5 text-[hsl(0,80%,50%)] fill-current" />
                             <div>
                               <p className="font-medium text-success">
                                 Donation Completed
@@ -531,7 +538,7 @@ export default function MyAppointments() {
                             Share Achievement
                           </Button>
                           <Button
-                            className="flex-1 bg-hope-red hover:bg-hope-red/90"
+                            className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                             asChild
                           >
                             <Link to="/drives">Book Next Donation</Link>

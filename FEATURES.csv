@@ -38,9 +38,12 @@ Admin,Blood Drive Calendar,Monthly calendar view of all scheduled drives,NEW,Com
 AI & Support,AI Chatbot,Built-in chatbot widget for user assistance,OLD,Complete,ChatbotWidget.tsx — fully functional rule-based chatbot with keyword matching
 AI & Support,Quick Action Buttons,Common tasks shortcuts in chatbot,OLD,Complete,Chatbot shows inline suggestion buttons after each bot response
 AI & Support,Contact Us Form,Simple form that stores messages in database,NEW,Complete,Contact.tsx — form wired to Supabase contacts table via supabase.insert
+Notifications,In-App Notifications,Notification bell icon with notification center,NEW,Complete,NotificationCenter.tsx — notification dropdown with tabs, mark read/delete functionality
+Notifications,Appointment Reminders,Send reminders 1 day and 1 hour before appointment,NEW,Complete,notificationService.ts — sendAppointmentReminder function with reminder types
+Notifications,Hospital Urgent Alerts,Hospitals can alert donors about urgent blood needs,NEW,Complete,HospitalPortal.tsx — Notifications tab with blood type targeting
+Notifications,Admin Broadcast,Admin can broadcast notifications to all donors or by blood type,NEW,Complete,AdminDashboard.tsx — Broadcast notification dialog with priority and blood type filter
 Auth & Security,Clerk Auth (Donors),Modern auth with social login,OLD,Complete,Clerk fully integrated in main.tsx + HybridAuthContext
 Auth & Security,Supabase Auth (Admin/Hospital),Direct credential login,OLD,Complete,AdminLogin.tsx + HospitalLogin.tsx — Supabase direct credential auth
-Auth & Security,Password Change,Allow users to update their password,NEW,Pending,Outside current sprint scope
 Auth & Security,Forgot Password,Simple password reset via email,NEW,Complete,ForgotPassword.tsx — /forgot-password route with Supabase resetPasswordForEmail
 Public Pages,Landing Page,Hero section with stats and features,OLD,Complete,Index.tsx — full landing page with hero + stats + features sections
 Public Pages,About Page,Company information,OLD,Complete,About.tsx — complete company info page
@@ -49,4 +52,4 @@ Public Pages,Terms of Service,Legal terms,OLD,Complete,Terms.tsx — complete le
 Public Pages,Privacy Policy,Privacy information,OLD,Complete,Privacy.tsx — complete privacy policy page
 UI/UX,Responsive Design,Mobile-friendly layout,OLD,Complete,Tailwind responsive classes used throughout — md: lg: breakpoints applied
 UI/UX,Dark Mode Toggle,Switch between light/dark theme,NEW,Complete,Navbar.tsx — dark mode toggle button with localStorage persistence
-UI/UX,Search Donors by Blood Type,Filter donors list by blood type,NEW,Pending,Outside current sprint scope
+UI/UX,Search Donors by Blood Type,Filter donors list by blood type,NEW,Complete,AdminDashboard.tsx — Blood type dropdown filter in Donors tab with clear filters button

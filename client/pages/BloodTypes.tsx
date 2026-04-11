@@ -64,13 +64,13 @@ const FACTS: Record<string, { label: string; color: string; fact: string }> = {
 
 export default function BloodTypes() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-gradient-to-b from-[hsl(0,0%,98%)] to-white dark:from-[hsl(14,100%,50%)] dark:to-background">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-6">
           <Button
             variant="ghost"
             asChild
-            className="text-hope-red hover:text-hope-red/80 -ml-2"
+            className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 -ml-2"
           >
             <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -80,10 +80,10 @@ export default function BloodTypes() {
         </div>
 
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-sm mx-auto mb-4 flex items-center justify-center">
             <Heart className="w-8 h-8 text-white fill-current" />
           </div>
-          <h1 className="text-4xl font-bold text-hope-red mb-2">
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-2">
             Blood Type Guide
           </h1>
           <p className="text-muted-foreground text-lg">
@@ -96,10 +96,10 @@ export default function BloodTypes() {
           {BLOOD_TYPES.map((type) => (
             <Card
               key={type}
-              className="border-0 shadow-lg hover:shadow-xl transition-shadow"
+              className="border-2 border-[hsl(0,80%,50%)] rounded-sm hover:shadow-xl transition-shadow"
             >
               <CardHeader className="pb-3 text-center">
-                <div className="w-14 h-14 bg-hope-red rounded-full mx-auto mb-2 flex items-center justify-center">
+                <div className="w-14 h-14 bg-[hsl(0,80%,50%)] rounded-sm mx-auto mb-2 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">{type}</span>
                 </div>
                 <Badge className={FACTS[type].color}>{FACTS[type].label}</Badge>
@@ -120,7 +120,7 @@ export default function BloodTypes() {
         </div>
 
         {/* Compatibility Table */}
-        <Card className="border-0 shadow-lg mb-8">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8">
           <CardHeader>
             <CardTitle>Donation Compatibility Chart</CardTitle>
           </CardHeader>
@@ -134,7 +134,7 @@ export default function BloodTypes() {
                   {BLOOD_TYPES.map((t) => (
                     <th
                       key={t}
-                      className="p-2 font-bold text-hope-red text-center"
+                      className="p-2 font-bold text-[hsl(0,80%,50%)] text-center"
                     >
                       {t}
                     </th>
@@ -147,7 +147,9 @@ export default function BloodTypes() {
                     key={donor}
                     className="border-t border-border hover:bg-muted/30 transition-colors"
                   >
-                    <td className="p-2 font-bold text-hope-red">{donor}</td>
+                    <td className="p-2 font-bold text-[hsl(0,80%,50%)]">
+                      {donor}
+                    </td>
                     {BLOOD_TYPES.map((recipient) => (
                       <td key={recipient} className="p-2 text-center">
                         {COMPATIBILITY[donor].includes(recipient) ? (
@@ -165,8 +167,8 @@ export default function BloodTypes() {
         </Card>
 
         {/* Call to Action */}
-        <div className="text-center p-8 bg-hope-red/5 dark:bg-hope-red/10 rounded-2xl border border-hope-red/20">
-          <h2 className="text-2xl font-bold text-hope-red mb-2">
+        <div className="text-center p-8 bg-[hsl(0,80%,50%)]/5 dark:bg-[hsl(0,80%,50%)]/10 rounded-sm border border-[hsl(0,80%,50%)]/20">
+          <h2 className="text-2xl font-bold text-[hsl(0,80%,50%)] mb-2">
             Ready to Donate?
           </h2>
           <p className="text-muted-foreground mb-4">
@@ -174,7 +176,7 @@ export default function BloodTypes() {
           </p>
           <Button
             asChild
-            className="bg-hope-red hover:bg-hope-red/90 text-white"
+            className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
           >
             <Link to="/drives">Find Blood Drives</Link>
           </Button>

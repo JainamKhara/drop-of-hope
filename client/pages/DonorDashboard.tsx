@@ -3,12 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useHybridAuth, DonorProfile } from "@/contexts/HybridAuthContext";
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import NotificationCenter from "@/components/NotificationCenter";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   appointmentService,
   donationService,
@@ -24,7 +25,8 @@ import {
   LogOut,
   Droplets,
   TrendingUp,
-  Calendar as CalendarIcon,
+  ChevronRight,
+  Star,
 } from "lucide-react";
 
 interface DashboardData {
@@ -52,34 +54,22 @@ export default function DonorDashboard() {
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [hasRedirected, setHasRedirected] = useState(false);
 
-  // Redirect if not signed in or not a donor (only after everything is loaded)
+  // Redirect if not signed in or not a donor
   useEffect(() => {
-    // Wait for both Clerk and HybridAuth to be loaded
     if (clerkLoaded && !loading) {
-      console.log("Auth states:", {
-        clerkLoaded,
-        loading,
-        isSignedIn,
-        userRole,
-        hasRedirected,
-      });
-      // Only redirect if we haven't already redirected and user is not authenticated
       if (!hasRedirected && (!isSignedIn || userRole !== "donor")) {
-        console.log("Redirecting to login page");
         setHasRedirected(true);
         navigate("/donor/login");
       }
     }
   }, [clerkLoaded, loading, isSignedIn, userRole, navigate, hasRedirected]);
 
-  // Reset redirect flag when user becomes authenticated
   useEffect(() => {
     if (isSignedIn && userRole === "donor") {
       setHasRedirected(false);
     }
   }, [isSignedIn, userRole]);
 
-  // Load dashboard data when donor profile is available
   useEffect(() => {
     if (donorProfile) {
       loadDashboardData(donorProfile);
@@ -90,7 +80,6 @@ export default function DonorDashboard() {
     try {
       setDashboardLoading(true);
 
-      // Fetch real data from database
       const [appointmentsResult, donationsResult, rewardsResult, drivesResult] =
         await Promise.all([
           appointmentService.getUpcomingByDonor(profile.id),
@@ -104,7 +93,6 @@ export default function DonorDashboard() {
       const rewards = rewardsResult.data || [];
       const upcomingDrives = drivesResult.data || [];
 
-      // Use last_donation_date from donor profile
       const lastDonationDate = profile.last_donation_date
         ? new Date(profile.last_donation_date)
         : null;
@@ -138,11 +126,15 @@ export default function DonorDashboard() {
     }
   };
 
+  const heroRef = useScrollReveal({ threshold: 0.1, delay: 0 });
+  const timelineRef = useScrollReveal({ threshold: 0.1, delay: 100 });
+  const rewardsRef = useScrollReveal({ threshold: 0.1, delay: 200 });
+
   if (!clerkLoaded || loading || !donorProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-background">
         <div className="text-center">
-          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-6 h-6 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading your dashboard...</p>
@@ -153,9 +145,9 @@ export default function DonorDashboard() {
 
   if (dashboardLoading || !dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-background">
         <div className="text-center">
-          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-6 h-6 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading dashboard data...</p>
@@ -168,439 +160,331 @@ export default function DonorDashboard() {
     dashboardData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-hope-red mb-2">
-            Welcome back, {donorProfile.name}!
-          </h1>
-          <p className="text-muted-foreground">
-            Thank you for being a life-saving hero. Here's your impact
-            dashboard.
-          </p>
-        </div>
-
-        {/* Donation Counter Widget */}
-        {stats.daysUntilNextDonation === 0 ? (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-hope-red to-red-600 text-white flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Heart className="w-6 h-6 text-white fill-current" />
+    <div className="min-h-screen bg-white dark:bg-background">
+      {/* Hero Section */}
+      <section
+        ref={heroRef}
+        className="border-b-2 border-[hsl(0,80%,50%)] py-12 px-4"
+      >
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            {/* Left - Profile & Eligibility Status */}
+            <div>
+              <div className="flex items-center space-x-4 mb-6">
+                <Avatar className="w-16 h-16 border-2 border-[hsl(0,80%,50%)]">
+                  <AvatarImage
+                    src={donorProfile.profile_pic_url}
+                    alt={donorProfile.name}
+                  />
+                  <AvatarFallback className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)]">
+                    <User className="w-8 h-8" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="h2-brutal select-none">{donorProfile.name}</h1>
+                  <Badge
+                    variant="outline"
+                    className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent"
+                  >
+                    Level {stats.level} Donor
+                  </Badge>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-lg">You can donate today!</p>
-                <p className="text-white/80 text-sm">
-                  Your next donation can save up to 3 lives.
+
+              {/* Donation Status */}
+              <div className="space-y-4">
+                <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
+                  <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                    Donation Status
+                  </p>
+                  <p className="h2-brutal text-[hsl(0,80%,50%)] select-none">
+                    {stats.daysUntilNextDonation === 0
+                      ? "READY"
+                      : "IN PROGRESS"}
+                  </p>
+                  <p className="text-sm text-foreground mt-1">
+                    {stats.daysUntilNextDonation === 0
+                      ? "You can donate today!"
+                      : `${stats.daysUntilNextDonation} days until eligible`}
+                  </p>
+                </div>
+
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      DONATION CYCLE
+                    </span>
+                    <span className="text-xs font-bold text-[hsl(0,80%,50%)]">
+                      {Math.floor(
+                        ((56 - stats.daysUntilNextDonation) / 56) * 100,
+                      )}
+                      %
+                    </span>
+                  </div>
+                  <Progress
+                    value={Math.floor(
+                      ((56 - stats.daysUntilNextDonation) / 56) * 100,
+                    )}
+                    className="h-2"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Center - Key Stats */}
+            <div className="space-y-4">
+              <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
+                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                  Total Donations
+                </p>
+                <p className="stat-hero text-[hsl(0,80%,50%)]">
+                  {stats.totalDonations}
+                </p>
+                <p className="text-sm text-foreground">
+                  {stats.totalDonations * 3} lives potentially saved
+                </p>
+              </div>
+
+              <div className="border-l-4 border-[hsl(120,71%,43%)] pl-4">
+                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                  Points Earned
+                </p>
+                <p className="text-4xl font-bold text-[hsl(120,71%,43%)]">
+                  {stats.totalPoints.toLocaleString()}
+                </p>
+                <p className="text-sm text-foreground">
+                  Redeemable for rewards
                 </p>
               </div>
             </div>
-            <a href="/drives">
-              <button className="bg-white text-hope-red font-semibold px-5 py-2 rounded-lg text-sm hover:bg-white/90 transition-colors">
-                Find a Drive
-              </button>
-            </a>
-          </div>
-        ) : (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-slate-100 to-blue-50 dark:from-slate-800 dark:to-slate-700 border border-blue-100 dark:border-slate-600 flex items-center gap-4 shadow-sm">
-            <div className="w-14 h-14 bg-hope-red/10 rounded-full flex items-center justify-center flex-shrink-0">
-              <CalendarIcon className="w-7 h-7 text-hope-red" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground">
-                Days since last donation
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-hope-red">
-                  {56 - stats.daysUntilNextDonation}
-                </span>
-                <span className="text-muted-foreground text-sm">days ago</span>
-                <span className="ml-auto text-sm font-medium text-amber-600 dark:text-amber-400">
-                  {stats.daysUntilNextDonation} days until eligible
-                </span>
-              </div>
-              <div className="mt-1 h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
-                <div
-                  className="h-2 bg-hope-red rounded-full transition-all"
-                  style={{
-                    width: `${Math.min(((56 - stats.daysUntilNextDonation) / 56) * 100, 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Donations
-              </CardTitle>
-              <Droplets className="h-4 w-4 text-hope-red" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-hope-red">
-                {stats.totalDonations}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Lives potentially saved: {stats.totalDonations * 3}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Points Earned
-              </CardTitle>
-              <Award className="h-4 w-4 text-hope-red" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-hope-red">
-                {stats.totalPoints}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Level {stats.level} donor
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Next Donation
-              </CardTitle>
-              <CalendarIcon className="h-4 w-4 text-hope-red" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-hope-red">
-                {stats.daysUntilNextDonation === 0
-                  ? "Ready!"
-                  : `${stats.daysUntilNextDonation} days`}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {stats.daysUntilNextDonation === 0
-                  ? "You can donate now"
-                  : "Until you can donate again"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blood Type</CardTitle>
-              <Heart className="h-4 w-4 text-hope-red" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-hope-red">
-                {donorProfile.blood_type || "Not Set"}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {donorProfile.blood_type
-                  ? "Universal compatibility"
-                  : "Please update your profile"}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <Card className="mb-8 border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-hope-red">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Button asChild className="bg-hope-red hover:bg-hope-red/90">
+            {/* Right - Quick Actions */}
+            <div className="space-y-3">
+              <Button
+                size="lg"
+                corners="crisp"
+                className="w-full justify-start"
+                asChild
+              >
                 <Link to="/drives">
                   <MapPin className="w-4 h-4 mr-2" />
-                  Find Blood Drives
+                  Find Drives
                 </Link>
               </Button>
-              <Button asChild variant="outline">
-                <Link to="/profile">
-                  <User className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
+              <Button
+                size="lg"
+                variant="outline"
+                corners="crisp"
+                className="w-full justify-start"
+                asChild
+              >
                 <Link to="/appointments">
                   <Calendar className="w-4 h-4 mr-2" />
                   My Appointments
                 </Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button
+                size="lg"
+                variant="outline"
+                corners="crisp"
+                className="w-full justify-start"
+                asChild
+              >
                 <Link to="/profile">
                   <User className="w-4 h-4 mr-2" />
-                  Update Profile
+                  Edit Profile
                 </Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button
+                size="lg"
+                variant="outline"
+                corners="crisp"
+                className="w-full justify-start"
+                asChild
+              >
                 <Link to="/rewards">
                   <Award className="w-4 h-4 mr-2" />
                   View Rewards
                 </Link>
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upcoming Appointments */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-hope-red flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
-                Upcoming Appointments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {appointments.length > 0 ? (
-                <div className="space-y-4">
-                  {appointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {appointment.drives?.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(
-                            appointment.appointment_date,
-                          ).toLocaleDateString()}{" "}
-                          at {appointment.appointment_time}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {appointment.drives?.location}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-hope-red/10 text-hope-red"
-                      >
-                        {appointment.status}
-                      </Badge>
-                    </div>
-                  ))}
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to="/appointments">View All Appointments</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    No upcoming appointments
-                  </p>
-                  <Button asChild>
-                    <Link to="/drives">Schedule an Appointment</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Recent Donations */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-hope-red flex items-center">
-                <Droplets className="w-5 h-5 mr-2" />
-                Recent Donations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {donations.length > 0 ? (
-                <div className="space-y-4">
-                  {donations.map((donation) => (
-                    <div
-                      key={donation.id}
-                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {donation.drives?.name ||
-                            donation.hospitals?.name ||
-                            "Direct Donation"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(
-                            donation.donation_date,
-                          ).toLocaleDateString()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {donation.quantity_ml}ml • {donation.blood_type}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-100 text-green-800"
-                        >
-                          +{donation.points_earned} points
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to="/profile">View Donation History</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Droplets className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">No donations yet</p>
-                  <Button asChild>
-                    <Link to="/drives">Find Your First Drive</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Recent Rewards */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-hope-red flex items-center">
-                <Award className="w-5 h-5 mr-2" />
-                Recent Achievements
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {rewards.length > 0 ? (
-                <div className="space-y-4">
-                  {rewards.map((reward) => (
-                    <div
-                      key={reward.id}
-                      className="flex items-center justify-between p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="text-2xl">
-                          {reward.badge_icon || "🏆"}
-                        </div>
-                        <div>
-                          <p className="font-medium">{reward.badge_name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {reward.badge_description}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-hope-red/10 text-hope-red"
-                      >
-                        {reward.points_threshold} pts
-                      </Badge>
-                    </div>
-                  ))}
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to="/rewards">View All Achievements</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    No achievements yet
-                  </p>
-                  <Button asChild>
-                    <Link to="/drives">Start Donating to Earn Rewards</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Nearby Blood Drives */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-hope-red flex items-center">
-                <MapPin className="w-5 h-5 mr-2" />
-                Nearby Blood Drives
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {upcomingDrives.length > 0 ? (
-                <div className="space-y-4">
-                  {upcomingDrives.map((drive) => (
-                    <div
-                      key={drive.id}
-                      className="p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="font-medium">{drive.name}</p>
-                        <Badge variant="secondary">
-                          {drive.registered_count}/{drive.capacity}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        {drive.location}, {drive.city}
-                      </p>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {new Date(drive.start_date).toLocaleDateString()} •{" "}
-                        {drive.start_time} - {drive.end_time}
-                      </p>
-                      <Button
-                        asChild
-                        size="sm"
-                        className="w-full bg-hope-red hover:bg-hope-red/90"
-                      >
-                        <Link to={`/book-appointment/${drive.id}`}>
-                          Book Appointment
-                        </Link>
-                      </Button>
-                    </div>
-                  ))}
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to="/drives">View All Drives</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    No nearby drives found
-                  </p>
-                  <Button asChild>
-                    <Link to="/drives">Explore All Drives</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          </div>
         </div>
+      </section>
 
-        {/* Progress to Next Level */}
-        {stats.level < 10 && (
-          <Card className="mt-8 border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-hope-red flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                Progress to Level {stats.level + 1}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Current Points: {stats.totalPoints}</span>
-                  <span>Target: {(stats.level + 1) * 100} points</span>
+      {/* Timeline Section */}
+      <section ref={timelineRef} className="py-16 px-4 border-b border-border">
+        <div className="container mx-auto max-w-2xl">
+          <h2 className="h2-brutal mb-12 select-none">DONATION HISTORY</h2>
+
+          {donations.length > 0 ? (
+            <div className="space-y-6">
+              {donations.map((donation, idx) => (
+                <div key={donation.id} className="relative">
+                  {/* Timeline Line */}
+                  {idx < donations.length - 1 && (
+                    <div className="absolute left-6 top-12 w-1 h-12 bg-[hsl(0,80%,50%)]/20"></div>
+                  )}
+
+                  {/* Timeline Dot */}
+                  <div className="absolute left-0 top-0 w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                    <Droplets className="w-6 h-6 text-white" />
+                  </div>
+
+                  {/* Timeline Content */}
+                  <div className="ml-16 pt-2 pb-2">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-mono font-bold text-lg text-foreground">
+                        {new Date(donation.donation_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className="border-2 border-[hsl(120,71%,43%)] text-[hsl(120,71%,43%)] bg-transparent"
+                      >
+                        +100 pts
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {donation.blood_bank_name || "Blood Drive"}
+                    </p>
+                  </div>
                 </div>
-                <Progress value={stats.totalPoints % 100} className="w-full" />
-                <p className="text-sm text-muted-foreground">
-                  {(stats.level + 1) * 100 - stats.totalPoints} more points to
-                  level up!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <Droplets className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-4">
+                No donations yet. Ready to save lives?
+              </p>
+              <Button corners="crisp" asChild>
+                <Link to="/drives">Find a Drive</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
 
-      {/* Chatbot Widget */}
+      {/* Upcoming Appointments */}
+      {appointments.length > 0 && (
+        <section className="py-16 px-4 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border">
+          <div className="container mx-auto max-w-2xl">
+            <h2 className="h2-brutal mb-8 select-none">
+              UPCOMING APPOINTMENTS
+            </h2>
+
+            <div className="space-y-3">
+              {appointments.map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className="border-2 border-[hsl(0,80%,50%)] p-4 rounded-none flex items-start justify-between"
+                >
+                  <div>
+                    <p className="font-display font-bold text-lg">
+                      {appointment.drives?.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(
+                        appointment.appointment_date,
+                      ).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      })}{" "}
+                      @ {appointment.appointment_time}
+                    </p>
+                    <p className="text-sm text-foreground flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {appointment.drives?.location}
+                    </p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="border-2 border-[hsl(120,71%,43%)] text-[hsl(120,71%,43%)] bg-transparent"
+                  >
+                    {appointment.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Rewards Section */}
+      <section ref={rewardsRef} className="py-16 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="h2-brutal mb-8 select-none">YOUR ACHIEVEMENTS</h2>
+
+          {rewards.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rewards.map((reward) => (
+                <Card
+                  key={reward.id}
+                  variant="outline"
+                  className="border-2 border-[hsl(0,80%,50%)] rounded-none"
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center mx-auto mb-4">
+                      <Star className="w-6 h-6 text-white fill-current" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg mb-2">
+                      {reward.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {reward.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-4">
+                Earn achievements by donating and building your impact
+              </p>
+            </div>
+          )}
+
+          <div className="mt-8 text-center">
+            <Button size="lg" corners="crisp" asChild>
+              <Link to="/rewards">View All Rewards</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 px-4 bg-[hsl(0,80%,50%)] text-white border-t-2 border-[hsl(0,80%,30%)]">
+        <div className="container mx-auto text-center">
+          <h2 className="h2-brutal text-white mb-4 select-none">
+            READY FOR YOUR NEXT DONATION?
+          </h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto">
+            Your next donation can save up to 3 lives. Find a blood drive near
+            you today.
+          </p>
+          <Button
+            size="lg"
+            corners="crisp"
+            variant="outline"
+            className="border-white text-white hover:bg-white hover:text-[hsl(0,80%,50%)]"
+            asChild
+          >
+            <Link to="/drives">Find Drives</Link>
+          </Button>
+        </div>
+      </section>
+
       <ChatbotWidget />
     </div>
   );

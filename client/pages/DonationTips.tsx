@@ -65,7 +65,7 @@ const FAQS = [
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div className="border border-border rounded-sm overflow-hidden">
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/40 transition-colors"
@@ -88,13 +88,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function DonationTips() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
           <Button
             variant="ghost"
             asChild
-            className="text-hope-red hover:text-hope-red/80 -ml-2"
+            className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 -ml-2"
           >
             <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -104,7 +104,7 @@ export default function DonationTips() {
         </div>
 
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-hope-red mb-2">
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-2">
             Donation Tips & FAQs
           </h1>
           <p className="text-muted-foreground text-lg">
@@ -114,7 +114,7 @@ export default function DonationTips() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           {/* Pre-Donation */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-success" />
@@ -137,7 +137,7 @@ export default function DonationTips() {
           </Card>
 
           {/* Post-Donation */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-warning" />
@@ -161,7 +161,7 @@ export default function DonationTips() {
         </div>
 
         {/* FAQs */}
-        <Card className="border-0 shadow-lg mb-8">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8">
           <CardHeader>
             <CardTitle>Frequently Asked Questions</CardTitle>
           </CardHeader>
@@ -173,8 +173,8 @@ export default function DonationTips() {
         </Card>
 
         {/* CTA */}
-        <div className="text-center p-8 bg-hope-red/5 rounded-2xl border border-hope-red/20">
-          <h2 className="text-2xl font-bold text-hope-red mb-2">
+        <div className="text-center p-8 bg-[hsl(0,80%,50%)]/5 rounded-none border border-[hsl(0,80%,50%)]/20">
+          <h2 className="text-2xl font-bold text-[hsl(0,80%,50%)] mb-2">
             Ready to Save Lives?
           </h2>
           <p className="text-muted-foreground mb-4">
@@ -182,7 +182,7 @@ export default function DonationTips() {
           </p>
           <Button
             asChild
-            className="bg-hope-red hover:bg-hope-red/90 text-white"
+            className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
           >
             <Link to="/drives">Find Blood Drives</Link>
           </Button>

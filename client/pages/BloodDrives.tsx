@@ -163,7 +163,7 @@ export default function BloodDrives() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-hope-red mx-auto mb-4 animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-4 animate-spin" />
           <p className="text-muted-foreground">Loading blood drives...</p>
         </div>
       </div>
@@ -171,12 +171,12 @@ export default function BloodDrives() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-4">
             Find Blood Drives Near You
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -186,9 +186,9 @@ export default function BloodDrives() {
         </div>
 
         {/* Filters Section */}
-        <Card className="mb-8 border-0 shadow-md">
+        <Card className="mb-8 border-2 border-[hsl(0,80%,50%)]">
           <CardHeader>
-            <CardTitle className="text-hope-red flex items-center">
+            <CardTitle className="text-[hsl(0,80%,50%)] flex items-center">
               <Filter className="w-5 h-5 mr-2" />
               Filter Drives
             </CardTitle>
@@ -252,8 +252,9 @@ export default function BloodDrives() {
                     initialFocus
                     classNames={{
                       day_selected:
-                        "bg-hope-red text-white hover:bg-hope-red hover:text-white focus:bg-hope-red focus:text-white",
-                      day_today: "bg-hope-pink/30 text-hope-red font-semibold",
+                        "bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)] hover:text-white focus:bg-[hsl(0,80%,50%)] focus:text-white",
+                      day_today:
+                        "bg-[hsl(0,0%,98%)]/30 text-[hsl(0,80%,50%)] font-semibold",
                     }}
                   />
                 </PopoverContent>
@@ -289,12 +290,12 @@ export default function BloodDrives() {
             {filteredDrives.map((drive) => (
               <Card
                 key={drive.id}
-                className="border-0 shadow-md hover:shadow-lg transition-shadow"
+                className="border-2 border-[hsl(0,80%,50%)] hover:shadow-lg transition-shadow"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg text-hope-red line-clamp-2">
+                      <CardTitle className="text-lg text-[hsl(0,80%,50%)] line-clamp-2">
                         {drive.name}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
@@ -322,7 +323,7 @@ export default function BloodDrives() {
                   <div className="space-y-4">
                     {/* Location */}
                     <div className="flex items-start space-x-2">
-                      <MapPin className="w-4 h-4 text-hope-red mt-1 flex-shrink-0" />
+                      <MapPin className="w-4 h-4 text-[hsl(0,80%,50%)] mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-sm font-medium">{drive.location}</p>
                         <p className="text-xs text-muted-foreground">
@@ -333,7 +334,7 @@ export default function BloodDrives() {
 
                     {/* Date and Time */}
                     <div className="flex items-center space-x-2">
-                      <CalendarIcon className="w-4 h-4 text-hope-red" />
+                      <CalendarIcon className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                       <p className="text-sm">
                         {new Date(drive.start_date).toLocaleDateString()}
                         {drive.start_date !== drive.end_date &&
@@ -342,7 +343,7 @@ export default function BloodDrives() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-hope-red" />
+                      <Clock className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                       <p className="text-sm">
                         {drive.start_time} - {drive.end_time}
                       </p>
@@ -350,7 +351,7 @@ export default function BloodDrives() {
 
                     {/* Capacity */}
                     <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-hope-red" />
+                      <Users className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                       <p className="text-sm">
                         {drive.registered_count || 0}/{drive.capacity}{" "}
                         registered
@@ -369,7 +370,7 @@ export default function BloodDrives() {
                               <Badge
                                 key={type}
                                 variant="outline"
-                                className="text-xs border-hope-red text-hope-red"
+                                className="text-xs border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)]"
                               >
                                 {type}
                               </Badge>
@@ -389,7 +390,7 @@ export default function BloodDrives() {
                     <div className="flex space-x-2 pt-2">
                       <Button
                         asChild
-                        className="flex-1 bg-hope-red hover:bg-hope-red/90"
+                        className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                         disabled={drive.registered_count >= drive.capacity}
                       >
                         <Link to={`/book-appointment/${drive.id}`}>
@@ -436,7 +437,7 @@ export default function BloodDrives() {
             ))}
           </div>
         ) : (
-          <Card className="border-0 shadow-md">
+          <Card className="border-2 border-[hsl(0,80%,50%)]">
             <CardContent className="text-center py-12">
               <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">
@@ -458,15 +459,15 @@ export default function BloodDrives() {
 
         {/* Call to Action for Creating Drives */}
         {adminProfile && (
-          <Card className="mt-8 border-0 shadow-md bg-hope-pink dark:bg-hope-coral">
+          <Card className="mt-8 border-2 border-[hsl(0,80%,50%)] bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)]">
             <CardContent className="text-center py-8">
-              <h3 className="text-xl font-semibold text-hope-red mb-2">
+              <h3 className="text-xl font-semibold text-[hsl(0,80%,50%)] mb-2">
                 Want to organize a blood drive?
               </h3>
               <p className="text-muted-foreground mb-4">
                 Help save lives by organizing a blood drive in your community.
               </p>
-              <Button asChild className="bg-hope-red hover:bg-hope-red/90">
+              <Button asChild className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white">
                 <Link to="/admin">Organize a Drive</Link>
               </Button>
             </CardContent>
@@ -482,7 +483,7 @@ export default function BloodDrives() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-hope-red" />
+              <MessageSquare className="w-5 h-5 text-[hsl(0,80%,50%)]" />
               Leave Your Feedback
             </DialogTitle>
           </DialogHeader>
@@ -527,7 +528,7 @@ export default function BloodDrives() {
               Cancel
             </Button>
             <Button
-              className="bg-hope-red hover:bg-hope-red/90"
+              className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
               disabled={feedbackRating === 0}
               onClick={() => {
                 toast({

@@ -290,7 +290,7 @@ export default function BookAppointment() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-hope-red mx-auto mb-4 animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-4 animate-spin" />
           <p className="text-muted-foreground">
             Loading blood drive details...
           </p>
@@ -317,14 +317,14 @@ export default function BookAppointment() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-gradient-to-b from-[hsl(0,0%,98%)] to-white dark:from-[hsl(14,100%,50%)] dark:to-background">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Drive Info */}
-          <Card className="mb-8 border-0 shadow-md">
+          <Card className="mb-8 border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader>
-              <CardTitle className="text-2xl text-hope-red">
+              <CardTitle className="text-2xl text-[hsl(0,80%,50%)]">
                 {drive.name}
               </CardTitle>
               <p className="text-muted-foreground">
@@ -338,7 +338,7 @@ export default function BookAppointment() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-2">
-                    <MapPin className="w-4 h-4 text-hope-red mt-1" />
+                    <MapPin className="w-4 h-4 text-[hsl(0,80%,50%)] mt-1" />
                     <div>
                       <p className="font-medium">{drive.location}</p>
                       <p className="text-sm text-muted-foreground">
@@ -348,7 +348,7 @@ export default function BookAppointment() {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <CalendarIcon className="w-4 h-4 text-hope-red" />
+                    <CalendarIcon className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                     <p>
                       {new Date(drive.start_date).toLocaleDateString()}
                       {drive.start_date !== drive.end_date &&
@@ -357,7 +357,7 @@ export default function BookAppointment() {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-hope-red" />
+                    <Clock className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                     <p>
                       {drive.start_time} - {drive.end_time}
                     </p>
@@ -373,7 +373,7 @@ export default function BookAppointment() {
                           {drive.blood_types_needed.map((type) => (
                             <span
                               key={type}
-                              className="px-2 py-1 bg-hope-red text-white text-sm rounded"
+                              className="px-2 py-1 bg-[hsl(0,80%,50%)] text-white text-sm rounded-sm"
                             >
                               {type}
                             </span>
@@ -396,17 +396,17 @@ export default function BookAppointment() {
           </Card>
 
           {/* Multi-step Form */}
-          <Card className="border-0 shadow-md">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader>
-              <CardTitle className="text-hope-red">
+              <CardTitle className="text-[hsl(0,80%,50%)]">
                 Book Your Appointment - Step {step} of 3
               </CardTitle>
               <div className="flex space-x-2 mt-4">
                 {[1, 2, 3].map((s) => (
                   <div
                     key={s}
-                    className={`h-2 flex-1 rounded ${
-                      s <= step ? "bg-hope-red" : "bg-gray-200"
+                    className={`h-2 flex-1 rounded-sm ${
+                      s <= step ? "bg-[hsl(0,80%,50%)]" : "bg-gray-200"
                     }`}
                   />
                 ))}
@@ -422,7 +422,7 @@ export default function BookAppointment() {
                       <Label className="text-base font-medium">
                         Choose Date
                       </Label>
-                      <Card className="border shadow-sm">
+                      <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                         <CardContent className="p-3">
                           <Calendar
                             mode="single"
@@ -431,9 +431,9 @@ export default function BookAppointment() {
                             disabled={(date) => !canSelectDate(date)}
                             classNames={{
                               day_selected:
-                                "bg-hope-red text-white hover:bg-hope-red hover:text-white focus:bg-hope-red focus:text-white",
+                                "bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)] hover:text-white focus:bg-[hsl(0,80%,50%)] focus:text-white",
                               day_today:
-                                "bg-hope-pink/30 text-hope-red font-semibold",
+                                "bg-[hsl(0,0%,98%)]/30 text-[hsl(0,80%,50%)] font-semibold",
                             }}
                           />
                         </CardContent>
@@ -455,7 +455,7 @@ export default function BookAppointment() {
                               onClick={() => setSelectedTime(time)}
                               className={
                                 selectedTime === time
-                                  ? "bg-hope-red hover:bg-hope-red/90"
+                                  ? "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                                   : ""
                               }
                             >
@@ -475,7 +475,7 @@ export default function BookAppointment() {
                     <Button
                       onClick={() => setStep(2)}
                       disabled={!selectedDate || !selectedTime}
-                      className="bg-hope-red hover:bg-hope-red/90"
+                      className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                     >
                       Next: Personal Information
                     </Button>
@@ -612,7 +612,7 @@ export default function BookAppointment() {
                       disabled={
                         !donorInfo.name || !donorInfo.email || !donorInfo.phone
                       }
-                      className="bg-hope-red hover:bg-hope-red/90"
+                      className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                     >
                       Next: Medical Information
                     </Button>
@@ -751,7 +751,7 @@ export default function BookAppointment() {
                         I agree to the{" "}
                         <Link
                           to="/terms"
-                          className="text-hope-red hover:underline"
+                          className="text-[hsl(0,80%,50%)] hover:underline"
                         >
                           terms and conditions
                         </Link>{" "}
@@ -761,9 +761,9 @@ export default function BookAppointment() {
                   </div>
 
                   {/* Appointment Summary */}
-                  <Card className="bg-hope-pink dark:bg-hope-coral">
+                  <Card className="bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] border-2 border-[hsl(0,80%,50%)] rounded-sm">
                     <CardHeader>
-                      <CardTitle className="text-hope-red">
+                      <CardTitle className="text-[hsl(0,80%,50%)]">
                         Appointment Summary
                       </CardTitle>
                     </CardHeader>
@@ -800,7 +800,7 @@ export default function BookAppointment() {
                     <Button
                       onClick={handleSubmit}
                       disabled={!agreedToTerms || submitting}
-                      className="bg-hope-red hover:bg-hope-red/90"
+                      className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                     >
                       {submitting ? (
                         <>

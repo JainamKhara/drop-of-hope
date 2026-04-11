@@ -14,20 +14,20 @@ function ClerkSignUpForm() {
         appearance={{
           elements: {
             rootBox: "mx-auto",
-            card: "shadow-xl border-0 bg-white dark:bg-gray-800",
-            headerTitle: "text-hope-red font-bold",
+            card: "border-2 border-[hsl(0,80%,50%)] rounded-sm bg-white dark:bg-gray-800",
+            headerTitle: "text-[hsl(0,80%,50%)] font-bold",
             headerSubtitle: "text-muted-foreground",
             socialButtonsBlockButton:
               "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
             socialButtonsBlockButtonText:
               "text-gray-700 dark:text-gray-200 font-medium",
             formButtonPrimary:
-              "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
+              "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 border-[hsl(0,80%,50%)] text-white font-medium transition-colors duration-200",
             formFieldInput:
-              "border-gray-300 focus:border-hope-red focus:ring-hope-red",
+              "border-gray-300 focus:border-[hsl(0,80%,50%)] focus:ring-[hsl(0,80%,50%)]",
             formFieldLabel: "text-gray-700 dark:text-gray-200",
             footerActionLink:
-              "text-hope-red hover:text-hope-red/80 font-medium",
+              "text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 font-medium",
             dividerLine: "bg-gray-200",
             dividerText: "text-gray-500",
           },
@@ -123,7 +123,7 @@ export default function DonorRegister() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-6 h-6 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -138,11 +138,11 @@ export default function DonorRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background overflow-y-auto">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)] overflow-y-auto">
       <div className="container mx-auto px-4 py-6 md:py-12">
         <div className="w-full max-w-md mx-auto">
           <div className="text-center mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-hope-red mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-[hsl(0,80%,50%)] mb-2">
               Join Drop of Hope
             </h1>
             <p className="text-muted-foreground text-sm md:text-base">
@@ -160,7 +160,7 @@ export default function DonorRegister() {
               Already have an account?{" "}
               <Link
                 to="/donor/login"
-                className="text-hope-red hover:text-hope-red/80 font-medium"
+                className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 font-medium"
               >
                 Sign in here
               </Link>
@@ -188,14 +188,14 @@ export default function DonorRegister() {
               <div className="space-x-4">
                 <Link
                   to="/terms"
-                  className="hover:text-hope-red transition-colors"
+                  className="hover:text-[hsl(0,80%,50%)] transition-colors"
                 >
                   Terms of Service
                 </Link>
                 <span>•</span>
                 <Link
                   to="/privacy"
-                  className="hover:text-hope-red transition-colors"
+                  className="hover:text-[hsl(0,80%,50%)] transition-colors"
                 >
                   Privacy Policy
                 </Link>

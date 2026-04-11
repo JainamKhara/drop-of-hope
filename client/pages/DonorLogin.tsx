@@ -20,20 +20,20 @@ function ClerkLoginForm() {
         appearance={{
           elements: {
             rootBox: "mx-auto",
-            card: "shadow-xl border-0 bg-white dark:bg-gray-800",
-            headerTitle: "text-hope-red font-bold",
+            card: "border-2 border-[hsl(0,80%,50%)] rounded-sm bg-white dark:bg-gray-800",
+            headerTitle: "text-[hsl(0,80%,50%)] font-bold",
             headerSubtitle: "text-muted-foreground",
             socialButtonsBlockButton:
               "border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium",
             socialButtonsBlockButtonText:
               "text-gray-700 dark:text-gray-200 font-medium",
             formButtonPrimary:
-              "bg-hope-red hover:bg-hope-red/90 border-hope-red text-white font-medium transition-colors duration-200",
+              "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 border-[hsl(0,80%,50%)] text-white font-medium transition-colors duration-200",
             formFieldInput:
-              "border-gray-300 focus:border-hope-red focus:ring-hope-red",
+              "border-gray-300 focus:border-[hsl(0,80%,50%)] focus:ring-[hsl(0,80%,50%)]",
             formFieldLabel: "text-gray-700 dark:text-gray-200",
             footerActionLink:
-              "text-hope-red hover:text-hope-red/80 font-medium",
+              "text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 font-medium",
             dividerLine: "bg-gray-200",
             dividerText: "text-gray-500",
           },
@@ -134,7 +134,7 @@ export default function DonorLogin() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-6 h-6 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Checking authentication...</p>
@@ -155,13 +155,13 @@ export default function DonorLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           {/* Welcome Message */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-hope-red mb-2">
+            <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)] mb-2">
               Welcome Back, Donor
             </h1>
             <p className="text-muted-foreground">
@@ -178,7 +178,7 @@ export default function DonorLogin() {
               Don't have an account?{" "}
               <Link
                 to="/donor/register"
-                className="text-hope-red hover:text-hope-red/80 font-medium"
+                className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 font-medium"
               >
                 Sign up here
               </Link>
@@ -206,14 +206,14 @@ export default function DonorLogin() {
               <div className="space-x-4">
                 <Link
                   to="/terms"
-                  className="hover:text-hope-red transition-colors"
+                  className="hover:text-[hsl(0,80%,50%)] transition-colors"
                 >
                   Terms of Service
                 </Link>
                 <span>•</span>
                 <Link
                   to="/privacy"
-                  className="hover:text-hope-red transition-colors"
+                  className="hover:text-[hsl(0,80%,50%)] transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -224,7 +224,7 @@ export default function DonorLogin() {
       </div>
 
       {/* Background decoration */}
-      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-hope-pink/30 to-transparent pointer-events-none" />
+      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[hsl(0,80%,50%)]/30 to-transparent pointer-events-none" />
     </div>
   );
 }

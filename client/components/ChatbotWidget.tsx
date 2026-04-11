@@ -258,8 +258,9 @@ export default function ChatbotWidget() {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 rounded-full bg-hope-red hover:bg-hope-red/90 shadow-lg"
-          size="lg"
+          corners="crisp"
+          size="icon-lg"
+          className="w-16 h-16"
         >
           <MessageCircle className="w-8 h-8" />
         </Button>
@@ -270,7 +271,7 @@ export default function ChatbotWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-50 w-96 h-[500px] max-w-[90vw] max-h-[80vh]">
       <Card className="border-0 shadow-2xl h-full flex flex-col">
-        <CardHeader className="bg-hope-red text-white rounded-t-lg">
+        <CardHeader className="bg-[hsl(0,80%,50%)] text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -308,19 +309,21 @@ export default function ChatbotWidget() {
                   >
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        message.type === "user" ? "bg-hope-red" : "bg-gray-100"
+                        message.type === "user"
+                          ? "bg-[hsl(0,80%,50%)]"
+                          : "bg-gray-100"
                       }`}
                     >
                       {message.type === "user" ? (
                         <User className="w-4 h-4 text-white" />
                       ) : (
-                        <Bot className="w-4 h-4 text-hope-red" />
+                        <Bot className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                       )}
                     </div>
                     <div
-                      className={`px-3 py-2 rounded-lg ${
+                      className={`px-3 py-2 rounded-sm ${
                         message.type === "user"
-                          ? "bg-hope-red text-white"
+                          ? "bg-[hsl(0,80%,50%)] text-white"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
@@ -355,9 +358,9 @@ export default function ChatbotWidget() {
               <div className="flex justify-start">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-hope-red" />
+                    <Bot className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                   </div>
-                  <div className="bg-gray-100 px-3 py-2 rounded-lg">
+                  <div className="bg-gray-100 px-3 py-2 rounded-sm">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                       <div
@@ -390,7 +393,8 @@ export default function ChatbotWidget() {
               />
               <Button
                 onClick={handleSendMessage}
-                className="bg-hope-red hover:bg-hope-red/90"
+                size="default"
+                corners="crisp"
                 disabled={!inputValue.trim() || isTyping}
               >
                 <Send className="w-4 h-4" />

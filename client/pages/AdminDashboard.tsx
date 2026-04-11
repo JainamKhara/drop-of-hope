@@ -8,6 +8,7 @@ import {
   hospitalService,
   appointmentService,
   bloodRequestService,
+  notificationService,
 } from "@/lib/db-services";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -61,6 +62,7 @@ import {
   UserCheck,
   Mail,
   Bell,
+  Send,
   LogOut,
   RefreshCw,
   Eye,
@@ -103,6 +105,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterBloodType, setFilterBloodType] = useState("all");
 
   // Database state
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
@@ -130,6 +133,17 @@ export default function AdminDashboard() {
   const [announcementMsg, setAnnouncementMsg] = useState("");
   const [announcementLink, setAnnouncementLink] = useState("");
   const [announcementSaving, setAnnouncementSaving] = useState(false);
+
+  // Notification broadcast state
+  const [isBroadcastDialogOpen, setIsBroadcastDialogOpen] = useState(false);
+  const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
+  const [broadcastForm, setBroadcastForm] = useState({
+    title: "",
+    message: "",
+    priority: "medium",
+    bloodTypeFilter: "",
+    actionUrl: "",
+  });
 
   // Dialog states
   const [isDriveDialogOpen, setIsDriveDialogOpen] = useState(false);
@@ -501,7 +515,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-5 h-5 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -561,28 +575,26 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 border-b-2 border-[hsl(0,80%,50%)] pb-6">
           <div>
-            <h1 className="text-4xl font-bold text-hope-red mb-2">
-              Admin Dashboard
+            <h1 className="h2-brutal text-[hsl(0,80%,50%)] mb-2 select-none">
+              ADMIN DASHBOARD
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               Manage blood donations, drives, and community partnerships
             </p>
           </div>
           <div className="flex space-x-3">
-            <Button
-              className="bg-hope-red hover:bg-hope-red/90"
-              onClick={() => setIsDriveDialogOpen(true)}
-            >
+            <Button corners="crisp" onClick={() => setIsDriveDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Create Blood Drive
             </Button>
             <Button
               variant="outline"
+              corners="crisp"
               onClick={() => {
                 const now = new Date().toISOString().split("T")[0];
 
@@ -708,79 +720,97 @@ export default function AdminDashboard() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 shadow-lg">
+          <Card
+            variant="outline"
+            className="border-2 border-[hsl(0,80%,50%)] rounded-none"
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Total Donors</p>
-                  <p className="text-3xl font-bold text-hope-red">
+                  <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
+                    Total Donors
+                  </p>
+                  <p className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {analyticsData.totalDonors.toLocaleString()}
                   </p>
-                  <p className="text-sm text-success">
+                  <p className="text-sm text-[hsl(120,71%,43%)]">
                     +{analyticsData.monthlyGrowth}% this month
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
-                  <Users className="w-6 h-6 text-hope-red" />
+                <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card
+            variant="outline"
+            className="border-2 border-[hsl(0,80%,50%)] rounded-none"
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
                     Total Donations
                   </p>
-                  <p className="text-3xl font-bold text-hope-red">
+                  <p className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {analyticsData.totalDonations.toLocaleString()}
                   </p>
-                  <p className="text-sm text-success">
+                  <p className="text-sm text-[hsl(120,71%,43%)]">
                     {analyticsData.donationsThisMonth} this month
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-hope-red fill-current" />
+                <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                  <Heart className="w-6 h-6 text-white fill-current" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card
+            variant="outline"
+            className="border-2 border-[hsl(0,80%,50%)] rounded-none"
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Active Drives</p>
-                  <p className="text-3xl font-bold text-hope-red">
+                  <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
+                    Active Drives
+                  </p>
+                  <p className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {analyticsData.activeDrives}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {analyticsData.upcomingAppointments} appointments
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-hope-red" />
+                <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card
+            variant="outline"
+            className="border-2 border-[hsl(0,80%,50%)] rounded-none"
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
                     Lives Impacted
                   </p>
-                  <p className="text-3xl font-bold text-hope-red">
+                  <p className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {analyticsData.livesImpacted.toLocaleString()}
                   </p>
-                  <p className="text-sm text-success">+3,672 this month</p>
+                  <p className="text-sm text-[hsl(120,71%,43%)]">
+                    +3,672 this month
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-hope-red/10 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-hope-red" />
+                <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -789,21 +819,21 @@ export default function AdminDashboard() {
 
         {/* Management Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="blood-requests">Blood Requests</TabsTrigger>
-            <TabsTrigger value="donors">Donors</TabsTrigger>
-            <TabsTrigger value="drives">Blood Drives</TabsTrigger>
-            <TabsTrigger value="hospitals">Hospitals</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7 border-b-2 border-[hsl(0,80%,50%)] bg-transparent rounded-none p-0 h-12">
+            <TabsTrigger value="overview" corners="crisp" className="rounded-none border-r border-border">Overview</TabsTrigger>
+            <TabsTrigger value="appointments" corners="crisp" className="rounded-none border-r border-border">Appointments</TabsTrigger>
+            <TabsTrigger value="blood-requests" corners="crisp" className="rounded-none border-r border-border">Blood Requests</TabsTrigger>
+            <TabsTrigger value="donors" corners="crisp" className="rounded-none border-r border-border">Donors</TabsTrigger>
+            <TabsTrigger value="drives" corners="crisp" className="rounded-none border-r border-border">Blood Drives</TabsTrigger>
+            <TabsTrigger value="hospitals" corners="crisp" className="rounded-none border-r border-border">Hospitals</TabsTrigger>
+            <TabsTrigger value="analytics" corners="crisp" className="rounded-none">Analytics</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Activity — real data from appointments */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Activity className="w-5 h-5" />
@@ -815,9 +845,9 @@ export default function AdminDashboard() {
                     {appointments.slice(0, 5).map((apt: any) => (
                       <div
                         key={apt.id}
-                        className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                        className="flex items-center space-x-3 p-3 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
                       >
-                        <div className="w-2 h-2 bg-hope-red rounded-full flex-shrink-0" />
+                        <div className="w-2 h-2 bg-[hsl(0,80%,50%)] rounded-full flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">
                             {apt.donors?.name || "Donor"} booked{" "}
@@ -844,7 +874,7 @@ export default function AdminDashboard() {
                     {bloodRequests.slice(0, 3).map((req: any) => (
                       <div
                         key={req.id}
-                        className="flex items-center space-x-3 p-3 bg-warning/10 rounded-lg"
+                        className="flex items-center space-x-3 p-3 bg-warning/10 rounded-sm"
                       >
                         <div className="w-2 h-2 bg-warning rounded-full flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -869,7 +899,7 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Urgent Requests */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <AlertTriangle className="w-5 h-5" />
@@ -918,7 +948,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Top Donors Leaderboard */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Award className="w-5 h-5 text-amber-500" />
@@ -930,7 +960,7 @@ export default function AdminDashboard() {
                   {[...leaderboardDonors].slice(0, 10).map((donor, index) => (
                     <div
                       key={donor.id}
-                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                      className="flex items-center gap-4 p-3 rounded-sm hover:bg-muted/50 transition-colors"
                     >
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
@@ -945,7 +975,7 @@ export default function AdminDashboard() {
                       >
                         {index + 1}
                       </div>
-                      <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                      <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
                         {donor.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -955,7 +985,7 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-hope-red">
+                        <p className="font-bold text-[hsl(0,80%,50%)]">
                           {donor.points}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -973,10 +1003,10 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
             {/* Announcement Management */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Bell className="w-5 h-5 text-hope-red" />
+                  <Bell className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                   <span>Announcement Banner</span>
                 </CardTitle>
               </CardHeader>
@@ -1025,7 +1055,7 @@ export default function AdminDashboard() {
                         description: "Banner is now live on the homepage.",
                       });
                     }}
-                    className="bg-hope-red hover:bg-hope-red/90 text-white"
+                    className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                   >
                     {announcementSaving ? "Publishing..." : "Publish Banner"}
                   </Button>
@@ -1036,11 +1066,65 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+            {/* Broadcast Notifications */}
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Send className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                    <span>Broadcast Notifications</span>
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsBroadcastDialogOpen(true)}
+                    className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Notification
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Send push notifications to all donors or filter by blood type.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 border rounded-sm bg-[hsl(0,80%,50%)]/5">
+                    <p className="text-2xl font-bold text-[hsl(0,80%,50%)]">
+                      {analyticsData.totalDonors}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Donors
+                    </p>
+                  </div>
+                  <div className="p-4 border rounded-sm bg-orange-50">
+                    <p className="text-2xl font-bold text-orange-600">
+                      {
+                        bloodRequests.filter((r: any) => r.status === "pending")
+                          .length
+                      }
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Pending Requests
+                    </p>
+                  </div>
+                  <div className="p-4 border rounded-sm bg-blue-50">
+                    <p className="text-2xl font-bold text-blue-600">
+                      {analyticsData.upcomingAppointments}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Upcoming Appointments
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Appointments Management Tab */}
           <TabsContent value="appointments" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Calendar className="w-5 h-5" />
@@ -1061,10 +1145,10 @@ export default function AdminDashboard() {
                     {appointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
-                        className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
                       >
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold">
+                          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
                             {appointment.donors?.name
                               ?.substring(0, 2)
                               .toUpperCase() || "DN"}
@@ -1171,7 +1255,7 @@ export default function AdminDashboard() {
 
           {/* Blood Requests Tab */}
           <TabsContent value="blood-requests" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Activity className="w-5 h-5" />
@@ -1192,7 +1276,7 @@ export default function AdminDashboard() {
                     {bloodRequests.map((request: any) => (
                       <div
                         key={request.id}
-                        className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800"
+                        className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-900/20 rounded-sm border border-orange-200 dark:border-orange-800"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
@@ -1305,10 +1389,10 @@ export default function AdminDashboard() {
           {/* Donors Management Tab */}
           <TabsContent value="donors" className="space-y-6 mt-6">
             {/* Search and Filter */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder="Search donors by name, email, or blood type..."
@@ -1318,7 +1402,7 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1328,16 +1412,46 @@ export default function AdminDashboard() {
                       <SelectItem value="ineligible">Ineligible</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button variant="outline">
-                    <Filter className="w-4 h-4 mr-2" />
-                    More Filters
-                  </Button>
+                  <Select
+                    value={filterBloodType}
+                    onValueChange={setFilterBloodType}
+                  >
+                    <SelectTrigger className="w-36">
+                      <SelectValue placeholder="Blood Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Blood Types</SelectItem>
+                      <SelectItem value="O+">O+</SelectItem>
+                      <SelectItem value="O-">O-</SelectItem>
+                      <SelectItem value="A+">A+</SelectItem>
+                      <SelectItem value="A-">A-</SelectItem>
+                      <SelectItem value="B+">B+</SelectItem>
+                      <SelectItem value="B-">B-</SelectItem>
+                      <SelectItem value="AB+">AB+</SelectItem>
+                      <SelectItem value="AB-">AB-</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(filterBloodType !== "all" ||
+                    filterStatus !== "all" ||
+                    searchTerm) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setFilterStatus("all");
+                        setFilterBloodType("all");
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Donors List */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Donors</CardTitle>
                 <Button
@@ -1368,7 +1482,7 @@ export default function AdminDashboard() {
                     a.click();
                     URL.revokeObjectURL(url);
                   }}
-                  className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                  className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export CSV
@@ -1376,48 +1490,90 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {recentDonors.map((donor) => (
-                    <div
-                      key={donor.id}
-                      className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold">
-                          {donor.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </div>
-                        <div>
-                          <p className="font-medium">{donor.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {donor.bloodType} • {donor.donations} donations •
-                            Last:{" "}
-                            {format(new Date(donor.lastDonation), "MMM dd")}
+                  {(() => {
+                    const filteredDonors = recentDonors.filter((donor) => {
+                      const matchesSearch =
+                        searchTerm === "" ||
+                        donor.name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase()) ||
+                        donor.email
+                          ?.toLowerCase()
+                          .includes(searchTerm.toLowerCase()) ||
+                        donor.bloodType
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase());
+
+                      const matchesStatus =
+                        filterStatus === "all" ||
+                        (filterStatus === "eligible" &&
+                          donor.status === "active") ||
+                        (filterStatus === "pending" &&
+                          donor.status === "pending") ||
+                        (filterStatus === "ineligible" &&
+                          donor.status === "inactive");
+
+                      const matchesBloodType =
+                        filterBloodType === "all" ||
+                        donor.bloodType === filterBloodType;
+
+                      return matchesSearch && matchesStatus && matchesBloodType;
+                    });
+
+                    if (filteredDonors.length === 0) {
+                      return (
+                        <div className="text-center py-12">
+                          <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                          <p className="text-muted-foreground">
+                            No donors found matching your filters
                           </p>
                         </div>
+                      );
+                    }
+
+                    return filteredDonors.map((donor) => (
+                      <div
+                        key={donor.id}
+                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
+                            {donor.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
+                          <div>
+                            <p className="font-medium">{donor.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {donor.bloodType} • {donor.donations} donations •
+                              Last:{" "}
+                              {format(new Date(donor.lastDonation), "MMM dd")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Badge className={getStatusColor(donor.status)}>
+                            {getStatusIcon(donor.status)}
+                            <span className="ml-1 capitalize">
+                              {donor.status}
+                            </span>
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setViewingDonor(donor);
+                              setIsDonorDialogOpen(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <Badge className={getStatusColor(donor.status)}>
-                          {getStatusIcon(donor.status)}
-                          <span className="ml-1 capitalize">
-                            {donor.status}
-                          </span>
-                        </Badge>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setViewingDonor(donor);
-                            setIsDonorDialogOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               </CardContent>
             </Card>
@@ -1456,10 +1612,10 @@ export default function AdminDashboard() {
               while (cells.length % 7 !== 0) cells.push(null);
 
               return (
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <CalendarDays className="w-5 h-5 text-hope-red" />
+                      <CalendarDays className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                       <span>Blood Drive Calendar — {monthName}</span>
                       <Badge className="ml-2">
                         {driveDays.size} drive days
@@ -1483,11 +1639,11 @@ export default function AdminDashboard() {
                         return (
                           <div
                             key={idx}
-                            className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-sm transition-colors ${
+                            className={`relative flex flex-col items-center justify-center h-10 rounded-sm text-sm transition-colors ${
                               day === null
                                 ? ""
                                 : hasDrive
-                                  ? "bg-hope-red/10 border border-hope-red/30 font-semibold text-hope-red cursor-pointer hover:bg-hope-red/20"
+                                  ? "bg-[hsl(0,80%,50%)]/10 border border-[hsl(0,80%,50%)]/30 font-semibold text-[hsl(0,80%,50%)] cursor-pointer hover:bg-[hsl(0,80%,50%)]/20"
                                   : isToday
                                     ? "bg-muted font-bold ring-1 ring-hope-red"
                                     : "hover:bg-muted/50"
@@ -1511,7 +1667,7 @@ export default function AdminDashboard() {
                           >
                             {day}
                             {hasDrive && (
-                              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-hope-red rounded-full" />
+                              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[hsl(0,80%,50%)] rounded-full" />
                             )}
                           </div>
                         );
@@ -1526,12 +1682,12 @@ export default function AdminDashboard() {
               );
             })()}
 
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Blood Drives Management</CardTitle>
                   <Button
-                    className="bg-hope-red hover:bg-hope-red/90"
+                    className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                     onClick={() => setIsDriveDialogOpen(true)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -1542,7 +1698,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {bloodDrives.map((drive) => (
-                    <div key={drive.id} className="p-4 border rounded-lg">
+                    <div key={drive.id} className="p-4 border rounded-sm">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-lg">
@@ -1562,17 +1718,17 @@ export default function AdminDashboard() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-hope-red" />
+                          <Calendar className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                           <span className="text-sm">
                             {format(new Date(drive.date), "MMM dd, yyyy")}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4 text-hope-red" />
+                          <MapPin className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                           <span className="text-sm">{drive.location}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4 text-hope-red" />
+                          <Users className="w-4 h-4 text-[hsl(0,80%,50%)]" />
                           <span className="text-sm">
                             {drive.registered}/{drive.capacity} registered
                           </span>
@@ -1586,7 +1742,7 @@ export default function AdminDashboard() {
                               className={`h-2 rounded-full ${
                                 drive.registered > drive.capacity
                                   ? "bg-orange-500"
-                                  : "bg-hope-red"
+                                  : "bg-[hsl(0,80%,50%)]"
                               }`}
                               style={{
                                 width: `${Math.min((drive.registered / drive.capacity) * 100, 100)}%`,
@@ -1628,7 +1784,7 @@ export default function AdminDashboard() {
 
           {/* Hospitals Tab */}
           <TabsContent value="hospitals" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2">
@@ -1636,7 +1792,7 @@ export default function AdminDashboard() {
                     <span>Hospital Partnerships</span>
                   </CardTitle>
                   <Button
-                    className="bg-hope-red hover:bg-hope-red/90"
+                    className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                     onClick={() => setIsHospitalDialogOpen(true)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -1647,7 +1803,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {hospitals.map((hospital) => (
-                    <div key={hospital.id} className="p-4 border rounded-lg">
+                    <div key={hospital.id} className="p-4 border rounded-sm">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-lg">
@@ -1712,7 +1868,7 @@ export default function AdminDashboard() {
           <TabsContent value="analytics" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Donors by Blood Type */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <BarChart3 className="w-5 h-5" />
@@ -1749,7 +1905,7 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Blood Request Status Breakdown */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Activity className="w-5 h-5" />
@@ -1803,7 +1959,7 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Drive Capacity Overview */}
-              <Card className="border-0 shadow-lg col-span-full">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm col-span-full">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <TrendingUp className="w-5 h-5" />
@@ -2016,7 +2172,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <Button
-              className="bg-hope-red hover:bg-hope-red/90 w-full mt-2"
+              className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90 w-full mt-2"
               onClick={handleCreateDrive}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -2141,7 +2297,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <Button
-              className="bg-hope-red hover:bg-hope-red/90 w-full mt-2"
+              className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90 w-full mt-2"
               onClick={handleAddHospital}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -2156,7 +2312,7 @@ export default function AdminDashboard() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-hope-red" />
+              <UserCheck className="w-5 h-5 text-[hsl(0,80%,50%)]" />
               Donor Profile
             </DialogTitle>
             <DialogDescription>
@@ -2166,7 +2322,7 @@ export default function AdminDashboard() {
           {viewingDonor && (
             <div className="space-y-4 mt-2">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-hope-red rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-bold text-xl">
                   {viewingDonor.name
                     .split(" ")
                     .map((n: string) => n[0])
@@ -2183,19 +2339,19 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted rounded-sm">
                   <p className="text-sm text-muted-foreground">Blood Type</p>
-                  <p className="font-bold text-xl text-hope-red">
+                  <p className="font-bold text-xl text-[hsl(0,80%,50%)]">
                     {viewingDonor.bloodType}
                   </p>
                 </div>
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted rounded-sm">
                   <p className="text-sm text-muted-foreground">
                     Total Donations
                   </p>
                   <p className="font-bold text-xl">{viewingDonor.donations}</p>
                 </div>
-                <div className="p-3 bg-muted rounded-lg col-span-2">
+                <div className="p-3 bg-muted rounded-sm col-span-2">
                   <p className="text-sm text-muted-foreground">Last Donation</p>
                   <p className="font-medium">
                     {format(
@@ -2269,7 +2425,7 @@ export default function AdminDashboard() {
                 />
               </div>
               <Button
-                className="bg-hope-red hover:bg-hope-red/90 w-full mt-2"
+                className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90 w-full mt-2"
                 onClick={handleEditDrive}
               >
                 Save Changes
@@ -2287,7 +2443,7 @@ export default function AdminDashboard() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Hospital className="w-5 h-5 text-hope-red" />
+              <Hospital className="w-5 h-5 text-[hsl(0,80%,50%)]" />
               Hospital Details
             </DialogTitle>
             <DialogDescription>
@@ -2313,13 +2469,13 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted rounded-sm">
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Phone className="w-3 h-3" /> Contact
                   </p>
                   <p className="font-medium">{viewingHospital.contact}</p>
                 </div>
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted rounded-sm">
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Mail className="w-3 h-3" /> Email
                   </p>
@@ -2327,11 +2483,11 @@ export default function AdminDashboard() {
                     {viewingHospital.email}
                   </p>
                 </div>
-                <div className="p-3 bg-muted rounded-lg col-span-2">
+                <div className="p-3 bg-muted rounded-sm col-span-2">
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Droplets className="w-3 h-3" /> Current Need
                   </p>
-                  <p className="font-bold text-xl text-hope-red">
+                  <p className="font-bold text-xl text-[hsl(0,80%,50%)]">
                     {viewingHospital.currentNeed}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -2367,6 +2523,198 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Broadcast Notification Dialog */}
+      <Dialog
+        open={isBroadcastDialogOpen}
+        onOpenChange={setIsBroadcastDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+              Broadcast Notification
+            </DialogTitle>
+            <DialogDescription>
+              Send a notification to all donors or filter by blood type.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="broadcast-title">Title *</Label>
+              <Input
+                id="broadcast-title"
+                placeholder="e.g. Urgent: Blood Donation Drive"
+                value={broadcastForm.title}
+                onChange={(e) =>
+                  setBroadcastForm({ ...broadcastForm, title: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="broadcast-message">Message *</Label>
+              <Textarea
+                id="broadcast-message"
+                placeholder="Enter notification message..."
+                value={broadcastForm.message}
+                onChange={(e) =>
+                  setBroadcastForm({
+                    ...broadcastForm,
+                    message: e.target.value,
+                  })
+                }
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="broadcast-priority">Priority</Label>
+                <Select
+                  value={broadcastForm.priority}
+                  onValueChange={(value) =>
+                    setBroadcastForm({ ...broadcastForm, priority: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="broadcast-blood-type">Blood Type Filter</Label>
+                <Select
+                  value={broadcastForm.bloodTypeFilter || "all"}
+                  onValueChange={(value) =>
+                    setBroadcastForm({
+                      ...broadcastForm,
+                      bloodTypeFilter: value === "all" ? "" : value,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All blood types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Blood Types</SelectItem>
+                    <SelectItem value="O+">O+</SelectItem>
+                    <SelectItem value="O-">O-</SelectItem>
+                    <SelectItem value="A+">A+</SelectItem>
+                    <SelectItem value="A-">A-</SelectItem>
+                    <SelectItem value="B+">B+</SelectItem>
+                    <SelectItem value="B-">B-</SelectItem>
+                    <SelectItem value="AB+">AB+</SelectItem>
+                    <SelectItem value="AB-">AB-</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="broadcast-url">Action URL (optional)</Label>
+              <Input
+                id="broadcast-url"
+                placeholder="e.g. /drives"
+                value={broadcastForm.actionUrl}
+                onChange={(e) =>
+                  setBroadcastForm({
+                    ...broadcastForm,
+                    actionUrl: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                This will send a notification to{" "}
+                {broadcastForm.bloodTypeFilter
+                  ? `all donors with ${broadcastForm.bloodTypeFilter} blood type`
+                  : "all registered donors"}
+                . This action cannot be undone.
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsBroadcastDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
+                disabled={
+                  isSendingBroadcast ||
+                  !broadcastForm.title ||
+                  !broadcastForm.message
+                }
+                onClick={async () => {
+                  setIsSendingBroadcast(true);
+                  try {
+                    const result =
+                      await notificationService.broadcastToAllDonors(
+                        broadcastForm.title,
+                        broadcastForm.message,
+                        broadcastForm.priority as "low" | "medium" | "high",
+                        broadcastForm.actionUrl || undefined,
+                        broadcastForm.bloodTypeFilter || undefined,
+                      );
+
+                    if (result.error) throw result.error;
+
+                    if (result.notified === 0) {
+                      toast({
+                        title: "No Recipients",
+                        description:
+                          "No eligible donors found to send notification to.",
+                        variant: "destructive",
+                      });
+                    } else {
+                      toast({
+                        title: "Notification Sent",
+                        description: `Successfully sent to ${result.notified} donors.`,
+                      });
+                    }
+
+                    setIsBroadcastDialogOpen(false);
+                    setBroadcastForm({
+                      title: "",
+                      message: "",
+                      priority: "medium",
+                      bloodTypeFilter: "",
+                      actionUrl: "",
+                    });
+                  } catch (error) {
+                    console.error("Error sending broadcast:", error);
+                    toast({
+                      title: "Error",
+                      description: "Failed to send notification.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsSendingBroadcast(false);
+                  }
+                }}
+              >
+                {isSendingBroadcast ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Notification
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

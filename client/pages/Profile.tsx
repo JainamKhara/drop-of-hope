@@ -179,11 +179,11 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Profile Header */}
-          <Card className="border-0 shadow-lg mb-8">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8">
             <CardContent className="p-8">
               <div className="flex items-start space-x-6">
                 {/* Profile Picture */}
@@ -193,7 +193,7 @@ export default function Profile() {
                       src={user?.imageUrl || formData?.profile_pic_url}
                       alt={user?.fullName || formData?.name || "User"}
                     />
-                    <AvatarFallback className="bg-hope-red text-white text-4xl font-bold">
+                    <AvatarFallback className="bg-[hsl(0,80%,50%)] text-white text-4xl font-bold">
                       {formData?.name
                         ? formData.name
                             .split(" ")
@@ -217,7 +217,7 @@ export default function Profile() {
 
                 {/* Profile Info */}
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-hope-red mb-2">
+                  <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)] mb-2">
                     {formData?.name || user?.fullName || "User"}
                   </h1>
                   <p className="text-muted-foreground mb-4">
@@ -226,31 +226,31 @@ export default function Profile() {
 
                   {/* Quick Stats */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {formData?.level || 1}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Donor Level
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {formData?.points || 0}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Points Earned
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {(formData?.level || 1) * 3}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Lives Saved
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
                       <Badge
                         className={
                           canDonate()
@@ -283,7 +283,7 @@ export default function Profile() {
             <TabsContent value="personal" className="space-y-6 mt-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Basic Information */}
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <User className="w-5 h-5" />
@@ -391,7 +391,7 @@ export default function Profile() {
                 </Card>
 
                 {/* Address Information */}
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <MapPin className="w-5 h-5" />
@@ -516,7 +516,7 @@ export default function Profile() {
             <TabsContent value="medical" className="space-y-6 mt-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Current Health Status */}
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Activity className="w-5 h-5" />
@@ -540,7 +540,7 @@ export default function Profile() {
                         {medicalData.medications.map((med, index) => (
                           <div
                             key={index}
-                            className="p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                            className="p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm"
                           >
                             <p className="font-medium">{med.name}</p>
                             <p className="text-sm text-muted-foreground">
@@ -585,7 +585,7 @@ export default function Profile() {
                         {medicalData.conditions.map((condition, index) => (
                           <div
                             key={index}
-                            className="p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                            className="p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm"
                           >
                             <p className="font-medium">{condition.condition}</p>
                             <p className="text-sm text-muted-foreground">
@@ -608,7 +608,7 @@ export default function Profile() {
                 </Card>
 
                 {/* Donation Eligibility */}
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Shield className="w-5 h-5" />
@@ -616,7 +616,7 @@ export default function Profile() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 bg-hope-pink dark:bg-hope-coral rounded-lg">
+                    <div className="p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
                       <div className="flex items-center space-x-3">
                         {canDonate() ? (
                           <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
@@ -628,7 +628,7 @@ export default function Profile() {
                           </div>
                         )}
                         <div>
-                          <p className="font-semibold text-hope-red">
+                          <p className="font-semibold text-[hsl(0,80%,50%)]">
                             {canDonate()
                               ? "Eligible to Donate"
                               : "Currently Ineligible"}
@@ -687,7 +687,7 @@ export default function Profile() {
 
             {/* Donation History Tab */}
             <TabsContent value="donations" className="space-y-6 mt-6">
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Donation History</CardTitle>
@@ -727,7 +727,7 @@ export default function Profile() {
                           a.click();
                           URL.revokeObjectURL(url);
                         }}
-                        className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                        className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                       >
                         <Download className="w-4 h-4 mr-1" />
                         Export CSV
@@ -754,10 +754,10 @@ export default function Profile() {
                     {donations.map((donation, index) => (
                       <div
                         key={donation.id || index}
-                        className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm"
                       >
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center flex-shrink-0">
                             <Heart className="w-5 h-5 text-white fill-current" />
                           </div>
                           <div>
@@ -811,7 +811,7 @@ export default function Profile() {
 
             {/* Achievements Tab */}
             <TabsContent value="achievements" className="space-y-6 mt-6">
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Award className="w-5 h-5" />
@@ -821,11 +821,11 @@ export default function Profile() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Achievement cards would go here */}
-                    <div className="text-center p-6 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="w-16 h-16 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <div className="text-center p-6 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-full mx-auto mb-4 flex items-center justify-center">
                         <Award className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="font-semibold text-hope-red">
+                      <h3 className="font-semibold text-[hsl(0,80%,50%)]">
                         Hero Badge
                       </h3>
                       <p className="text-sm text-muted-foreground">
@@ -833,11 +833,11 @@ export default function Profile() {
                       </p>
                     </div>
 
-                    <div className="text-center p-6 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="w-16 h-16 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <div className="text-center p-6 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-full mx-auto mb-4 flex items-center justify-center">
                         <Heart className="w-8 h-8 text-white fill-current" />
                       </div>
-                      <h3 className="font-semibold text-hope-red">
+                      <h3 className="font-semibold text-[hsl(0,80%,50%)]">
                         Life Saver
                       </h3>
                       <p className="text-sm text-muted-foreground">
@@ -845,7 +845,7 @@ export default function Profile() {
                       </p>
                     </div>
 
-                    <div className="text-center p-6 border-2 border-dashed border-muted rounded-lg">
+                    <div className="text-center p-6 border-2 border-dashed border-muted rounded-sm">
                       <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
                         <Award className="w-8 h-8 text-muted-foreground" />
                       </div>

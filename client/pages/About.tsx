@@ -19,7 +19,7 @@ export default function About() {
       label: "Lives Saved",
       value: "25k+",
       icon: Heart,
-      color: "text-hope-red",
+      color: "text-[hsl(0,80%,50%)]",
     },
     {
       label: "Active Donors",
@@ -44,10 +44,10 @@ export default function About() {
   return (
     <div className="min-h-screen bg-white dark:bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-b from-hope-pink/30 to-white dark:from-hope-coral/20 dark:to-background overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-b from-[hsl(0,0%,98%)]/30 to-white dark:from-hope-coral/20 dark:to-background overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-hope-red mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-[hsl(0,80%,50%)] mb-6 leading-tight">
               Giving Life When It Matters Most
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
@@ -57,7 +57,7 @@ export default function About() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button
-                className="bg-hope-red hover:bg-hope-red/90 h-12 px-8 text-lg"
+                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 h-12 px-8 text-lg text-white"
                 asChild
               >
                 <Link to="/donor/register">Join the Mission</Link>
@@ -69,8 +69,8 @@ export default function About() {
           </div>
         </div>
         {/* Background blobs */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-hope-pink/50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-hope-red/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-[hsl(0,0%,98%)]/50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-[hsl(0,80%,50%)]/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
       </section>
 
       {/* Stats Section */}
@@ -99,51 +99,51 @@ export default function About() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <div className="aspect-[4/5] rounded-3xl bg-hope-red/5 overflow-hidden shadow-2xl border border-hope-red/10 flex flex-col items-center justify-center relative bg-[radial-gradient(circle_at_center,theme(colors.hope.pink)_0%,transparent_100%)]">
+              <div className="aspect-[4/5] rounded-3xl bg-[hsl(0,80%,50%)]/5 overflow-hidden shadow-2xl border border-[hsl(0,80%,50%)]/10 flex flex-col items-center justify-center relative bg-[radial-gradient(circle_at_center,hsl(0,0%,98%)_0%,transparent_100%)]">
                 <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white dark:from-background dark:via-transparent dark:to-background pointer-events-none z-10 opacity-90" />
                 <div className="flex flex-col gap-12 animate-marquee-vertical py-12 items-center">
                   {/* First set of words */}
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     HOPE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     LIFE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     GIVE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     SAVE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     HEAL
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     SERVE
                   </span>
                   {/* Duplicate set for infinite loop */}
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     HOPE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     LIFE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     GIVE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     SAVE
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     HEAL
                   </span>
-                  <span className="text-6xl md:text-8xl font-black text-hope-red/10 tracking-tighter select-none">
+                  <span className="text-6xl md:text-8xl font-black text-[hsl(0,80%,50%)]/10 tracking-tighter select-none">
                     SERVE
                   </span>
                 </div>
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white dark:bg-card p-6 rounded-2xl shadow-xl max-w-xs border border-hope-red/20">
-                <Sparkles className="w-8 h-8 text-hope-red mb-3" />
+              <div className="absolute -bottom-6 -right-6 bg-white dark:bg-card p-6 rounded-2xl shadow-xl max-w-xs border border-[hsl(0,80%,50%)]/20">
+                <Sparkles className="w-8 h-8 text-[hsl(0,80%,50%)] mb-3" />
                 <p className="font-semibold text-lg italic">
                   "Every drop you donate can rewrite the story of someone's
                   life."
@@ -157,8 +157,8 @@ export default function About() {
               </h2>
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-hope-red/10 flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-hope-red" />
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[hsl(0,80%,50%)]/10 flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-[hsl(0,80%,50%)]" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Zero Delay</h3>
@@ -206,7 +206,7 @@ export default function About() {
       </section>
 
       {/* Team CTA */}
-      <section className="py-20 bg-hope-red text-white">
+      <section className="py-20 bg-[hsl(0,80%,50%)] text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">
             Ready to make a difference?
@@ -226,7 +226,7 @@ export default function About() {
             </Button>
             <Button
               variant="outline"
-              className="h-12 px-8 text-lg bg-transparent border-white text-white hover:bg-white hover:text-hope-red"
+              className="h-12 px-8 text-lg bg-transparent border-white text-white hover:bg-white hover:text-[hsl(0,80%,50%)]"
               asChild
             >
               <Link to="/hospital/login">Hospital Portal</Link>

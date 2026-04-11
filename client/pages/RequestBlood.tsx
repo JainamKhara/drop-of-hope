@@ -116,13 +116,13 @@ export default function RequestBlood() {
   // Success state after submission
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+      <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
         <main className="container mx-auto px-4 py-16">
           <div className="max-w-lg mx-auto text-center">
             <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-success" />
             </div>
-            <h1 className="text-3xl font-bold text-hope-red mb-4">
+            <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)] mb-4">
               Request Submitted!
             </h1>
             <p className="text-muted-foreground mb-8">
@@ -146,7 +146,7 @@ export default function RequestBlood() {
                     notes: "",
                   });
                 }}
-                className="bg-hope-red hover:bg-hope-red/90"
+                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
               >
                 Submit Another Request
               </Button>
@@ -161,11 +161,11 @@ export default function RequestBlood() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-hope-red mb-2">
+            <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-2">
               Emergency Blood Request
             </h1>
             <p className="text-muted-foreground">
@@ -174,7 +174,7 @@ export default function RequestBlood() {
             </p>
           </div>
 
-          <Alert className="mb-8 border-hope-red bg-hope-red/5 text-hope-red">
+          <Alert className="mb-8 border-2 border-[hsl(0,80%,50%)] bg-[hsl(0,80%,50%)]/5 text-[hsl(0,80%,50%)]">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               For extreme emergencies, please contact your local emergency
@@ -182,10 +182,10 @@ export default function RequestBlood() {
             </AlertDescription>
           </Alert>
 
-          <Card className="border-0 shadow-xl">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader>
               <CardTitle className="text-2xl flex items-center gap-2">
-                <Droplets className="w-6 h-6 text-hope-red" />
+                <Droplets className="w-6 h-6 text-[hsl(0,80%,50%)]" />
                 Request Details
               </CardTitle>
               <CardDescription>
@@ -377,7 +377,7 @@ export default function RequestBlood() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-hope-red hover:bg-hope-red/90 text-white font-bold h-12 text-lg"
+                  className="w-full bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white font-bold h-12 text-lg"
                   disabled={
                     isSubmitting || !formData.bloodType || !formData.patientName
                   }
@@ -410,7 +410,7 @@ function Alert({
 }) {
   return (
     <div
-      className={`flex items-start gap-4 p-4 rounded-lg border ${className}`}
+      className={`flex items-start gap-4 p-4 rounded-sm border ${className}`}
     >
       {children}
     </div>

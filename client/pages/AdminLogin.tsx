@@ -79,7 +79,7 @@ export default function AdminLogin() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-5 h-5 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -136,7 +136,7 @@ export default function AdminLogin() {
           </Card>
 
           {/* Sign In Form */}
-          <Card className="border-0 shadow-xl">
+          <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl text-blue-600 dark:text-blue-400">
                 Admin Sign In
@@ -284,7 +284,7 @@ export default function AdminLogin() {
               Not an admin?{" "}
               <Link
                 to="/login"
-                className="text-hope-red hover:text-hope-red/80 font-medium"
+                className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 font-medium"
               >
                 Donor login
               </Link>

@@ -84,9 +84,11 @@ export default function Terms() {
             </h1>
             <p className="text-muted-foreground">
               Last Updated:{" "}
-              <span className="font-semibold text-hope-red">{lastUpdated}</span>
+              <span className="font-semibold text-[hsl(0,80%,50%)]">
+                {lastUpdated}
+              </span>
             </p>
-            <div className="w-24 h-1 bg-hope-red mx-auto mt-6 rounded-full"></div>
+            <div className="w-24 h-1 bg-[hsl(0,80%,50%)] mx-auto mt-6 rounded-full"></div>
           </div>
 
           <div className="bg-white dark:bg-card rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -107,7 +109,7 @@ export default function Terms() {
                       className="scroll-mt-24"
                     >
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-hope-red/10 flex items-center justify-center text-hope-red">
+                        <div className="w-10 h-10 rounded-full bg-[hsl(0,80%,50%)]/10 flex items-center justify-center text-[hsl(0,80%,50%)]">
                           <section.icon className="w-5 h-5" />
                         </div>
                         <h2 className="text-2xl font-bold m-0">
@@ -138,9 +140,9 @@ export default function Terms() {
               </div>
             </div>
 
-            <div className="bg-hope-red/5 p-8 border-t border-hope-red/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="bg-[hsl(0,80%,50%)]/5 p-8 border-t border-[hsl(0,80%,50%)]/10 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <ShieldCheck className="w-10 h-10 text-hope-red" />
+                <ShieldCheck className="w-10 h-10 text-[hsl(0,80%,50%)]" />
                 <div>
                   <p className="font-bold">Your safety is our priority</p>
                   <p className="text-sm text-muted-foreground">
@@ -149,7 +151,7 @@ export default function Terms() {
                 </div>
               </div>
               <Button
-                className="bg-hope-red hover:bg-hope-red/90 font-bold"
+                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 font-bold text-white"
                 asChild
               >
                 <Link to="/register">Accept & Register</Link>
@@ -161,10 +163,16 @@ export default function Terms() {
 
       <footer className="py-12 text-center text-muted-foreground">
         <div className="flex justify-center gap-6 mb-4 text-sm">
-          <Link to="/privacy" className="hover:text-hope-red transition-colors">
+          <Link
+            to="/privacy"
+            className="hover:text-[hsl(0,80%,50%)] transition-colors"
+          >
             Privacy Policy
           </Link>
-          <Link to="/contact" className="hover:text-hope-red transition-colors">
+          <Link
+            to="/contact"
+            className="hover:text-[hsl(0,80%,50%)] transition-colors"
+          >
             Contact Us
           </Link>
         </div>

@@ -36,19 +36,21 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-hope-red rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-sm mx-auto mb-4 flex items-center justify-center">
             <Heart className="w-8 h-8 text-white fill-current" />
           </div>
-          <h1 className="text-3xl font-bold text-hope-red">Forgot Password</h1>
+          <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)]">
+            Forgot Password
+          </h1>
           <p className="text-muted-foreground mt-1">
             We'll send you a reset link by email
           </p>
         </div>
 
-        <Card className="border-0 shadow-xl">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5" />
@@ -69,7 +71,7 @@ export default function ForgotPassword() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-hope-red/20 text-hope-red"
+                  className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)]"
                 >
                   <Link to="/hospital/login">Back to Login</Link>
                 </Button>
@@ -101,7 +103,7 @@ export default function ForgotPassword() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-hope-red hover:bg-hope-red/90 text-white"
+                  className="w-full bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                 >
                   {loading ? "Sending..." : "Send Reset Link"}
                 </Button>
@@ -109,7 +111,7 @@ export default function ForgotPassword() {
                 <div className="text-center">
                   <Link
                     to="/hospital/login"
-                    className="text-sm text-hope-red hover:underline inline-flex items-center gap-1"
+                    className="text-sm text-[hsl(0,80%,50%)] hover:underline inline-flex items-center gap-1"
                   >
                     <ArrowLeft className="w-3 h-3" />
                     Back to Login

@@ -246,7 +246,7 @@ export default function Rewards() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-hope-red mx-auto mb-4 animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-4 animate-spin" />
           <p className="text-muted-foreground">Loading your rewards...</p>
         </div>
       </div>
@@ -254,11 +254,11 @@ export default function Rewards() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-4">
             Rewards & Achievements
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -268,7 +268,7 @@ export default function Rewards() {
         </div>
 
         {/* Level Progress Card */}
-        <Card className="border-0 shadow-xl mb-8">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8">
           <CardContent className="p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
@@ -279,7 +279,7 @@ export default function Rewards() {
                   <Trophy className="w-8 h-8" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-hope-red">
+                  <h2 className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {currentLevel?.name} Level
                   </h2>
                   <p className="text-muted-foreground">
@@ -288,7 +288,7 @@ export default function Rewards() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-hope-red">
+                <div className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                   {livesImpacted}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -326,7 +326,7 @@ export default function Rewards() {
           <TabsContent value="overview" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Recent Achievements */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Award className="w-5 h-5" />
@@ -347,9 +347,9 @@ export default function Rewards() {
                         .map((badge, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center space-x-3 p-3 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                            className="flex items-center space-x-3 p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm"
                           >
-                            <div className="w-10 h-10 bg-hope-red rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center">
                               <badge.icon className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1">
@@ -366,7 +366,7 @@ export default function Rewards() {
               </Card>
 
               {/* Quick Stats */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <TrendingUp className="w-5 h-5" />
@@ -375,24 +375,24 @@ export default function Rewards() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {totalDonations}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Total Donations
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {currentPoints}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Total Points
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                      <div className="text-2xl font-bold text-hope-red">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                      <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {currentUserRank > 0 ? `#${currentUserRank}` : "—"}
                       </div>
                       <div className="text-sm text-muted-foreground">
@@ -404,7 +404,7 @@ export default function Rewards() {
               </Card>
 
               {/* Next Goals */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Target className="w-5 h-5" />
@@ -419,7 +419,7 @@ export default function Rewards() {
                       .map((badge, idx) => (
                         <div
                           key={idx}
-                          className="p-3 border border-dashed border-muted rounded-lg"
+                          className="p-3 border border-dashed border-muted rounded-sm"
                         >
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
@@ -448,12 +448,12 @@ export default function Rewards() {
               {mergedBadges.map((badge, idx) => (
                 <Card
                   key={idx}
-                  className={`border-0 shadow-lg ${badge.earned ? "" : "opacity-60"}`}
+                  className={`border-2 border-[hsl(0,80%,50%)] rounded-sm ${badge.earned ? "" : "opacity-60"}`}
                 >
                   <CardContent className="p-6 text-center">
                     <div
                       className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                        badge.earned ? "bg-hope-red" : "bg-muted"
+                        badge.earned ? "bg-[hsl(0,80%,50%)]" : "bg-muted"
                       }`}
                     >
                       <badge.icon
@@ -469,7 +469,7 @@ export default function Rewards() {
                         badge.rarity.slice(1)}
                     </Badge>
                     <div className="mt-3">
-                      <span className="text-sm font-medium text-hope-red">
+                      <span className="text-sm font-medium text-[hsl(0,80%,50%)]">
                         +{badge.points} points
                       </span>
                     </div>
@@ -482,7 +482,7 @@ export default function Rewards() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="mt-3 w-full border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                        className="mt-3 w-full border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                         onClick={async () => {
                           const text = `I just earned the "${badge.name}" badge on Drop of Hope! 🩸 Every drop counts. #DropOfHope #BloodDonation`;
                           if (navigator.share) {
@@ -508,7 +508,7 @@ export default function Rewards() {
 
           {/* Leaderboard Tab */}
           <TabsContent value="leaderboard" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="w-5 h-5" />
@@ -528,17 +528,17 @@ export default function Rewards() {
                       return (
                         <div
                           key={user.id}
-                          className={`flex items-center justify-between p-4 rounded-lg ${
+                          className={`flex items-center justify-between p-4 rounded-sm ${
                             isCurrentUser
-                              ? "bg-hope-red/10 border-2 border-hope-red"
-                              : "bg-hope-pink dark:bg-hope-coral"
+                              ? "bg-[hsl(0,80%,50%)]/10 border-2 border-[hsl(0,80%,50%)]"
+                              : "bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)]"
                           }`}
                         >
                           <div className="flex items-center space-x-4">
                             <div
                               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                                 rank <= 3
-                                  ? "bg-hope-red text-white"
+                                  ? "bg-[hsl(0,80%,50%)] text-white"
                                   : "bg-muted text-muted-foreground"
                               }`}
                             >
@@ -565,7 +565,7 @@ export default function Rewards() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-lg font-bold text-hope-red">
+                            <div className="text-lg font-bold text-[hsl(0,80%,50%)]">
                               {user.points || 0}
                             </div>
                             <Badge className="mt-1">
@@ -584,9 +584,9 @@ export default function Rewards() {
           {/* Rewards Store Tab */}
           <TabsContent value="rewards" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardContent className="p-6 text-center">
-                  <Gift className="w-16 h-16 text-hope-red mx-auto mb-4" />
+                  <Gift className="w-16 h-16 text-[hsl(0,80%,50%)] mx-auto mb-4" />
                   <h3 className="text-xl font-semibold mb-2">Coming Soon!</h3>
                   <p className="text-muted-foreground mb-4">
                     Redeem your points for exclusive rewards, merchandise, and

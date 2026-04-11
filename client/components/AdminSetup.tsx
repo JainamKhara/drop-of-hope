@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  seedTestData,
-  testCredentials,
-} from "@/lib/seedData";
+import { seedTestData, testCredentials } from "@/lib/seedData";
 import {
   Database,
   Users,
@@ -41,11 +38,12 @@ export const AdminSetup = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-hope-red mb-2">
+        <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)] mb-2">
           Database Setup
         </h1>
         <p className="text-muted-foreground">
-          Initialize the database with test data for admin, donor, and hospital users
+          Initialize the database with test data for admin, donor, and hospital
+          users
         </p>
       </div>
 
@@ -82,8 +80,8 @@ export const AdminSetup = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Passwords are now stored directly in the admin and hospital tables.
-              No separate auth users are needed.
+              Passwords are now stored directly in the admin and hospital
+              tables. No separate auth users are needed.
             </p>
           </CardContent>
         </Card>
@@ -127,7 +125,9 @@ export const AdminSetup = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-hope-red">Donor Credentials</CardTitle>
+            <CardTitle className="text-[hsl(0,80%,50%)]">
+              Donor Credentials
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
@@ -145,7 +145,9 @@ export const AdminSetup = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-green-600">Hospital Credentials</CardTitle>
+            <CardTitle className="text-green-600">
+              Hospital Credentials
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
@@ -174,8 +176,8 @@ export const AdminSetup = () => {
               user profiles to the database.
             </p>
             <p>
-              <strong>Step 2:</strong> Passwords are stored directly in the admin and hospital tables.
-              No separate auth users are needed.
+              <strong>Step 2:</strong> Passwords are stored directly in the
+              admin and hospital tables. No separate auth users are needed.
             </p>
             <p>
               <strong>Step 3:</strong> Use the credentials above to test

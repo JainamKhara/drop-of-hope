@@ -21,7 +21,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-4 h-4 bg-white rounded-full"></div>
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -53,7 +53,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-4 h-4 bg-white rounded-full"></div>
           </div>
           <p className="text-muted-foreground">Setting up your profile...</p>
@@ -64,10 +64,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If signed in but wrong role → send to their own dashboard
   if (userRole && !allowedRoles.includes(userRole)) {
-    const userDashboard =
-      userRole === "admin"
-        ? "/admin"
-        : "/dashboard";
+    const userDashboard = userRole === "admin" ? "/admin" : "/dashboard";
 
     return <Navigate to={redirectTo || userDashboard} replace />;
   }
@@ -99,7 +96,7 @@ export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-4 h-4 bg-white rounded-full"></div>
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -116,7 +113,7 @@ export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-4 h-4 bg-white rounded-full"></div>
           </div>
           <p className="text-muted-foreground">Setting up your profile...</p>

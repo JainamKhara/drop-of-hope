@@ -2,6 +2,11 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  handleSendUrgentNotification,
+  handleBroadcastNotification,
+  handleRunScheduledReminders,
+} from "./routes/notifications";
 
 export function createServer() {
   const app = express();
@@ -18,6 +23,11 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Notification routes
+  app.post("/api/notifications/urgent", handleSendUrgentNotification);
+  app.post("/api/notifications/broadcast", handleBroadcastNotification);
+  app.post("/api/notifications/send-reminders", handleRunScheduledReminders);
 
   return app;
 }

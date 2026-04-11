@@ -28,6 +28,7 @@ import {
   bloodRequestService,
   appointmentService,
   driveService,
+  notificationService,
 } from "@/lib/db-services";
 import {
   Heart,
@@ -130,6 +131,17 @@ export default function HospitalPortal() {
     department: "",
     requiredBy: "",
     notes: "",
+  });
+
+  // Notification state
+  const [isNotificationDialogOpen, setIsNotificationDialogOpen] =
+    useState(false);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
+  const [notificationForm, setNotificationForm] = useState({
+    bloodType: "",
+    unitsNeeded: "",
+    urgency: "high",
+    patientInfo: "",
   });
 
   // Redirect if not authenticated as hospital
@@ -266,7 +278,7 @@ export default function HospitalPortal() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-hope-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Heart className="w-5 h-5 text-white fill-current" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
@@ -471,19 +483,86 @@ export default function HospitalPortal() {
     }
   };
 
+  // Handle sending urgent blood need notification
+  const handleSendUrgentNotification = async () => {
+    if (!notificationForm.bloodType || !notificationForm.unitsNeeded) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSendingNotification(true);
+      const result = await notificationService.sendUrgentBloodNeed(
+        hospitalProfile.id,
+        hospitalProfile.name,
+        notificationForm.bloodType,
+        parseInt(notificationForm.unitsNeeded),
+        notificationForm.urgency as "critical" | "high" | "medium",
+        notificationForm.patientInfo,
+      );
+
+      if (result.error) throw result.error;
+
+      if (result.notified === 0) {
+        if (result.found === 0) {
+          toast({
+            title: "No Donors Found",
+            description: `No donors with ${notificationForm.bloodType} blood type found in the system.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "No Eligible Donors",
+            description: `Found ${result.found} donors with ${notificationForm.bloodType} but none have registered accounts.`,
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Notifications Sent",
+          description: `Successfully sent urgent notification to ${result.notified} donors with ${notificationForm.bloodType} blood type.`,
+        });
+      }
+
+      setIsNotificationDialogOpen(false);
+      setNotificationForm({
+        bloodType: "",
+        unitsNeeded: "",
+        urgency: "high",
+        patientInfo: "",
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send notifications. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Hospital Info Header */}
-        <Card className="border-0 shadow-lg mb-8">
+        <Card
+          variant="outline"
+          className="border-2 border-[hsl(0,80%,50%)] rounded-none mb-8"
+        >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Hospital className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                  <Hospital className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-hope-red">
+                  <h1 className="h2-brutal text-[hsl(0,80%,50%)] select-none">
                     {hospitalProfile.name}
                   </h1>
                   <p className="text-muted-foreground">
@@ -493,7 +572,7 @@ export default function HospitalPortal() {
                   <div className="flex items-center space-x-2 mt-1">
                     <Badge
                       variant="outline"
-                      className="border-success text-success"
+                      className="border-2 border-[hsl(120,71%,43%)] text-[hsl(120,71%,43%)] bg-transparent"
                     >
                       {hospitalProfile.is_verified
                         ? "Verified Partner"
@@ -520,21 +599,21 @@ export default function HospitalPortal() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">Total Units</p>
-                  <p className="text-3xl font-bold text-hope-red">
+                  <p className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {bloodInventory.reduce((sum, item) => sum + item.units, 0)}
                   </p>
                 </div>
-                <Package className="w-8 h-8 text-hope-red" />
+                <Package className="w-8 h-8 text-[hsl(0,80%,50%)]" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -554,7 +633,7 @@ export default function HospitalPortal() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -573,7 +652,7 @@ export default function HospitalPortal() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -614,17 +693,18 @@ export default function HospitalPortal() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="inventory">Blood Inventory</TabsTrigger>
             <TabsTrigger value="appointments">Donor Appointments</TabsTrigger>
             <TabsTrigger value="requests">Blood Requests</TabsTrigger>
             <TabsTrigger value="drives">Blood Drives</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           {/* Donor Appointments Tab */}
           <TabsContent value="appointments" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Calendar className="w-5 h-5" />
@@ -647,10 +727,10 @@ export default function HospitalPortal() {
                     {donorAppointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
-                        className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                        className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-sm border border-blue-200 dark:border-blue-800"
                       >
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-hope-red rounded-full flex items-center justify-center text-white font-semibold">
+                          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
                             {appointment.donors?.name
                               ?.substring(0, 2)
                               .toUpperCase() || "DN"}
@@ -783,7 +863,7 @@ export default function HospitalPortal() {
           <TabsContent value="inventory" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {bloodInventory.map((item) => (
-                <Card key={item.type} className="border-0 shadow-lg">
+                <Card key={item.type} className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-2xl font-bold">
@@ -878,12 +958,12 @@ export default function HospitalPortal() {
 
           {/* Blood Requests Tab */}
           <TabsContent value="requests" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Blood Requests</CardTitle>
                   <Button
-                    className="bg-hope-red hover:bg-hope-red/90"
+                    className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
                     onClick={() => setIsDialogOpen(true)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -894,7 +974,7 @@ export default function HospitalPortal() {
               <CardContent>
                 <div className="space-y-4">
                   {bloodRequests.map((request) => (
-                    <div key={request.id} className="p-4 border rounded-lg">
+                    <div key={request.id} className="p-4 border rounded-sm">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h3 className="font-semibold">
@@ -1059,7 +1139,7 @@ export default function HospitalPortal() {
                                   <div
                                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                       isDone
-                                        ? "bg-hope-red text-white"
+                                        ? "bg-[hsl(0,80%,50%)] text-white"
                                         : "bg-muted text-muted-foreground"
                                     }`}
                                   >
@@ -1068,7 +1148,7 @@ export default function HospitalPortal() {
                                   <span
                                     className={`text-xs mt-1 capitalize ${
                                       isActive
-                                        ? "text-hope-red font-semibold"
+                                        ? "text-[hsl(0,80%,50%)] font-semibold"
                                         : "text-muted-foreground"
                                     }`}
                                   >
@@ -1079,7 +1159,7 @@ export default function HospitalPortal() {
                                   <div
                                     className={`flex-1 h-0.5 mb-4 ${
                                       stepIdx < order
-                                        ? "bg-hope-red"
+                                        ? "bg-[hsl(0,80%,50%)]"
                                         : "bg-muted"
                                     }`}
                                   />
@@ -1098,7 +1178,7 @@ export default function HospitalPortal() {
 
           {/* Blood Drives Tab */}
           <TabsContent value="drives" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Calendar className="w-5 h-5" />
@@ -1120,7 +1200,7 @@ export default function HospitalPortal() {
                 ) : (
                   <div className="space-y-4">
                     {hospitalDrives.map((drive: any) => (
-                      <div key={drive.id} className="p-4 border rounded-lg">
+                      <div key={drive.id} className="p-4 border rounded-sm">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold">{drive.name}</h3>
                           <Badge
@@ -1156,7 +1236,7 @@ export default function HospitalPortal() {
                         <div className="mt-3">
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                              className="h-2 rounded-full bg-hope-red"
+                              className="h-2 rounded-full bg-[hsl(0,80%,50%)]"
                               style={{
                                 width: `${Math.min(((drive.registered_count ?? 0) / drive.capacity) * 100, 100)}%`,
                               }}
@@ -1212,7 +1292,7 @@ export default function HospitalPortal() {
                               a.click();
                               URL.revokeObjectURL(url);
                             }}
-                            className="border-hope-red/20 text-hope-red hover:bg-hope-red hover:text-white"
+                            className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
                           >
                             Attendance Report
                           </Button>
@@ -1225,11 +1305,136 @@ export default function HospitalPortal() {
             </Card>
           </TabsContent>
 
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-6 mt-6">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <AlertTriangle className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                    <span>Send Urgent Blood Need Alerts</span>
+                  </CardTitle>
+                  <Button
+                    className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
+                    onClick={() => setIsNotificationDialogOpen(true)}
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Alert
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Notify registered donors with specific blood types about
+                  urgent blood needs.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Sending urgent notifications will alert all donors with
+                      the selected blood type in your area. Use this feature
+                      responsibly for genuine emergencies only.
+                    </AlertDescription>
+                  </Alert>
+
+                  {/* Recent Urgent Requests */}
+                  <div>
+                    <h3 className="font-medium mb-3">High Priority Requests</h3>
+                    <div className="space-y-3">
+                      {bloodRequests
+                        .filter(
+                          (r) =>
+                            r.urgency === "critical" || r.urgency === "high",
+                        )
+                        .slice(0, 5)
+                        .map((request) => (
+                          <div
+                            key={request.id}
+                            className="flex items-center justify-between p-3 border rounded-sm bg-[hsl(0,80%,50%)]/5"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-[hsl(0,80%,50%)]/10 rounded-full flex items-center justify-center">
+                                <Droplets className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {request.bloodType} Blood Needed
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {request.units} units required
+                                </p>
+                              </div>
+                            </div>
+                            <Badge
+                              className={
+                                request.urgency === "critical"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }
+                            >
+                              {request.urgency.toUpperCase()}
+                            </Badge>
+                          </div>
+                        ))}
+                      {bloodRequests.filter(
+                        (r) => r.urgency === "critical" || r.urgency === "high",
+                      ).length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          No high priority requests at the moment.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notification History */}
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
+              <CardHeader>
+                <CardTitle>Notification Guidelines</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-sm">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className="bg-green-100 text-green-800">
+                          Best Practice
+                        </Badge>
+                      </div>
+                      <h4 className="font-medium">When to Send Alerts</h4>
+                      <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                        <li>• Critical shortages of rare blood types</li>
+                        <li>• Emergency surgeries requiring rare blood</li>
+                        <li>• Natural disasters or mass casualty events</li>
+                        <li>• Scheduled procedures with limited time</li>
+                      </ul>
+                    </div>
+                    <div className="p-4 border rounded-sm">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className="bg-red-100 text-red-800">Avoid</Badge>
+                      </div>
+                      <h4 className="font-medium">When NOT to Send</h4>
+                      <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                        <li>• Routine stock replenishment</li>
+                        <li>• Minor shortages that can wait</li>
+                        <li>• Regular scheduled procedures</li>
+                        <li>• Non-urgent inventory updates</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Blood Inventory by Type */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Package className="w-5 h-5" />
@@ -1263,7 +1468,7 @@ export default function HospitalPortal() {
               </Card>
 
               {/* Request Status Breakdown */}
-              <Card className="border-0 shadow-lg">
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Activity className="w-5 h-5" />
@@ -1317,7 +1522,7 @@ export default function HospitalPortal() {
               </Card>
             </div>
 
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Reports</CardTitle>
@@ -1352,7 +1557,7 @@ export default function HospitalPortal() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-hope-red">
+            <DialogTitle className="text-xl font-bold text-[hsl(0,80%,50%)]">
               Submit New Blood Request
             </DialogTitle>
             <DialogDescription>
@@ -1496,7 +1701,7 @@ export default function HospitalPortal() {
               </Button>
               <Button
                 type="submit"
-                className="bg-hope-red hover:bg-hope-red/90"
+                className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
                 disabled={
                   isSubmitting ||
                   !newRequest.bloodType ||
@@ -1589,7 +1794,7 @@ export default function HospitalPortal() {
               {viewingRequest.notes && (
                 <div>
                   <p className="text-sm text-muted-foreground">Notes</p>
-                  <p className="text-sm mt-1 p-3 bg-muted rounded-lg">
+                  <p className="text-sm mt-1 p-3 bg-muted rounded-sm">
                     {viewingRequest.notes}
                   </p>
                 </div>
@@ -1710,7 +1915,7 @@ export default function HospitalPortal() {
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-hope-red hover:bg-hope-red/90"
+                  className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -1734,27 +1939,27 @@ export default function HospitalPortal() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Droplets className="w-5 h-5 text-hope-red" />
+              <Droplets className="w-5 h-5 text-[hsl(0,80%,50%)]" />
               {viewingInventory?.type} Blood Inventory
             </DialogTitle>
             <DialogDescription>Current inventory details</DialogDescription>
           </DialogHeader>
           {viewingInventory && (
             <div className="space-y-4 mt-2">
-              <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-4xl font-bold text-hope-red">
+              <div className="p-4 bg-muted rounded-sm text-center">
+                <p className="text-4xl font-bold text-[hsl(0,80%,50%)]">
                   {viewingInventory.units}
                 </p>
                 <p className="text-sm text-muted-foreground">units available</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-warning/10 rounded-lg">
+                <div className="p-3 bg-warning/10 rounded-sm">
                   <p className="text-sm text-muted-foreground">Low Threshold</p>
                   <p className="font-semibold text-warning">
                     {viewingInventory.low} units
                   </p>
                 </div>
-                <div className="p-3 bg-destructive/10 rounded-lg">
+                <div className="p-3 bg-destructive/10 rounded-sm">
                   <p className="text-sm text-muted-foreground">
                     Critical Threshold
                   </p>
@@ -1797,7 +2002,7 @@ export default function HospitalPortal() {
                   Close
                 </Button>
                 <Button
-                  className="bg-hope-red hover:bg-hope-red/90"
+                  className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
                   onClick={() => {
                     setIsInventoryDialogOpen(false);
                     setNewRequest({
@@ -1813,6 +2018,134 @@ export default function HospitalPortal() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Urgent Notification Dialog */}
+      <Dialog
+        open={isNotificationDialogOpen}
+        onOpenChange={setIsNotificationDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+              Send Urgent Blood Alert
+            </DialogTitle>
+            <DialogDescription>
+              Alert donors with specific blood types about urgent blood needs.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="notif-blood-type">Blood Type *</Label>
+              <Select
+                value={notificationForm.bloodType}
+                onValueChange={(value) =>
+                  setNotificationForm({ ...notificationForm, bloodType: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select blood type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="O+">O+</SelectItem>
+                  <SelectItem value="O-">O-</SelectItem>
+                  <SelectItem value="A+">A+</SelectItem>
+                  <SelectItem value="A-">A-</SelectItem>
+                  <SelectItem value="B+">B+</SelectItem>
+                  <SelectItem value="B-">B-</SelectItem>
+                  <SelectItem value="AB+">AB+</SelectItem>
+                  <SelectItem value="AB-">AB-</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notif-units">Units Needed *</Label>
+              <Input
+                id="notif-units"
+                type="number"
+                min="1"
+                placeholder="e.g. 5"
+                value={notificationForm.unitsNeeded}
+                onChange={(e) =>
+                  setNotificationForm({
+                    ...notificationForm,
+                    unitsNeeded: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notif-urgency">Urgency Level</Label>
+              <Select
+                value={notificationForm.urgency}
+                onValueChange={(value) =>
+                  setNotificationForm({ ...notificationForm, urgency: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notif-patient">Patient Info (Optional)</Label>
+              <Input
+                id="notif-patient"
+                placeholder="e.g. Emergency surgery patient"
+                value={notificationForm.patientInfo}
+                onChange={(e) =>
+                  setNotificationForm({
+                    ...notificationForm,
+                    patientInfo: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                This will send a push notification to all{" "}
+                {notificationForm.bloodType || "selected"} donors in your area.
+                This action cannot be undone.
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsNotificationDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-[hsl(0,80%,50%)] text-white hover:bg-[hsl(0,80%,50%)]/90"
+                disabled={
+                  isSendingNotification ||
+                  !notificationForm.bloodType ||
+                  !notificationForm.unitsNeeded
+                }
+                onClick={handleSendUrgentNotification}
+              >
+                {isSendingNotification ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Alert
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

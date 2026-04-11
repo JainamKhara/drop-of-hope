@@ -75,7 +75,7 @@ const getLevelColor = (level: number) => {
   if (level >= 5) return "text-blue-600";
   if (level >= 4) return "text-gray-500";
   if (level >= 3) return "text-yellow-600";
-  return "text-hope-red";
+  return "text-[hsl(0,80%,50%)]";
 };
 
 export default function Community() {
@@ -192,11 +192,13 @@ export default function Community() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-hope-red mb-4">Community</h1>
+          <h1 className="text-4xl font-bold text-[hsl(0,80%,50%)] mb-4">
+            Community
+          </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Connect with fellow donors, share your journey, and inspire others
             to save lives
@@ -205,10 +207,10 @@ export default function Community() {
 
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)]">
             <CardContent className="p-6 text-center">
-              <Users className="w-8 h-8 text-hope-red mx-auto mb-2" />
-              <div className="text-2xl font-bold text-hope-red">
+              <Users className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-2" />
+              <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                 {totalDonors || "—"}
               </div>
               <div className="text-sm text-muted-foreground">
@@ -216,10 +218,10 @@ export default function Community() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)]">
             <CardContent className="p-6 text-center">
-              <Heart className="w-8 h-8 text-hope-red mx-auto mb-2 fill-current" />
-              <div className="text-2xl font-bold text-hope-red">
+              <Heart className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-2 fill-current" />
+              <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                 {totalDonors * 3 || "—"}
               </div>
               <div className="text-sm text-muted-foreground">
@@ -227,10 +229,10 @@ export default function Community() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)]">
             <CardContent className="p-6 text-center">
-              <MessageCircle className="w-8 h-8 text-hope-red mx-auto mb-2" />
-              <div className="text-2xl font-bold text-hope-red">
+              <MessageCircle className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-2" />
+              <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                 {posts.length}
               </div>
               <div className="text-sm text-muted-foreground">
@@ -238,10 +240,10 @@ export default function Community() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-lg">
+          <Card className="border-2 border-[hsl(0,80%,50%)]">
             <CardContent className="p-6 text-center">
-              <TrendingUp className="w-8 h-8 text-hope-red mx-auto mb-2" />
-              <div className="text-2xl font-bold text-hope-red">
+              <TrendingUp className="w-8 h-8 text-[hsl(0,80%,50%)] mx-auto mb-2" />
+              <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                 {leaderboard[0]?.points || "—"}
               </div>
               <div className="text-sm text-muted-foreground">Top Points</div>
@@ -263,7 +265,7 @@ export default function Community() {
               {/* Main Feed */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Create Post */}
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)]">
                   <CardHeader>
                     <CardTitle>Share Your Story</CardTitle>
                   </CardHeader>
@@ -281,7 +283,7 @@ export default function Community() {
                     />
                     <div className="flex justify-end">
                       <Button
-                        className="bg-hope-red hover:bg-hope-red/90 text-white"
+                        className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                         onClick={handleNewPost}
                         disabled={!newPost.trim() || posting || !donorProfile}
                       >
@@ -299,10 +301,10 @@ export default function Community() {
                 {/* Posts Feed */}
                 {postsLoading ? (
                   <div className="flex justify-center py-16">
-                    <Loader2 className="w-8 h-8 animate-spin text-hope-red" />
+                    <Loader2 className="w-8 h-8 animate-spin text-[hsl(0,80%,50%)]" />
                   </div>
                 ) : posts.length === 0 ? (
-                  <Card className="border-0 shadow-lg">
+                  <Card className="border-2 border-[hsl(0,80%,50%)]">
                     <CardContent className="py-16 text-center">
                       <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                       <p className="font-medium">No posts yet</p>
@@ -317,7 +319,7 @@ export default function Community() {
                     const level = author.level || 1;
                     const isLiked = likedPosts.has(post.id);
                     return (
-                      <Card key={post.id} className="border-0 shadow-lg">
+                      <Card key={post.id} className="border-2 border-[hsl(0,80%,50%)]">
                         <CardContent className="p-6">
                           {/* Post Header */}
                           <div className="flex items-start space-x-3 mb-4">
@@ -325,7 +327,7 @@ export default function Community() {
                               <AvatarImage
                                 src={author.profile_pic_url || undefined}
                               />
-                              <AvatarFallback className="bg-hope-red text-white">
+                              <AvatarFallback className="bg-[hsl(0,80%,50%)] text-white">
                                 {(author.name || "U")
                                   .substring(0, 2)
                                   .toUpperCase()}
@@ -378,7 +380,7 @@ export default function Community() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleLike(post.id)}
-                              className={isLiked ? "text-hope-red" : ""}
+                              className={isLiked ? "text-[hsl(0,80%,50%)]" : ""}
                             >
                               <ThumbsUp
                                 className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
@@ -413,21 +415,21 @@ export default function Community() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {donorProfile && (
-                  <Card className="border-0 shadow-lg">
+                  <Card className="border-2 border-[hsl(0,80%,50%)]">
                     <CardHeader>
                       <CardTitle>Your Impact</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                        <div className="text-2xl font-bold text-hope-red">
+                      <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)] rounded-sm">
+                        <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                           {donorProfile.points || 0}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Your Points
                         </div>
                       </div>
-                      <div className="text-center p-3 bg-hope-pink dark:bg-hope-coral rounded-lg">
-                        <div className="text-2xl font-bold text-hope-red">
+                      <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)] rounded-sm">
+                        <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                           {getLevelLabel(donorProfile.level || 1)}
                         </div>
                         <div className="text-sm text-muted-foreground">
@@ -438,7 +440,7 @@ export default function Community() {
                   </Card>
                 )}
 
-                <Card className="border-0 shadow-lg">
+                <Card className="border-2 border-[hsl(0,80%,50%)]">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <TrendingUp className="w-5 h-5" />
@@ -472,7 +474,7 @@ export default function Community() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full text-hope-red"
+                      className="w-full text-[hsl(0,80%,50%)]"
                       onClick={() => setActiveTab("leaderboard")}
                     >
                       View Full Leaderboard
@@ -485,7 +487,7 @@ export default function Community() {
 
           {/* ── Leaderboard Tab ── */}
           <TabsContent value="leaderboard" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-2 border-[hsl(0,80%,50%)]">
               <CardHeader>
                 <CardTitle>Top Donors</CardTitle>
               </CardHeader>
@@ -499,7 +501,7 @@ export default function Community() {
                     {leaderboard.map((donor, index) => (
                       <div
                         key={donor.id}
-                        className="flex items-center justify-between p-4 bg-hope-pink dark:bg-hope-coral rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)] rounded-sm"
                       >
                         <div className="flex items-center space-x-4">
                           <div
@@ -527,7 +529,7 @@ export default function Community() {
                             <AvatarImage
                               src={donor.profile_pic_url || undefined}
                             />
-                            <AvatarFallback className="bg-hope-red text-white text-sm">
+                            <AvatarFallback className="bg-[hsl(0,80%,50%)] text-white text-sm">
                               {(donor.name || "U")
                                 .substring(0, 2)
                                 .toUpperCase()}
@@ -570,7 +572,7 @@ export default function Community() {
               ).map((group: any) => (
                 <Card
                   key={group.type}
-                  className="border-0 shadow-lg hover:shadow-xl transition-shadow"
+                  className="border-2 border-[hsl(0,80%,50%)] hover:shadow-xl transition-shadow"
                 >
                   <CardContent className="p-6 text-center">
                     <div

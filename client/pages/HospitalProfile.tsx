@@ -49,7 +49,7 @@ export default function HospitalProfile() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-hope-red border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-[hsl(0,80%,50%)] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -65,13 +65,13 @@ export default function HospitalProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-hope-pink to-white dark:from-hope-coral dark:to-background">
+    <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
           <Button
             variant="ghost"
             asChild
-            className="text-hope-red hover:text-hope-red/80 -ml-2"
+            className="text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)]/80 -ml-2"
           >
             <Link to="/drives">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -81,15 +81,15 @@ export default function HospitalProfile() {
         </div>
 
         {/* Hospital Header */}
-        <Card className="border-0 shadow-xl mb-6">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-6">
           <CardContent className="p-8">
             <div className="flex items-start gap-6">
-              <div className="w-20 h-20 bg-hope-red rounded-2xl flex items-center justify-center flex-shrink-0">
+              <div className="w-20 h-20 bg-[hsl(0,80%,50%)] rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Building2 className="w-10 h-10 text-white" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-hope-red">
+                  <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)]">
                     {hospital.name}
                   </h1>
                   {hospital.is_verified && (
@@ -130,10 +130,10 @@ export default function HospitalProfile() {
         </Card>
 
         {/* Blood Drives */}
-        <Card className="border-0 shadow-lg">
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Heart className="w-5 h-5 text-hope-red fill-current" />
+              <Heart className="w-5 h-5 text-[hsl(0,80%,50%)] fill-current" />
               Upcoming Blood Drives
               <Badge className="ml-2">{drives.length}</Badge>
             </CardTitle>
@@ -149,7 +149,7 @@ export default function HospitalProfile() {
                 {drives.map((drive: any) => (
                   <div
                     key={drive.id}
-                    className="p-4 border border-border rounded-xl hover:border-hope-red/30 transition-colors"
+                    className="p-4 border border-border rounded-sm hover:border-[hsl(0,80%,50%)]/30 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
@@ -175,7 +175,7 @@ export default function HospitalProfile() {
                               <Badge
                                 key={t}
                                 variant="outline"
-                                className="text-xs border-hope-red/30 text-hope-red"
+                                className="text-xs border-[hsl(0,80%,50%)]/30 text-[hsl(0,80%,50%)]"
                               >
                                 {t}
                               </Badge>
@@ -196,7 +196,7 @@ export default function HospitalProfile() {
                       <Button
                         asChild
                         size="sm"
-                        className="bg-hope-red hover:bg-hope-red/90 text-white"
+                        className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
                       >
                         <Link to={`/book-appointment/${drive.id}`}>
                           Book a Slot

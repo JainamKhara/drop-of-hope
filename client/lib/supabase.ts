@@ -146,7 +146,8 @@ export interface CommunityPost {
 
 export interface Notification {
   id: string;
-  user_id: string;
+  donor_id?: string;
+  user_id?: string;
   title: string;
   message: string;
   type?: string;
