@@ -164,10 +164,10 @@ export default function DonorDashboard() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="border-b-2 border-[hsl(0,80%,50%)] py-12 px-4"
+        className="border-b-2 border-[hsl(0,80%,50%)] py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8"
       >
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 items-center">
             {/* Left - Profile & Eligibility Status */}
             <div>
               <div className="flex items-center space-x-4 mb-6">
@@ -314,7 +314,7 @@ export default function DonorDashboard() {
       </section>
 
       {/* Timeline Section */}
-      <section ref={timelineRef} className="py-16 px-4 border-b border-border">
+      <section ref={timelineRef} className="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 border-b border-border">
         <div className="container mx-auto max-w-2xl">
           <h2 className="h2-brutal mb-12 select-none">DONATION HISTORY</h2>
 
@@ -375,7 +375,7 @@ export default function DonorDashboard() {
 
       {/* Upcoming Appointments */}
       {appointments.length > 0 && (
-        <section className="py-16 px-4 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border">
+        <section className="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border">
           <div className="container mx-auto max-w-2xl">
             <h2 className="h2-brutal mb-8 select-none">
               UPCOMING APPOINTMENTS
@@ -385,7 +385,7 @@ export default function DonorDashboard() {
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
-                  className="border-2 border-[hsl(0,80%,50%)] p-4 rounded-none flex items-start justify-between"
+                  className="border-2 border-[hsl(0,80%,50%)] p-3 sm:p-4 md:p-5 rounded-none flex items-start justify-between"
                 >
                   <div>
                     <p className="font-display font-bold text-lg">
@@ -420,12 +420,12 @@ export default function DonorDashboard() {
       )}
 
       {/* Rewards Section */}
-      <section ref={rewardsRef} className="py-16 px-4">
+      <section ref={rewardsRef} className="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8">
         <div className="container mx-auto max-w-4xl">
           <h2 className="h2-brutal mb-8 select-none">YOUR ACHIEVEMENTS</h2>
 
           {rewards.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
               {rewards.map((reward) => (
                 <Card
                   key={reward.id}
@@ -464,7 +464,7 @@ export default function DonorDashboard() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 bg-[hsl(0,80%,50%)] text-white border-t-2 border-[hsl(0,80%,30%)]">
+      <section className="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 bg-[hsl(0,80%,50%)] text-white border-t-2 border-[hsl(0,80%,30%)]">
         <div className="container mx-auto text-center">
           <h2 className="h2-brutal text-white mb-4 select-none">
             READY FOR YOUR NEXT DONATION?

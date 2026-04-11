@@ -549,13 +549,13 @@ export default function HospitalPortal() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-12">
         {/* Hospital Info Header */}
         <Card
           variant="outline"
           className="border-2 border-[hsl(0,80%,50%)] rounded-none mb-8"
         >
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
@@ -598,7 +598,7 @@ export default function HospitalPortal() {
         </Card>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8">
           <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -693,13 +693,13 @@ export default function HospitalPortal() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="inventory">Blood Inventory</TabsTrigger>
-            <TabsTrigger value="appointments">Donor Appointments</TabsTrigger>
-            <TabsTrigger value="requests">Blood Requests</TabsTrigger>
-            <TabsTrigger value="drives">Blood Drives</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto border-b-2 border-[hsl(0,80%,50%)] bg-transparent rounded-none p-0 h-auto min-h-12">
+            <TabsTrigger value="inventory" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap border-r border-border">Blood Inventory</TabsTrigger>
+            <TabsTrigger value="appointments" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap border-r border-border">Appointments</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap border-r border-border">Requests</TabsTrigger>
+            <TabsTrigger value="drives" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap border-r border-border">Drives</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap border-r border-border">Notifications</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 py-2 md:py-3 whitespace-nowrap">Analytics</TabsTrigger>
           </TabsList>
 
           {/* Donor Appointments Tab */}
@@ -727,7 +727,7 @@ export default function HospitalPortal() {
                     {donorAppointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
-                        className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-sm border border-blue-200 dark:border-blue-800"
+                        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-sm border border-blue-200 dark:border-blue-800"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
@@ -765,7 +765,7 @@ export default function HospitalPortal() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 pt-2 sm:border-l-2 sm:pl-3">
                           <Badge
                             className={
                               appointment.status === "scheduled"

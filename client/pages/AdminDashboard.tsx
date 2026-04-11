@@ -576,18 +576,18 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8 border-b-2 border-[hsl(0,80%,50%)] pb-6">
           <div>
             <h1 className="h2-brutal text-[hsl(0,80%,50%)] mb-2 select-none">
               ADMIN DASHBOARD
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-sm md:text-base lg:text-lg text-muted-foreground">
               Manage blood donations, drives, and community partnerships
             </p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button corners="crisp" onClick={() => setIsDriveDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Create Blood Drive
@@ -819,14 +819,14 @@ export default function AdminDashboard() {
 
         {/* Management Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7 border-b-2 border-[hsl(0,80%,50%)] bg-transparent rounded-none p-0 h-12">
-            <TabsTrigger value="overview" corners="crisp" className="rounded-none border-r border-border">Overview</TabsTrigger>
-            <TabsTrigger value="appointments" corners="crisp" className="rounded-none border-r border-border">Appointments</TabsTrigger>
-            <TabsTrigger value="blood-requests" corners="crisp" className="rounded-none border-r border-border">Blood Requests</TabsTrigger>
-            <TabsTrigger value="donors" corners="crisp" className="rounded-none border-r border-border">Donors</TabsTrigger>
-            <TabsTrigger value="drives" corners="crisp" className="rounded-none border-r border-border">Blood Drives</TabsTrigger>
-            <TabsTrigger value="hospitals" corners="crisp" className="rounded-none border-r border-border">Hospitals</TabsTrigger>
-            <TabsTrigger value="analytics" corners="crisp" className="rounded-none">Analytics</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto border-b-2 border-[hsl(0,80%,50%)] bg-transparent rounded-none p-0 h-auto min-h-12">
+            <TabsTrigger value="overview" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Overview</TabsTrigger>
+            <TabsTrigger value="appointments" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Appointments</TabsTrigger>
+            <TabsTrigger value="blood-requests" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Requests</TabsTrigger>
+            <TabsTrigger value="donors" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Donors</TabsTrigger>
+            <TabsTrigger value="drives" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Drives</TabsTrigger>
+            <TabsTrigger value="hospitals" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Hospitals</TabsTrigger>
+            <TabsTrigger value="analytics" corners="crisp" className="rounded-none px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Analytics</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1145,7 +1145,7 @@ export default function AdminDashboard() {
                     {appointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
-                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
@@ -1276,7 +1276,7 @@ export default function AdminDashboard() {
                     {bloodRequests.map((request: any) => (
                       <div
                         key={request.id}
-                        className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-900/20 rounded-sm border border-orange-200 dark:border-orange-800"
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-orange-50 dark:bg-orange-900/20 rounded-sm border border-orange-200 dark:border-orange-800"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
@@ -1534,7 +1534,7 @@ export default function AdminDashboard() {
                     return filteredDonors.map((donor) => (
                       <div
                         key={donor.id}
-                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
@@ -1803,32 +1803,32 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {hospitals.map((hospital) => (
-                    <div key={hospital.id} className="p-4 border rounded-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold text-lg">
+                    <div key={hospital.id} className="p-3 sm:p-4 border rounded-sm space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-base sm:text-lg truncate">
                             {hospital.name}
                           </h3>
-                          <p className="text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">
                             {hospital.contact} • {hospital.email}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           <Badge className={getUrgencyColor(hospital.urgency)}>
-                            {hospital.urgency.toUpperCase()} URGENCY
+                            <span className="text-xs">{hospital.urgency.toUpperCase()}</span>
                           </Badge>
                           <Badge className={getStatusColor(hospital.status)}>
                             {getStatusIcon(hospital.status)}
-                            <span className="ml-1 capitalize">
+                            <span className="ml-1 capitalize text-xs">
                               {hospital.status}
                             </span>
                           </Badge>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2 border-t">
+                        <div className="min-w-0">
+                          <p className="text-xs sm:text-sm font-medium">
                             Current Need: {hospital.currentNeed}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -1839,21 +1839,22 @@ export default function AdminDashboard() {
                                 : "Routine monitoring"}
                           </p>
                         </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Mail className="w-4 h-4 mr-2" />
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          <Button variant="outline" size="sm" className="text-xs">
+                            <Mail className="w-3 h-3 mr-1" />
                             Contact
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
+                            className="text-xs"
                             onClick={() => {
                               setViewingHospital(hospital);
                               setIsHospitalDetailsOpen(true);
                             }}
                           >
-                            <Eye className="w-4 h-4 mr-1" />
-                            View Details
+                            <Eye className="w-3 h-3 mr-1" />
+                            Details
                           </Button>
                         </div>
                       </div>

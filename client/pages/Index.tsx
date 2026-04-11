@@ -105,35 +105,35 @@ export default function Index() {
       </div>
 
       {/* Hero Section - Asymmetric Layout */}
-      <section className="py-20 px-4 border-b-2 border-[hsl(0,80%,50%)]">
+      <section className="py-12 md:py-20 px-4 border-b-2 border-[hsl(0,80%,50%)]">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Section - 10% - Hero Image (subtle) */}
-            <div className="lg:col-span-1 flex justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 items-center">
+            {/* Left Section - 10% - Hero Image (subtle) - Hidden on mobile */}
+            <div className="hidden lg:flex lg:col-span-1 justify-center">
               <div className="w-16 h-96 bg-[hsl(0,80%,50%)] rounded-none"></div>
             </div>
 
-            {/* Right Section - 90% - Main Content */}
+            {/* Right Section - 90% on desktop, full width on mobile */}
             <div className="lg:col-span-11">
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <Badge
                   variant="outline"
-                  className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent"
+                  className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent text-sm md:text-base"
                 >
                   💧 Every Drop Counts
                 </Badge>
 
-                <h1 className="h1-brutal text-[hsl(0,80%,50%)] select-none">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono text-[hsl(0,80%,50%)] select-none">
                   SAVE LIVES.
                 </h1>
 
-                <p className="body-lg text-foreground max-w-2xl leading-relaxed">
+                <p className="text-base md:text-lg text-foreground max-w-2xl leading-relaxed">
                   Connect donors with those in need. Every donation is a second
                   chance at life. Drop of Hope unites communities through the
                   power of blood donation.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                   {isSignedIn ? (
                     <>
                       <Button size="lg" corners="crisp" asChild>
@@ -173,13 +173,13 @@ export default function Index() {
       {/* Stats Section - Staggered Alignment */}
       <section
         ref={statsRef}
-        className="py-20 px-4 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border"
+        className="py-12 md:py-20 px-4 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border"
       >
-        <div className="container mx-auto space-y-12">
+        <div className="container mx-auto space-y-8 md:space-y-12">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className={`flex items-center gap-8 ${
+              className={`flex items-center gap-4 md:gap-8 ${
                 index % 2 === 0 ? "flex-row" : "flex-row-reverse"
               }`}
               style={{
@@ -189,16 +189,16 @@ export default function Index() {
               }}
             >
               {/* Left/Right - Icon */}
-              <div className="flex-shrink-0 w-20 h-20 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
-                <stat.icon className="w-10 h-10 text-white" />
+              <div className="flex-shrink-0 w-12 h-12 md:w-20 md:h-20 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
+                <stat.icon className="w-6 md:w-10 h-6 md:h-10 text-white" />
               </div>
 
               {/* Center - Stats */}
               <div className="flex-1">
-                <div className="stat-hero text-[hsl(0,80%,50%)]">
+                <div className="text-3xl md:text-5xl lg:text-6xl font-bold font-mono text-[hsl(0,80%,50%)]">
                   {stat.value.toLocaleString()}+
                 </div>
-                <div className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider font-medium">
                   {stat.label}
                 </div>
               </div>
@@ -208,32 +208,32 @@ export default function Index() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 md:py-20 px-4">
         <div className="container mx-auto">
-          <div ref={featuresHeaderRef} className="text-center mb-16">
-            <h2 className="h2-brutal text-foreground mb-4 select-none">
+          <div ref={featuresHeaderRef} className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono text-foreground mb-4 select-none">
               HOW IT WORKS
             </h2>
-            <p className="body-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Our platform makes blood donation simple, rewarding, and impactful
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {features.map((feature, index) => (
               <Card
                 key={index}
                 variant="outline"
                 className="border-2 border-[hsl(0,80%,50%)] rounded-none"
               >
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-white" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center mb-4">
+                    <feature.icon className="w-5 md:w-6 h-5 md:h-6 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">
+                  <h3 className="font-display font-bold text-base md:text-lg mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -246,33 +246,33 @@ export default function Index() {
       {/* Mission Section */}
       <section
         ref={missionRef}
-        className="py-20 px-4 bg-[hsl(0,80%,50%)] text-white border-y-2 border-[hsl(0,80%,30%)]"
+        className="py-12 md:py-20 px-4 bg-[hsl(0,80%,50%)] text-white border-y-2 border-[hsl(0,80%,30%)]"
       >
         <div className="container mx-auto">
-          <h2 className="h2-brutal text-white mb-6 text-center select-none">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono text-white mb-6 text-center select-none">
             OUR MISSION
           </h2>
 
-          <p className="text-lg leading-relaxed max-w-4xl mx-auto text-center mb-12">
+          <p className="text-base md:text-lg leading-relaxed max-w-4xl mx-auto text-center mb-12">
             We believe that no one should suffer due to lack of blood. Our
             platform connects generous donors with hospitals and patients in
             need, creating a network of hope that spans communities and saves
             lives.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {["Accessibility", "Technology", "Community"].map((item, idx) => (
               <div
                 key={idx}
-                className="border-l-4 border-white pl-6"
+                className="border-l-4 border-white pl-4 md:pl-6"
                 style={{
                   animation: `slide-in-left 600ms ease-out forwards`,
                   animationDelay: `${idx * 100}ms`,
                   opacity: 0,
                 }}
               >
-                <h3 className="text-2xl font-bold mb-3 font-display">{item}</h3>
-                <p className="text-white/90">
+                <h3 className="text-lg md:text-2xl font-bold mb-3 font-display">{item}</h3>
+                <p className="text-sm md:text-base text-white/90">
                   {item === "Accessibility"
                     ? "Making blood donation accessible to everyone, everywhere"
                     : item === "Technology"

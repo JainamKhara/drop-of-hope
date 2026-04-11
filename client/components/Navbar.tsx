@@ -86,7 +86,7 @@ const Navbar = () => {
 
   return (
     <header className="border-b-2 border-[hsl(0,80%,50%)] bg-background dark:bg-background sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link
             to="/"
@@ -96,7 +96,7 @@ const Navbar = () => {
             <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
               <Heart className="w-5 h-5 text-white fill-current" />
             </div>
-            <span className="font-display font-bold text-lg text-[hsl(0,80%,50%)]">
+            <span className="font-display font-bold text-base sm:text-lg md:text-xl text-[hsl(0,80%,50%)]">
               Drop of Hope
             </span>
             {userRole === "admin" && (
@@ -117,7 +117,7 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className="text-foreground font-medium text-sm uppercase hover:border-b-2 hover:border-[hsl(0,80%,50%)] pb-1 transition-all"
+                className="text-foreground font-medium text-sm uppercase hover:border-b-2 hover:border-[hsl(0,80%,50%)] pb-0.5 md:pb-1 transition-all"
               >
                 {link.label}
               </Link>

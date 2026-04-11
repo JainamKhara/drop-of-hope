@@ -255,12 +255,12 @@ export default function ChatbotWidget() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <Button
           onClick={() => setIsOpen(true)}
           corners="crisp"
           size="icon-lg"
-          className="w-16 h-16"
+          className="w-14 h-14 sm:w-16 sm:h-16"
         >
           <MessageCircle className="w-8 h-8" />
         </Button>
@@ -269,7 +269,7 @@ export default function ChatbotWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 h-[500px] max-w-[90vw] max-h-[80vh]">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-72 sm:w-80 md:w-96 h-[400px] sm:h-[500px] max-w-[95vw] sm:max-w-[90vw] max-h-[80vh]">
       <Card className="border-0 shadow-2xl h-full flex flex-col">
         <CardHeader className="bg-[hsl(0,80%,50%)] text-white">
           <div className="flex items-center justify-between">
@@ -295,7 +295,7 @@ export default function ChatbotWidget() {
 
         <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5 space-y-4">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -381,7 +381,7 @@ export default function ChatbotWidget() {
           </div>
 
           {/* Input */}
-          <div className="border-t p-4">
+          <div className="border-t p-3 sm:p-4 md:p-5">
             <div className="flex space-x-2">
               <Input
                 value={inputValue}
