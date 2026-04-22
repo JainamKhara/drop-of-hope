@@ -63,11 +63,11 @@ export default function Profile() {
     is_verified: false,
   });
   const [medicalData, setMedicalData] = useState({
-    medications: [],
-    conditions: [],
-    allergies: [],
-    surgeries: [],
-    previousDonations: [],
+    medications: [] as Array<{ name: string; dosage: string; prescribedBy: string }>,
+    conditions: [] as Array<{ condition: string; status: string; diagnosedDate: string }>,
+    allergies: [] as Array<string>,
+    surgeries: [] as Array<string>,
+    previousDonations: [] as Array<any>,
     notes: "",
   });
   const [donations, setDonations] = useState<any[]>([]);

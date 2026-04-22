@@ -391,10 +391,10 @@ export default function BloodDrives() {
                       <Button
                         asChild
                         className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
-                        disabled={drive.registered_count >= drive.capacity}
+                        disabled={(drive.registered_count ?? 0) >= drive.capacity}
                       >
                         <Link to={`/book-appointment/${drive.id}`}>
-                          {drive.registered_count >= drive.capacity
+                          {(drive.registered_count ?? 0) >= drive.capacity
                             ? "Full"
                             : "Book Appointment"}
                         </Link>

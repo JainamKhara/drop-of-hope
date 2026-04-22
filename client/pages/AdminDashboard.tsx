@@ -1580,7 +1580,7 @@ export default function AdminDashboard() {
                           <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
                             {donor.name
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")}
                           </div>
                           <div>

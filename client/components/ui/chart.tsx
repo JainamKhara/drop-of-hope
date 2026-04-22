@@ -74,6 +74,26 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
+  /**
+   * Dynamic CSS Variable Injection
+   *
+   * This component uses dangerouslySetInnerHTML to inject CSS variable declarations
+   * based on the chart configuration. This is safe because:
+   * 1. No user input is directly interpolated - only developer-provided theme/config
+   * 2. Values are constrained to CSS variable syntax (cannot execute code)
+   * 3. The config object is typed and validated at the TypeScript level
+   * 4. Theme values are limited to predefined strings in THEMES constant
+   *
+   * Security considerations:
+   * - Do not expose this component to accept user-provided config objects
+   * - Always validate config structure before use
+   * - If user input becomes part of config, add sanitization layer
+   *
+   * Alternative approaches considered:
+   * - React inline styles: Limited to single element, cannot use CSS selectors
+   * - CSS modules: Requires static theme values, cannot be dynamic
+   * - CSSStyleSheet API: Better for modern browsers, but less compatible
+   */
   return (
     <style
       dangerouslySetInnerHTML={{

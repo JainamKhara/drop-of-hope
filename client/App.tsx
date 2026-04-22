@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HybridAuthProvider } from "./contexts/HybridAuthContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Pages
 import Index from "./pages/Index";
@@ -200,9 +201,11 @@ const AppContent = () => (
 
 const App = () => {
   return (
-    <HybridAuthProvider>
-      <AppContent />
-    </HybridAuthProvider>
+    <ErrorBoundary>
+      <HybridAuthProvider>
+        <AppContent />
+      </HybridAuthProvider>
+    </ErrorBoundary>
   );
 };
 
