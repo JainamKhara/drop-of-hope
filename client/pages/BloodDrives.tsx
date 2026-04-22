@@ -391,7 +391,9 @@ export default function BloodDrives() {
                       <Button
                         asChild
                         className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
-                        disabled={(drive.registered_count ?? 0) >= drive.capacity}
+                        disabled={
+                          (drive.registered_count ?? 0) >= drive.capacity
+                        }
                       >
                         <Link to={`/book-appointment/${drive.id}`}>
                           {(drive.registered_count ?? 0) >= drive.capacity
@@ -467,7 +469,10 @@ export default function BloodDrives() {
               <p className="text-muted-foreground mb-4">
                 Help save lives by organizing a blood drive in your community.
               </p>
-              <Button asChild className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white">
+              <Button
+                asChild
+                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
+              >
                 <Link to="/admin">Organize a Drive</Link>
               </Button>
             </CardContent>
