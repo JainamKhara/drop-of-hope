@@ -7,10 +7,13 @@ import {
   useState,
   ReactNode,
   useMemo,
+  useCallback,
+  useRef,
 } from "react";
 import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { supabase } from "../lib/supabase";
 import { validateCredentials, cleanInput } from "../lib/validation";
+import { useToast } from "@/hooks/use-toast";
 
 // ------------------ Types ------------------
 
@@ -123,6 +126,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   // Clerk setup
   const clerkAuth = useClerkAuth();
   const { user: clerkUser } = useUser();
+  const { toast } = useToast();
 
   const { isLoaded, isSignedIn, signOut: clerkSignOut } = clerkAuth;
 
@@ -136,6 +140,9 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
   // Loading states
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
+
+  // Track in-flight requests to prevent race conditions
+  const loadDonorProfileInFlightRef = useRef(false);
 
   // Computed user role based on which profile exists
   const userRole: UserRole | null = useMemo(() => {
@@ -178,12 +185,20 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
   // ------------------ Donor Profile ------------------
 
-  const loadDonorProfile = async () => {
+  // Wrap loadDonorProfile in useCallback to stabilize its reference
+  const loadDonorProfile = useCallback(async () => {
+    // Prevent duplicate simultaneous requests (race condition fix)
+    if (loadDonorProfileInFlightRef.current) {
+      return;
+    }
+
     if (!clerkUser) {
       setDonorProfile(null);
       setLoading(false);
       return;
     }
+
+    loadDonorProfileInFlightRef.current = true;
 
     try {
       // Test database connection
@@ -301,10 +316,16 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       }
     } catch (err) {
       console.error("Unexpected error loading donor profile:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load your donor profile. Please try refreshing the page.",
+        variant: "destructive",
+      });
     } finally {
+      loadDonorProfileInFlightRef.current = false;
       setLoading(false);
     }
-  };
+  }, [clerkUser, toast]);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -316,7 +337,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
         setLoading(false);
       }
     }
-  }, [isSignedIn, clerkUser, isLoaded]);
+  }, [isSignedIn, isLoaded, loadDonorProfile]);
 
   // ------------------ Admin Profile ------------------
 
@@ -333,6 +354,11 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       setAdminProfile(data);
     } catch (error) {
       console.error("Error loading admin profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load admin profile.",
+        variant: "destructive",
+      });
       setAdminProfile(null);
     }
   };
@@ -352,6 +378,11 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       setHospitalProfile(data);
     } catch (error) {
       console.error("Error loading hospital profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load hospital profile.",
+        variant: "destructive",
+      });
       setHospitalProfile(null);
     }
   };

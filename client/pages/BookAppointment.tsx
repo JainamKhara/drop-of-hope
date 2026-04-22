@@ -84,6 +84,11 @@ export default function BookAppointment() {
         setDrive(data as DriveWithDetails);
       } catch (error) {
         console.error("Error loading drive:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load the blood drive. Please try again.",
+          variant: "destructive",
+        });
         navigate("/drives");
       } finally {
         setLoading(false);

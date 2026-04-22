@@ -223,7 +223,8 @@ export const sendScheduledReminders = async () => {
       );
       const donorInfo = Array.isArray(apt.donors) ? apt.donors[0] : apt.donors;
 
-      if (!donorInfo?.id || !donorInfo?.clerk_user_id) continue;
+      // Ensure donorInfo and drives are valid before using them
+      if (!donorInfo?.id || !donorInfo?.clerk_user_id || !apt.drives?.[0]) continue;
 
       if (
         aptDateTime >= tomorrow &&
@@ -286,6 +287,12 @@ export const handleSendUrgentNotification = async (
       location,
     );
 
+    // Return error if notification sending failed
+    if (result.error) {
+      res.status(500).json({ error: "Failed to send notification", details: result.error });
+      return;
+    }
+
     res.json({ success: true, ...result });
   } catch (error) {
     console.error("Error in send urgent notification:", error);
@@ -313,6 +320,12 @@ export const handleBroadcastNotification = async (
       bloodTypeFilter,
     );
 
+    // Return error if broadcast failed
+    if (result.error) {
+      res.status(500).json({ error: "Failed to broadcast notification", details: result.error });
+      return;
+    }
+
     res.json({ success: true, ...result });
   } catch (error) {
     console.error("Error in broadcast notification:", error);
@@ -326,6 +339,13 @@ export const handleRunScheduledReminders = async (
 ) => {
   try {
     const result = await sendScheduledReminders();
+
+    // Return error if scheduled reminders failed
+    if (result.error) {
+      res.status(500).json({ error: "Failed to run scheduled reminders", details: result.error });
+      return;
+    }
+
     res.json({ success: true, ...result });
   } catch (error) {
     console.error("Error running scheduled reminders:", error);
