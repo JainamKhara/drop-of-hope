@@ -1093,9 +1093,6 @@ export const notificationService = {
     patientInfo?: string,
   ) => {
     const donors = await donorService.getByBloodType(bloodType);
-    console.log(
-      `Found ${donors.data?.length || 0} donors with ${bloodType} blood type`,
-    );
 
     if (!donors.data || donors.data.length === 0) {
       return { notified: 0, found: 0, error: null };

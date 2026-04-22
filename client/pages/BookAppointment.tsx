@@ -233,7 +233,6 @@ export default function BookAppointment() {
           });
         } catch (profileError) {
           // Silently fail - profile update is optional
-          console.log("Profile update skipped:", profileError);
         }
       }
 
@@ -259,7 +258,7 @@ export default function BookAppointment() {
       try {
         await donorService.addPoints(donorProfile.id, 50);
       } catch (pointsError) {
-        console.log("Points award skipped:", pointsError);
+        // Silently fail - points award is optional
       }
 
       toast({

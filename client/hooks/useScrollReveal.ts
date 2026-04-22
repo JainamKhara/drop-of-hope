@@ -75,15 +75,17 @@ export function useCountUp(options: CountUpOptions) {
   const { end, duration = 2000, delay = 0, triggerOnScroll = true } = options;
   const elementRef = useRef<HTMLSpanElement>(null);
   const animationRef = useRef<number | null>(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
+    startedRef.current = false;
+
     const startAnimation = () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
 
-      let started = false;
       let startTimestamp: number | null = null;
 
       const step = (timestamp: number) => {
@@ -107,9 +109,9 @@ export function useCountUp(options: CountUpOptions) {
     if (triggerOnScroll) {
       // Wait for scroll into view
       const observer = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && !started) {
+        if (entry.isIntersecting && !startedRef.current) {
           startAnimation();
-          started = true;
+          startedRef.current = true;
           observer.unobserve(element);
         }
       }, { threshold: 0.1 });

@@ -820,13 +820,48 @@ export default function AdminDashboard() {
         {/* Management Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex w-full overflow-x-auto border-b-2 border-[hsl(0,80%,50%)] bg-transparent rounded-none p-0 h-auto min-h-12">
-            <TabsTrigger value="overview" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Overview</TabsTrigger>
-            <TabsTrigger value="appointments" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Appointments</TabsTrigger>
-            <TabsTrigger value="blood-requests" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Requests</TabsTrigger>
-            <TabsTrigger value="donors" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Donors</TabsTrigger>
-            <TabsTrigger value="drives" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Drives</TabsTrigger>
-            <TabsTrigger value="hospitals" corners="crisp" className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Hospitals</TabsTrigger>
-            <TabsTrigger value="analytics" corners="crisp" className="rounded-none px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap">Analytics</TabsTrigger>
+            <TabsTrigger
+              value="overview"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="appointments"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Appointments
+            </TabsTrigger>
+            <TabsTrigger
+              value="blood-requests"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Requests
+            </TabsTrigger>
+            <TabsTrigger
+              value="donors"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Donors
+            </TabsTrigger>
+            <TabsTrigger
+              value="drives"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Drives
+            </TabsTrigger>
+            <TabsTrigger
+              value="hospitals"
+              className="rounded-none border-r border-border px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Hospitals
+            </TabsTrigger>
+            <TabsTrigger
+              value="analytics"
+              className="rounded-none px-3 sm:px-4 md:px-5 py-2 md:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap"
+            >
+              Analytics
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1803,7 +1838,10 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {hospitals.map((hospital) => (
-                    <div key={hospital.id} className="p-3 sm:p-4 border rounded-sm space-y-3">
+                    <div
+                      key={hospital.id}
+                      className="p-3 sm:p-4 border rounded-sm space-y-3"
+                    >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <h3 className="font-semibold text-base sm:text-lg truncate">
@@ -1815,7 +1853,9 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           <Badge className={getUrgencyColor(hospital.urgency)}>
-                            <span className="text-xs">{hospital.urgency.toUpperCase()}</span>
+                            <span className="text-xs">
+                              {hospital.urgency.toUpperCase()}
+                            </span>
                           </Badge>
                           <Badge className={getStatusColor(hospital.status)}>
                             {getStatusIcon(hospital.status)}
@@ -1840,7 +1880,11 @@ export default function AdminDashboard() {
                           </p>
                         </div>
                         <div className="flex flex-wrap gap-1 sm:gap-2">
-                          <Button variant="outline" size="sm" className="text-xs">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                          >
                             <Mail className="w-3 h-3 mr-1" />
                             Contact
                           </Button>

@@ -184,14 +184,6 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
       return;
     }
 
-    console.log("Loading donor profile for Clerk user:", {
-      id: clerkUser.id,
-      fullName: clerkUser.fullName,
-      email: clerkUser.primaryEmailAddress?.emailAddress,
-      phone: clerkUser.phoneNumbers[0]?.phoneNumber,
-      imageUrl: clerkUser.imageUrl,
-    });
-
     try {
       // Test database connection
       const { data: testData, error: testError } = await supabase
@@ -204,8 +196,6 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
         setLoading(false);
         return;
       }
-
-      console.log("Database connection test successful");
 
       const { data, error } = await supabase
         .from("donors")
@@ -229,8 +219,6 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
           }
           return "Anonymous Donor";
         })();
-
-        console.log("Generated donor name:", donorName);
 
         if (!donorName || donorName.trim() === "") {
           console.error("Failed to generate a valid donor name");
