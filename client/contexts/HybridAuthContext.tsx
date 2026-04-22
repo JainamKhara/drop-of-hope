@@ -1,5 +1,43 @@
 "use client";
 
+/**
+ * Hybrid Authentication Context
+ *
+ * This context manages authentication for three distinct user types using different strategies:
+ *
+ * 1. DONORS - Clerk OAuth Authentication
+ *    - Uses Clerk for secure, standards-compliant OAuth-based authentication
+ *    - Supports multi-factor authentication (MFA) and passwordless login
+ *    - Profile data stored in 'donors' table, keyed by clerk_user_id
+ *    - Best for: End-users who need enterprise-grade security
+ *
+ * 2. ADMINS - Direct Credential Verification
+ *    - Direct email + password verification against 'admins' table
+ *    - Credentials validated server-side before profile load
+ *    - Profile persisted in localStorage for session management
+ *    - Best for: Internal staff with controlled access
+ *
+ * 3. HOSPITALS - Direct Credential Verification
+ *    - Direct email + password verification against 'hospitals' table
+ *    - Credentials validated server-side before profile load
+ *    - Profile persisted in localStorage for session management
+ *    - Best for: Hospital partners with dedicated accounts
+ *
+ * WHY THIS HYBRID APPROACH?
+ * - Clerk OAuth for donors provides enterprise-grade security, MFA, and device management
+ * - Direct credentials for admin/hospital staff maintains backward compatibility with legacy systems
+ * - All credentials are validated at the context level for centralized security
+ * - Each user type has separate profile tables with distinct data structures
+ *
+ * AUTHENTICATION FLOW:
+ * - Donors: Sign up via Clerk → profile auto-created → loaded on app launch
+ * - Admins/Hospitals: Submit credentials → validated server-side → profile loaded & persisted
+ *
+ * SESSION PERSISTENCE:
+ * - Donors: Managed by Clerk automatically
+ * - Admins/Hospitals: Manual localStorage persistence (no auto-refresh like Clerk)
+ */
+
 import {
   createContext,
   useContext,
@@ -130,9 +168,8 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
   const { isLoaded, isSignedIn, signOut: clerkSignOut } = clerkAuth;
 
-  // We no longer use Supabase Auth, so we don't need these states
-
-  // Profiles
+  // Profile states for each user type
+  // Profiles are loaded based on which authentication type succeeded
   const [donorProfile, setDonorProfile] = useState<DonorProfile | null>(null);
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [hospitalProfile, setHospitalProfile] = useState<Hospital | null>(null);
@@ -387,9 +424,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     }
   };
 
-  // We no longer use Supabase Auth, so we don't need this function
-
-  // ------------------ Auth Functions ------------------
+  // ---------- Direct credential-based authentication for admin/hospital accounts --------
 
   const supabaseSignIn = async (
     email: string,

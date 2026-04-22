@@ -11,6 +11,7 @@ import {
   notificationService,
 } from "@/lib/db-services";
 import { supabase } from "@/lib/supabase";
+import { handleError } from "@/lib/error-handler";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -330,7 +331,11 @@ export default function AdminDashboard() {
         setBloodRequests(bloodRequestsResult.data);
       }
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
+      handleError(error, {
+        title: "Dashboard Error",
+        description: "Failed to load dashboard data. Please try refreshing the page.",
+        operation: "loadDashboardData",
+      });
     } finally {
       setDataLoading(false);
     }

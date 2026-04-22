@@ -58,7 +58,8 @@ export const sendUrgentBloodNeedNotification = async (
     const { data: donors, error: donorError } = await getSupabase()
       .from("donors")
       .select("id, clerk_user_id, name, email, phone, blood_type, city")
-      .eq("blood_type", bloodType);
+      .eq("blood_type", bloodType)
+      .limit(10000); // Limit to 10k donors to prevent performance issues with large databases
 
     if (donorError || !donors || donors.length === 0) {
       return { notified: 0, error: donorError };
@@ -151,7 +152,8 @@ export const broadcastToAllDonors = async (
       query = query.eq("blood_type", bloodTypeFilter);
     }
 
-    const { data: donors, error: donorError } = await query;
+    // Limit to 100k donors to prevent performance issues
+    const { data: donors, error: donorError } = await query.limit(100000);
 
     if (donorError || !donors || donors.length === 0) {
       return { notified: 0, error: donorError };
