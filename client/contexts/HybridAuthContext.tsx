@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { supabase } from "../lib/supabase";
+import { validateCredentials, cleanInput } from "../lib/validation";
 
 // ------------------ Types ------------------
 
@@ -365,13 +366,22 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
     expectedRole: "admin" | "hospital",
   ) => {
     try {
+      // Validate credentials
+      const validation = validateCredentials(email, password);
+      if (!validation.valid) {
+        throw new Error(validation.error || "Invalid credentials");
+      }
+
+      const cleanEmail = cleanInput(email);
+      const cleanPassword = cleanInput(password);
+
       if (expectedRole === "admin") {
         // Check admin credentials directly in the custom 'admins' table
         const { data: profileData, error: profileError } = await supabase
           .from("admins")
           .select("*")
-          .eq("email", email)
-          .eq("password", password)
+          .eq("email", cleanEmail)
+          .eq("password", cleanPassword)
           .single();
 
         if (profileError || !profileData) {
@@ -388,8 +398,8 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
         const { data: profileData, error: profileError } = await supabase
           .from("hospitals")
           .select("*")
-          .eq("email", email)
-          .eq("password", password)
+          .eq("email", cleanEmail)
+          .eq("password", cleanPassword)
           .single();
 
         if (profileError || !profileData) {

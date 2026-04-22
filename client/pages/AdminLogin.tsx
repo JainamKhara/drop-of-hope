@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
+import { validateCredentials } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,14 @@ export default function AdminLogin() {
     setError("");
 
     try {
+      // Validate credentials format before submission
+      const validation = validateCredentials(email, password);
+      if (!validation.valid) {
+        setError(validation.error || "Invalid input");
+        setIsLoading(false);
+        return;
+      }
+
       // Use role-based authentication to ensure only admins can login
       const { data, error } = await supabaseSignIn(email, password, "admin");
 

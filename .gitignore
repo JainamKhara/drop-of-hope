@@ -32,3 +32,6 @@ dist-ssr
 .agents
 .agent
 .vscode
+
+ISSUES.md
+CHANGELOG.md
