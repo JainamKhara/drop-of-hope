@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 import {
   Heart,
   ArrowLeft,
@@ -20,13 +21,59 @@ import {
   Zap,
   RefreshCw,
   Share2,
+  Coffee,
+  Ticket,
+  ShieldCheck,
+  ShoppingBag,
 } from "lucide-react";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import {
   rewardService,
   donorService,
   appointmentService,
+  notificationService,
+  redemptionService,
 } from "@/lib/db-services";
+
+// Reward items definitions
+const rewardItems = [
+  {
+    id: "item-1",
+    name: "Drop of Hope T-Shirt",
+    description: "Premium cotton t-shirt with heart logo",
+    points: 500,
+    icon: ShoppingBag,
+    image: "/reward_items_preview_1777560318359.png", // Fallback to preview if individual fails
+    category: "Merchandise"
+  },
+  {
+    id: "item-2",
+    name: "Amazon Gift Card",
+    description: "$10 Amazon gift card",
+    points: 800,
+    icon: Coffee,
+    image: "/reward_items_preview_1777560318359.png",
+    category: "Gift Cards"
+  },
+  {
+    id: "item-3",
+    name: "Health Wellness Kit",
+    description: "Essential first aid and wellness items",
+    points: 1200,
+    icon: ShieldCheck,
+    image: "/reward_items_preview_1777560318359.png",
+    category: "Wellness"
+  },
+  {
+    id: "item-4",
+    name: "Movie Ticket Voucher",
+    description: "Standard ticket for any movie at AMC/Regal",
+    points: 600,
+    icon: Ticket,
+    image: "/reward_items_preview_1777560318359.png",
+    category: "Entertainment"
+  }
+];
 
 // Badge definitions (static config — earned status comes from DB)
 const badgeDefinitions = [
@@ -36,6 +83,7 @@ const badgeDefinitions = [
     icon: Heart,
     rarity: "common",
     points: 50,
+    requirement: (stats: any) => stats.totalDonations >= 1,
   },
   {
     name: "Regular Donor",
@@ -43,6 +91,7 @@ const badgeDefinitions = [
     icon: Award,
     rarity: "common",
     points: 100,
+    requirement: (stats: any) => stats.totalDonations >= 5,
   },
   {
     name: "Hero",
@@ -50,6 +99,7 @@ const badgeDefinitions = [
     icon: Medal,
     rarity: "rare",
     points: 200,
+    requirement: (stats: any) => stats.totalDonations >= 10,
   },
   {
     name: "Life Saver",
@@ -57,6 +107,7 @@ const badgeDefinitions = [
     icon: Star,
     rarity: "rare",
     points: 250,
+    requirement: (stats: any) => stats.livesImpacted >= 30,
   },
   {
     name: "Streak Master",
@@ -64,6 +115,7 @@ const badgeDefinitions = [
     icon: Zap,
     rarity: "epic",
     points: 300,
+    requirement: (stats: any) => stats.totalDonations >= 5, // Simplified requirement
   },
   {
     name: "Champion",
@@ -71,6 +123,7 @@ const badgeDefinitions = [
     icon: Trophy,
     rarity: "epic",
     points: 500,
+    requirement: (stats: any) => stats.totalDonations >= 20,
   },
   {
     name: "Legendary Donor",
@@ -78,6 +131,15 @@ const badgeDefinitions = [
     icon: Crown,
     rarity: "legendary",
     points: 1000,
+    requirement: (stats: any) => stats.totalDonations >= 50,
+  },
+  {
+    name: "Bronze Achievement",
+    description: "Reach 3 completed donations",
+    icon: Award,
+    rarity: "common",
+    points: 75,
+    requirement: (stats: any) => stats.totalDonations >= 3,
   },
 ];
 
@@ -128,9 +190,11 @@ const levels = [
 ];
 
 export default function Rewards() {
-  const { donorProfile } = useHybridAuth();
+  const { donorProfile, refreshDonorProfile } = useHybridAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
+  const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Live data from DB
   const [earnedBadges, setEarnedBadges] = useState<any[]>([]);
@@ -149,6 +213,67 @@ export default function Rewards() {
       setLoading(false);
     }
   }, [donorProfile]);
+
+  const handleRedeem = async (item: typeof rewardItems[0]) => {
+    if (!donorProfile?.id) return;
+    
+    if (currentPoints < item.points) {
+      toast({
+        title: "Insufficient Points",
+        description: `You need ${item.points - currentPoints} more points to redeem this item.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setRedeemingId(item.id);
+      
+      // 1. Deduct points from donor
+      const newPoints = currentPoints - item.points;
+      const { error: updateError } = await donorService.update(donorProfile.id, {
+        points: newPoints
+      });
+
+      if (updateError) throw updateError;
+
+      // 2. Create redemption record
+      await redemptionService.create({
+        donor_id: donorProfile.id,
+        item_id: item.id,
+        item_name: item.name,
+        points_spent: item.points,
+        status: "pending"
+      });
+
+      // 3. Create notification for redemption
+      await notificationService.create({
+        donor_id: donorProfile.id,
+        title: "🎁 Reward Redeemed!",
+        message: `You have successfully redeemed "${item.name}" for ${item.points} points. Our team will contact you for delivery details.`,
+        type: "success",
+        priority: "high"
+      });
+
+      // 4. Refresh profile and show success
+      await refreshDonorProfile();
+      
+      toast({
+        title: "Redemption Successful!",
+        description: `You have redeemed ${item.name}. Check your notifications for details.`,
+      });
+
+    } catch (error) {
+      console.error("Redemption error:", error);
+      toast({
+        title: "Redemption Failed",
+        description: "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setRedeemingId(null);
+    }
+  };
 
   const loadRewardsData = async () => {
     if (!donorProfile?.id) return;
@@ -190,13 +315,15 @@ export default function Rewards() {
   };
 
   // Merge badge definitions with earned data
-  const earnedBadgeNames = new Set(earnedBadges.map((b: any) => b.badge_name));
+  const stats = { totalDonations, currentPoints, livesImpacted };
   const mergedBadges = badgeDefinitions.map((badge) => {
-    const earned = earnedBadges.find((b: any) => b.badge_name === badge.name);
+    const earnedInDb = earnedBadges.find((b: any) => b.badge_name === badge.name);
+    const meetsRequirement = badge.requirement(stats);
+    
     return {
       ...badge,
-      earned: !!earned,
-      earnedDate: earned?.earned_at || null,
+      earned: !!earnedInDb || meetsRequirement,
+      earnedDate: earnedInDb?.earned_at || null,
     };
   });
 
@@ -297,19 +424,48 @@ export default function Rewards() {
               </div>
             </div>
 
-            {nextLevel && (
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">
-                    Progress to {nextLevel.name}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {pointsToNextLevel} points needed
-                  </span>
+            <div className="mt-6 flex flex-wrap gap-4">
+              {nextLevel && (
+                <div className="flex-1 min-w-[200px]">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">
+                      Progress to {nextLevel.name}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {pointsToNextLevel} points needed
+                    </span>
+                  </div>
+                  <Progress value={progress} className="h-3" />
                 </div>
-                <Progress value={progress} className="h-3" />
-              </div>
-            )}
+              )}
+              <Button
+                variant="outline"
+                className="border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
+                onClick={async () => {
+                  const text = `I'm a ${currentLevel?.name} Level donor on Drop of Hope! 🩸 I've impacted ${livesImpacted} lives through ${totalDonations} donations. Join me in saving lives! #DropOfHope #BloodDonor`;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: "My Life-Saving Impact",
+                        text,
+                        url: window.location.origin,
+                      });
+                    } catch (err) {
+                      console.log("Share failed:", err);
+                    }
+                  } else {
+                    await navigator.clipboard.writeText(text);
+                    toast({
+                      title: "Copied to clipboard!",
+                      description: "Your impact summary is ready to share.",
+                    });
+                  }
+                }}
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share My Impact
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -486,13 +642,21 @@ export default function Rewards() {
                         onClick={async () => {
                           const text = `I just earned the "${badge.name}" badge on Drop of Hope! 🩸 Every drop counts. #DropOfHope #BloodDonation`;
                           if (navigator.share) {
-                            await navigator.share({
-                              title: "Drop of Hope Badge",
-                              text,
-                            });
+                            try {
+                              await navigator.share({
+                                title: "Drop of Hope Badge Unlocked!",
+                                text,
+                                url: window.location.origin,
+                              });
+                            } catch (err) {
+                              console.log("Share failed:", err);
+                            }
                           } else {
                             await navigator.clipboard.writeText(text);
-                            alert("Share text copied to clipboard!");
+                            toast({
+                              title: "Copied to clipboard!",
+                              description: "Share the good news with your friends!",
+                            });
                           }
                         }}
                       >
@@ -583,24 +747,56 @@ export default function Rewards() {
 
           {/* Rewards Store Tab */}
           <TabsContent value="rewards" className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
-                <CardContent className="p-6 text-center">
-                  <Gift className="w-16 h-16 text-[hsl(0,80%,50%)] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Coming Soon!</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Redeem your points for exclusive rewards, merchandise, and
-                    experiences.
-                  </p>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <p>• Exclusive Drop of Hope merchandise</p>
-                    <p>• Local restaurant gift cards</p>
-                    <p>• Health and wellness experiences</p>
-                    <p>• Charitable donations in your name</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {rewardItems.map((item) => (
+                <Card key={item.id} className="border-2 border-[hsl(0,80%,50%)] rounded-sm overflow-hidden group">
+                  <div className="aspect-square relative overflow-hidden bg-muted">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-[hsl(0,80%,50%)] border-none">
+                        {item.category}
+                      </Badge>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold text-lg leading-tight">{item.name}</h3>
+                      <div className="flex items-center text-[hsl(0,80%,50%)] font-bold">
+                        <Zap className="w-4 h-4 mr-1 fill-current" />
+                        {item.points}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {item.description}
+                    </p>
+                    <Button 
+                      className="w-full bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white rounded-sm"
+                      disabled={currentPoints < item.points || redeemingId === item.id}
+                      onClick={() => handleRedeem(item)}
+                    >
+                      {redeemingId === item.id ? (
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <ShoppingBag className="w-4 h-4 mr-2" />
+                      )}
+                      {currentPoints < item.points ? "Insufficient Points" : "Redeem Now"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+            
+            <Card className="border-2 border-dashed border-muted bg-muted/5 mt-8">
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground italic">
+                  More rewards coming soon! We are partnering with local businesses to bring you exclusive experiences.
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

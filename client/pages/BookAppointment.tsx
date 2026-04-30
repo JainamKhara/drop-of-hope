@@ -4,7 +4,6 @@ import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Drive } from "@/lib/supabase";
 import {
   driveService,
-  appointmentService,
   donorService,
 } from "@/lib/db-services";
 import { Button } from "@/components/ui/button";
@@ -241,23 +240,29 @@ export default function BookAppointment() {
         }
       }
 
-      // Save appointment to database
+      // Save appointment to database via API (sends confirmation email)
       const appointmentDate = format(selectedDate, "yyyy-MM-dd");
       const appointmentTime = selectedTime;
 
-      const { data: appointmentData, error: appointmentError } =
-        await appointmentService.create({
+      const response = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           donor_id: donorProfile.id,
           drive_id: drive.id,
           appointment_date: appointmentDate,
           appointment_time: appointmentTime,
           status: "scheduled",
           notes: notes || undefined,
-        });
+        }),
+      });
 
-      if (appointmentError) {
-        throw appointmentError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to book appointment");
       }
+
+      const appointmentData = await response.json();
 
       // Award points to the donor for booking (50 points for booking)
       try {

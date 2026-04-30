@@ -1,6 +1,4 @@
-"use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { useUser } from "@clerk/clerk-react";
@@ -10,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { useScrollReveal, useCountUp } from "@/hooks/useScrollReveal";
+import { statsService } from "@/lib/db-services";
 import {
   Heart,
   MapPin,
@@ -31,6 +30,24 @@ export default function Index() {
     clerkSignOut,
   } = useHybridAuth();
 
+  const [realStats, setRealStats] = useState({
+    livesSaved: 0,
+    activeDonors: 0,
+    bloodDrives: 0,
+    partnerHospitals: 0,
+  });
+
+  useEffect(() => {
+    statsService.getAdminStats().then(data => {
+      setRealStats({
+        livesSaved: data.livesImpacted || 0,
+        activeDonors: data.totalDonors || 0,
+        bloodDrives: data.totalDrives || 0,
+        partnerHospitals: data.partnerships || 0,
+      });
+    });
+  }, []);
+
   // 👤 Use appropriate profile based on role
   const profileName = (() => {
     if (userRole === "admin") return adminProfile?.name;
@@ -45,10 +62,10 @@ export default function Index() {
   })();
 
   const stats = [
-    { label: "Lives Saved", value: 10000, icon: Heart },
-    { label: "Active Donors", value: 5000, icon: Users },
-    { label: "Blood Drives", value: 200, icon: Calendar },
-    { label: "Partner Hospitals", value: 50, icon: Shield },
+    { label: "Lives Saved", value: realStats.livesSaved, icon: Heart },
+    { label: "Active Donors", value: realStats.activeDonors, icon: Users },
+    { label: "Blood Drives", value: realStats.bloodDrives, icon: Calendar },
+    { label: "Partner Hospitals", value: realStats.partnerHospitals, icon: Shield },
   ];
 
   const features = [

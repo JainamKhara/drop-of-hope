@@ -181,35 +181,51 @@ export default function HospitalPortal() {
         inventoryResult.status === "fulfilled"
           ? inventoryResult.value.data
           : null;
+      
       if (inventoryData) {
-        const processedInventory: BloodInventoryItem[] = inventoryData.map(
-          (item: any) => ({
-            type: item.blood_type,
-            units: item.units_available || 0,
-            low: 15,
-            critical: 8,
-            expiring: 0, // Would need expiry tracking
-            status:
-              item.units_available <= 8
-                ? "critical"
-                : item.units_available <= 15
-                  ? "low"
-                  : "adequate",
-          }),
+        // Group by blood type to aggregate totals and track expiring units
+        const grouped = (inventoryData as any[]).reduce((acc: any, item: any) => {
+          const type = item.blood_type;
+          if (!acc[type]) {
+            acc[type] = { units: 0, expiring: 0 };
+          }
+          acc[type].units += item.units_available || 0;
+          
+          // Check if expiring in 7 days
+          if (item.expiry_date) {
+            const expiryDate = new Date(item.expiry_date);
+            const sevenDaysFromNow = addDays(new Date(), 7);
+            if (expiryDate <= sevenDaysFromNow && expiryDate >= new Date()) {
+              acc[type].expiring += item.units_available || 0;
+            }
+          }
+          return acc;
+        }, {});
+
+        const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
+        const processedInventory: BloodInventoryItem[] = bloodTypes.map(
+          (type) => {
+            const data = grouped[type] || { units: 0, expiring: 0 };
+            return {
+              type,
+              units: data.units,
+              low: 15,
+              critical: 8,
+              expiring: data.expiring,
+              status:
+                data.units <= 8
+                  ? "critical"
+                  : data.units <= 15
+                    ? "low"
+                    : "adequate",
+            };
+          },
         );
         setBloodInventory(processedInventory);
       } else {
         // Default empty inventory for all blood types
-        const defaultInventory = [
-          "O+",
-          "O-",
-          "A+",
-          "A-",
-          "B+",
-          "B-",
-          "AB+",
-          "AB-",
-        ].map((type) => ({
+        const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
+        const defaultInventory = bloodTypes.map((type) => ({
           type,
           units: 0,
           low: 15,
@@ -779,28 +795,89 @@ export default function HospitalPortal() {
                           >
                             {appointment.status}
                           </Badge>
-                          {appointment.status === "scheduled" && (
+                          {appointment.status === "scheduled" && !appointment.acceptance_email_sent_at && (
                             <>
                               <Button
                                 size="sm"
                                 className="bg-success hover:bg-success/90"
                                 onClick={async () => {
+                                  const { data, error } =
+                                    await appointmentService.acceptWithEmail(
+                                      appointment.id,
+                                      hospitalProfile.name,
+                                    );
+                                  if (!error) {
+                                    toast({
+                                      title: "✅ Appointment Accepted",
+                                      description:
+                                        "The donor has been notified by email and in-app notification.",
+                                    });
+                                    loadHospitalData();
+                                  } else {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to accept appointment.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-1" />
+                                Accept
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={async () => {
                                   const { error } =
-                                    await appointmentService.approve(
+                                    await appointmentService.cancel(
                                       appointment.id,
                                     );
                                   if (!error) {
                                     toast({
-                                      title: "Appointment Confirmed",
+                                      title: "Appointment Rejected",
                                       description:
-                                        "The donor appointment has been confirmed.",
+                                        "The appointment has been cancelled.",
+                                      variant: "destructive",
                                     });
                                     loadHospitalData();
                                   }
                                 }}
                               >
+                                <Ban className="w-4 h-4 mr-1" />
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                          {(appointment.status === "confirmed" || (appointment.status === "scheduled" && appointment.acceptance_email_sent_at)) && (
+                            <>
+                              <Button
+                                size="sm"
+                                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
+                                onClick={async () => {
+                                  if (!window.confirm(`Mark ${appointment.donors?.name || "this donor"}'s donation as COMPLETE? This will award 100 points and send a completion email.`)) return;
+                                  const { data, error } =
+                                    await appointmentService.markComplete(
+                                      appointment.id,
+                                    );
+                                  if (!error) {
+                                    toast({
+                                      title: "🌟 Donation Marked Complete!",
+                                      description:
+                                        `100 points awarded to ${appointment.donors?.name || "donor"}. Completion email sent.`,
+                                    });
+                                    loadHospitalData();
+                                  } else {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to mark as complete.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
                                 <CheckCircle className="w-4 h-4 mr-1" />
-                                Confirm
+                                Mark Complete
                               </Button>
                               <Button
                                 size="sm"
@@ -825,30 +902,6 @@ export default function HospitalPortal() {
                                 Cancel
                               </Button>
                             </>
-                          )}
-                          {appointment.status === "confirmed" && (
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={async () => {
-                                const { error } =
-                                  await appointmentService.cancel(
-                                    appointment.id,
-                                  );
-                                if (!error) {
-                                  toast({
-                                    title: "Appointment Cancelled",
-                                    description:
-                                      "The appointment has been cancelled.",
-                                    variant: "destructive",
-                                  });
-                                  loadHospitalData();
-                                }
-                              }}
-                            >
-                              <Ban className="w-4 h-4 mr-1" />
-                              Cancel
-                            </Button>
                           )}
                         </div>
                       </div>

@@ -7,6 +7,11 @@ import {
   handleBroadcastNotification,
   handleRunScheduledReminders,
 } from "./routes/notifications";
+import { handleCreateAppointment } from "./routes/appointments";
+import { handleAcceptAppointment, handleMarkDonationComplete } from "./routes/hospitalActions";
+import { handleChatbotQuery } from "./routes/chatbot";
+import { startAppointmentReminderJob } from "./jobs/appointmentReminders";
+import { startExpirationJob, runExpirationChecks } from "./jobs/expirationJob";
 
 export function createServer() {
   const app = express();
@@ -28,6 +33,26 @@ export function createServer() {
   app.post("/api/notifications/urgent", handleSendUrgentNotification);
   app.post("/api/notifications/broadcast", handleBroadcastNotification);
   app.post("/api/notifications/send-reminders", handleRunScheduledReminders);
+
+  // Appointment routes
+  app.post("/api/appointments", handleCreateAppointment);
+  app.post("/api/appointments/:id/accept", handleAcceptAppointment);
+  app.post("/api/appointments/:id/complete", handleMarkDonationComplete);
+  app.post("/api/chatbot", handleChatbotQuery);
+
+  // Manual expiration trigger (for admin use)
+  app.post("/api/admin/run-expiration", async (_req, res) => {
+    try {
+      await runExpirationChecks();
+      res.json({ success: true, message: "Expiration checks completed" });
+    } catch (err) {
+      res.status(500).json({ error: "Expiration check failed" });
+    }
+  });
+
+  // Initialize background jobs
+  startAppointmentReminderJob();
+  startExpirationJob();
 
   return app;
 }

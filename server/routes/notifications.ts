@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { sendUrgentEmail, sendBroadcastEmail } from "../services/emailService";
 
 let supabase: SupabaseClient | null = null;
 
@@ -91,6 +92,22 @@ export const sendUrgentBloodNeedNotification = async (
       .insert(notifications)
       .select();
 
+    // Send urgent emails
+    const emailPromises = donors
+      .filter(d => d.email)
+      .map(d => sendUrgentEmail(
+        d.email!,
+        d.name || "Donor",
+        bloodType,
+        hospitalName,
+        unitsNeeded,
+        location
+      ).catch(err => console.error(`Error sending urgent email to ${d.email}:`, err)));
+
+    // We don't wait for all emails to send before responding to the request
+    // but we fire them off in the background
+    Promise.all(emailPromises);
+
     return { notified: data?.length || 0, error };
   } catch (error) {
     console.error("Error sending urgent blood need notification:", error);
@@ -179,6 +196,27 @@ export const broadcastToAllDonors = async (
       .from("notifications")
       .insert(notifications)
       .select();
+
+    // Send broadcast emails
+    // We only fetch email addresses for the broadcast if we don't have them yet
+    // In broadcastToAllDonors we already have donors from the query
+    const { data: donorsWithEmail } = await getSupabase()
+      .from("donors")
+      .select("email, name")
+      .in("id", donors.map(d => d.id))
+      .not("email", "is", null);
+
+    if (donorsWithEmail && donorsWithEmail.length > 0) {
+      const emailPromises = donorsWithEmail.map(d => sendBroadcastEmail(
+        d.email!,
+        d.name || "Donor",
+        title,
+        message,
+        actionUrl
+      ).catch(err => console.error(`Error sending broadcast email to ${d.email}:`, err)));
+      
+      Promise.all(emailPromises);
+    }
 
     return { notified: data?.length || 0, error };
   } catch (error) {

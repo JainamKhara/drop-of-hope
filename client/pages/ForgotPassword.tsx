@@ -73,7 +73,7 @@ export default function ForgotPassword() {
                   variant="outline"
                   className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)]"
                 >
-                  <Link to="/hospital/login">Back to Login</Link>
+                  <Link to="/login">Back to Login</Link>
                 </Button>
               </div>
             ) : (

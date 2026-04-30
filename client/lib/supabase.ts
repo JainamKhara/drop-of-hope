@@ -31,6 +31,7 @@ export interface Donor {
   created_at?: string;
   updated_at?: string;
   user_id?: string; // filled by Supabase
+  medical_history?: any;
 }
 
 export interface Hospital {

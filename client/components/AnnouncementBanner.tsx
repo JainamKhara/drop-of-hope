@@ -28,7 +28,7 @@ export default function AnnouncementBanner({
 
       if (data) {
         const dismissedKey = `dismissed_announcement_${data.id}`;
-        if (!sessionStorage.getItem(dismissedKey)) {
+        if (!localStorage.getItem(dismissedKey)) {
           setAnnouncement(data);
         }
       }
@@ -39,7 +39,7 @@ export default function AnnouncementBanner({
   if (!announcement || dismissed) return null;
 
   const handleDismiss = () => {
-    sessionStorage.setItem(`dismissed_announcement_${announcement.id}`, "1");
+    localStorage.setItem(`dismissed_announcement_${announcement.id}`, "1");
     setDismissed(true);
   };
 

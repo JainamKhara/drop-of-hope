@@ -329,7 +329,7 @@ export default function NotificationCenter() {
                                     onClick={() => {
                                       markAsRead(notification.id);
                                       setIsOpen(false);
-                                      // Navigate to actionUrl
+                                      if (notification.actionUrl) navigate(notification.actionUrl);
                                     }}
                                   >
                                     View
@@ -412,7 +412,7 @@ export default function NotificationCenter() {
                                     onClick={() => {
                                       markAsRead(notification.id);
                                       setIsOpen(false);
-                                      // Navigate to actionUrl
+                                      if (notification.actionUrl) navigate(notification.actionUrl);
                                     }}
                                   >
                                     View

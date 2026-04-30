@@ -231,16 +231,14 @@ export default function AdminDashboard() {
       if (statsResult) {
         setAnalyticsData({
           totalDonors: statsResult.totalDonors || 0,
-          activeDonors: Math.floor((statsResult.totalDonors || 0) * 0.75),
+          activeDonors: statsResult.activeDonors || 0,
           totalDonations: statsResult.totalDonations || 0,
           livesImpacted: statsResult.livesImpacted || 0,
           bloodDrives: statsResult.totalDrives || 0,
           activeDrives: statsResult.activeDrives || 0,
           partnerships: statsResult.partnerships || 0,
-          monthlyGrowth: 12.5,
-          donationsThisMonth: Math.floor(
-            (statsResult.totalDonations || 0) * 0.1,
-          ),
+          monthlyGrowth: statsResult.monthlyGrowth || 0,
+          donationsThisMonth: statsResult.donationsThisMonth || 0,
           upcomingAppointments: appointmentsResult.data?.length || 0,
         });
       }

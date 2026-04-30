@@ -1,4 +1,5 @@
 Category,Feature,Description,Status,Implementation,Notes
+
 Donor,Dashboard,Overview of donation history points and upcoming appointments,OLD,Complete,DonorDashboard.tsx — stats + appointments + donations + rewards cards all rendered
 Donor,Find Blood Drives,Discover nearby donation events with location filtering,OLD,Complete,BloodDrives.tsx — full page with location filtering
 Donor,Book Appointments,Schedule donation slots with calendar integration,OLD,Complete,BookAppointment.tsx — fully wired to appointmentService
@@ -14,6 +15,7 @@ Donor,Feedback Form,Simple form to rate donation experience at a drive,NEW,Compl
 Donor,Emergency Contact Info,Add emergency contact details to profile,NEW,Complete,Profile.tsx — emergency contact name/phone/relation fields in personal tab
 Donor,Donation Counter Widget,Show X days since last donation on dashboard,NEW,Complete,DonorDashboard.tsx — callout card showing days since / until next donation
 Donor,Print Appointment Slip,Generate printable appointment confirmation,NEW,Complete,MyAppointments.tsx — Print Slip button opens formatted print window
+
 Hospital,Hospital Portal,Centralized management dashboard,OLD,Complete,HospitalPortal.tsx — full portal with inventory + requests + appointments tabs
 Hospital,Blood Requests,Create urgent/routine blood type requests,OLD,Complete,Blood request form in HospitalPortal + bloodRequestService fully wired
 Hospital,Inventory Management,Track available blood units,OLD,Complete,Blood inventory tab with per-blood-type cards and status badges
@@ -24,6 +26,7 @@ Hospital,Request Status Tracker,Show status Pending to Approved to Fulfilled,NEW
 Hospital,Drive Attendance Report,List of donors who attended a specific drive,NEW,Complete,HospitalPortal.tsx — Attendance Report CSV export button on each drive card
 Hospital,Print Blood Request,Generate printable blood request form,NEW,Complete,HospitalPortal.tsx — Print button on each request opens formatted print slip window
 Hospital,Hospital Profile Page,Public page showing hospital info & contact,NEW,Complete,HospitalProfile.tsx — /hospital/:id route with public hospital info page
+
 Admin,Admin Dashboard,System-wide analytics and oversight,OLD,Complete,AdminDashboard.tsx — 7-tab dashboard with stats + donors + drives + hospitals
 Admin,User Management,View donors hospitals and manage accounts,OLD,Complete,Donors tab and Hospitals tab with full CRUD (view/edit/add)
 Admin,Drive Approval,Review and approve blood drive requests,OLD,Complete,AdminDashboard.tsx — Approve/Reject buttons fully wired on Blood Requests tab
@@ -35,21 +38,26 @@ Admin,Export User List,Download CSV of all donors,NEW,Complete,AdminDashboard.ts
 Admin,System Activity Log,Simple table showing recent actions,NEW,Complete,AdminDashboard.tsx — System Activity section populated from real DB appointments + blood requests
 Admin,Announcement Banner,Add a text banner visible to all users on homepage,NEW,Complete,AnnouncementBanner.tsx on Index.tsx + Supabase announcements table + Admin UI in AdminDashboard
 Admin,Blood Drive Calendar,Monthly calendar view of all scheduled drives,NEW,Complete,AdminDashboard.tsx — calendar grid card in drives tab with red dot indicators + drive name on hover
+
 AI & Support,AI Chatbot,Built-in chatbot widget for user assistance,OLD,Complete,ChatbotWidget.tsx — fully functional rule-based chatbot with keyword matching
 AI & Support,Quick Action Buttons,Common tasks shortcuts in chatbot,OLD,Complete,Chatbot shows inline suggestion buttons after each bot response
 AI & Support,Contact Us Form,Simple form that stores messages in database,NEW,Complete,Contact.tsx — form wired to Supabase contacts table via supabase.insert
+
 Notifications,In-App Notifications,Notification bell icon with notification center,NEW,Complete,NotificationCenter.tsx — notification dropdown with tabs, mark read/delete functionality
 Notifications,Appointment Reminders,Send reminders 1 day and 1 hour before appointment,NEW,Complete,notificationService.ts — sendAppointmentReminder function with reminder types
 Notifications,Hospital Urgent Alerts,Hospitals can alert donors about urgent blood needs,NEW,Complete,HospitalPortal.tsx — Notifications tab with blood type targeting
 Notifications,Admin Broadcast,Admin can broadcast notifications to all donors or by blood type,NEW,Complete,AdminDashboard.tsx — Broadcast notification dialog with priority and blood type filter
+
 Auth & Security,Clerk Auth (Donors),Modern auth with social login,OLD,Complete,Clerk fully integrated in main.tsx + HybridAuthContext
 Auth & Security,Supabase Auth (Admin/Hospital),Direct credential login,OLD,Complete,AdminLogin.tsx + HospitalLogin.tsx — Supabase direct credential auth
 Auth & Security,Forgot Password,Simple password reset via email,NEW,Complete,ForgotPassword.tsx — /forgot-password route with Supabase resetPasswordForEmail
+
 Public Pages,Landing Page,Hero section with stats and features,OLD,Complete,Index.tsx — full landing page with hero + stats + features sections
 Public Pages,About Page,Company information,OLD,Complete,About.tsx — complete company info page
 Public Pages,Contact Page,Contact information,OLD,Complete,Contact.tsx — contact info page wired to Supabase
 Public Pages,Terms of Service,Legal terms,OLD,Complete,Terms.tsx — complete legal terms page
 Public Pages,Privacy Policy,Privacy information,OLD,Complete,Privacy.tsx — complete privacy policy page
+
 UI/UX,Responsive Design,Mobile-friendly layout,OLD,Complete,Tailwind responsive classes used throughout — md: lg: breakpoints applied
 UI/UX,Dark Mode Toggle,Switch between light/dark theme,NEW,Complete,Navbar.tsx — dark mode toggle button with localStorage persistence
 UI/UX,Search Donors by Blood Type,Filter donors list by blood type,NEW,Complete,AdminDashboard.tsx — Blood type dropdown filter in Donors tab with clear filters button

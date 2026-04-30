@@ -34,10 +34,14 @@ import {
   Award,
   Activity,
   Download,
+  Droplets,
+  Star,
+  TrendingUp,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { donationService } from "@/lib/db-services";
+import { donationService, redemptionService } from "@/lib/db-services";
+import { ArrowUpDown, History } from "lucide-react";
 
 export default function Profile() {
   const { user } = useUser();
@@ -80,6 +84,8 @@ export default function Profile() {
   });
   const [donations, setDonations] = useState<any[]>([]);
   const [donationsLoading, setDonationsLoading] = useState(false);
+  const [pointsHistory, setPointsHistory] = useState<any[]>([]);
+  const [pointsLoading, setPointsLoading] = useState(false);
 
   const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
   const states = [
@@ -113,6 +119,190 @@ export default function Profile() {
     "West Bengal",
   ];
 
+  // Achievement definitions
+  const achievementList = [
+    {
+      id: "first_drop",
+      name: "First Drop",
+      description: "Completed your first blood donation",
+      icon: <Droplets className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 1,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 1) * 100),
+      threshold: "1 donation"
+    },
+    {
+      id: "bronze_lifesaver",
+      name: "Bronze Lifesaver",
+      description: "Completed 3 blood donations",
+      icon: <Award className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 3,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 3) * 100),
+      threshold: "3 donations"
+    },
+    {
+      id: "silver_lifesaver",
+      name: "Silver Lifesaver",
+      description: "Completed 5 blood donations",
+      icon: <Award className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 5,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 5) * 100),
+      threshold: "5 donations"
+    },
+    {
+      id: "gold_lifesaver",
+      name: "Gold Lifesaver",
+      description: "Completed 10 blood donations",
+      icon: <Award className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 10,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 10) * 100),
+      threshold: "10 donations"
+    },
+    {
+      id: "platinum_lifesaver",
+      name: "Platinum Donor",
+      description: "Completed 20 blood donations",
+      icon: <Star className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 20,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 20) * 100),
+      threshold: "20 donations"
+    },
+    {
+      id: "centurion",
+      name: "Centurion Donor",
+      description: "Completed 50 blood donations",
+      icon: <Shield className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.totalDonations >= 50,
+      progress: (stats: any) => Math.min(100, (stats.totalDonations / 50) * 100),
+      threshold: "50 donations"
+    },
+    {
+      id: "point_master",
+      name: "Point Master",
+      description: "Earned over 1000 points",
+      icon: <TrendingUp className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => stats.points >= 1000,
+      progress: (stats: any) => Math.min(100, (stats.points / 1000) * 100),
+      threshold: "1000 points"
+    },
+    {
+      id: "elite_donor",
+      name: "Elite Donor",
+      description: "Reached donor level 5",
+      icon: <Shield className="w-8 h-8 text-white" />,
+      requirement: (stats: any) => (stats.level || 1) >= 5,
+      progress: (stats: any) => Math.min(100, ((stats.level || 1) / 5) * 100),
+      threshold: "Level 5"
+    }
+  ];
+
+  const [stats, setStats] = useState({
+    totalDonations: 0,
+    points: 0,
+    level: 1,
+    livesSaved: 0
+  });
+
+  const handleViewCertificate = (donation: any) => {
+    const donorName = donorProfile?.name || "Valued Donor";
+    const certWindow = window.open("", "_blank", "width=900,height=650");
+    if (!certWindow) return;
+    
+    const dateStr = donation.donation_date 
+      ? new Date(donation.donation_date).toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        })
+      : "Date unknown";
+
+    certWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Donation Certificate – ${donorName}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@400;500;600&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Inter', sans-serif; background: #f5f0eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 32px; }
+          .cert { background: #fff; width: 800px; padding: 60px; border: 3px solid #c41e1e; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+          .cert::before { content: ''; position: absolute; inset: 12px; border: 1px solid #c41e1e44; pointer-events: none; }
+          .corner { position: absolute; width: 40px; height: 40px; border-color: #c41e1e; border-style: solid; }
+          .tl { top: 20px; left: 20px; border-width: 3px 0 0 3px; }
+          .tr { top: 20px; right: 20px; border-width: 3px 3px 0 0; }
+          .bl { bottom: 20px; left: 20px; border-width: 0 0 3px 3px; }
+          .br { bottom: 20px; right: 20px; border-width: 0 3px 3px 0; }
+          .logo { text-align: center; margin-bottom: 8px; }
+          .logo-icon { font-size: 40px; }
+          .logo-name { font-size: 13px; font-weight: 600; letter-spacing: 0.25em; color: #c41e1e; text-transform: uppercase; }
+          .divider { width: 120px; height: 2px; background: linear-gradient(90deg, transparent, #c41e1e, transparent); margin: 20px auto; }
+          .headline { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #888; text-align: center; margin-bottom: 8px; }
+          .main-title { font-family: 'Playfair Display', serif; font-size: 42px; color: #1a1a1a; text-align: center; line-height: 1.2; margin-bottom: 24px; }
+          .presented { text-align: center; color: #666; font-size: 14px; margin-bottom: 12px; }
+          .donor-name { font-family: 'Playfair Display', serif; font-size: 36px; font-style: italic; color: #c41e1e; text-align: center; margin-bottom: 24px; border-bottom: 1px solid #eee; padding-bottom: 24px; }
+          .body-text { text-align: center; color: #555; font-size: 14px; line-height: 1.8; margin-bottom: 32px; max-width: 540px; margin-left: auto; margin-right: auto; }
+          .details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; background: #fef2f2; border-radius: 8px; padding: 20px 28px; }
+          .detail { }
+          .detail-label { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #c41e1e; margin-bottom: 4px; }
+          .detail-val { font-size: 14px; color: #222; font-weight: 500; }
+          .sig-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; }
+          .sig-block { text-align: center; }
+          .sig-line { width: 140px; height: 1px; background: #333; margin-bottom: 8px; }
+          .sig-name { font-size: 12px; font-weight: 600; }
+          .sig-title { font-size: 11px; color: #888; }
+          .seal { width: 80px; height: 80px; border: 2px solid #c41e1e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+          .seal-text { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #c41e1e; text-align: center; }
+          .print-btn { display: block; margin: 24px auto 0; padding: 10px 28px; background: #c41e1e; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: Inter, sans-serif; }
+          @media print { .print-btn { display: none; } body { background: white; } }
+        </style>
+      </head>
+      <body>
+        <div class="cert">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="logo">
+            <div class="logo-icon">🩸</div>
+            <div class="logo-name">Drop of Hope</div>
+          </div>
+          <div class="divider"></div>
+          <div class="headline">Certificate of Appreciation</div>
+          <div class="main-title">Blood Donation<br>Certificate</div>
+          <div class="presented">This is to proudly certify that</div>
+          <div class="donor-name">${donorName}</div>
+          <p class="body-text">
+            has selflessly and courageously donated blood, potentially saving up to <strong>3 lives</strong>.
+            Your generosity is a testament to the power of humanity and compassion.
+          </p>
+          <div class="details">
+            <div class="detail"><div class="detail-label">Donation Type</div><div class="detail-val">Whole Blood</div></div>
+            <div class="detail"><div class="detail-label">Date</div><div class="detail-val">${dateStr}</div></div>
+            <div class="detail"><div class="detail-label">Location</div><div class="detail-val">${donation.drives?.name || donation.hospitals?.name || "Blood Center"}</div></div>
+            <div class="detail"><div class="detail-label">Amount</div><div class="detail-val">${donation.quantity_ml || 450}ml</div></div>
+          </div>
+          <div class="sig-row">
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-name">Drop of Hope</div>
+              <div class="sig-title">Program Director</div>
+            </div>
+            <div class="seal">
+              <div class="seal-text">Official<br>Seal<br>🩸</div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-name">${donorName}</div>
+              <div class="sig-title">Donor</div>
+            </div>
+          </div>
+        </div>
+        <button class="print-btn" onclick="window.print()">🖨️ Print Certificate</button>
+      </body>
+      </html>
+    `);
+    certWindow.document.close();
+    certWindow.focus();
+  };
+
   useEffect(() => {
     if (!user) {
       navigate("/donor/login");
@@ -120,12 +310,63 @@ export default function Profile() {
     }
     if (donorProfile) {
       setFormData(donorProfile);
+      if (donorProfile.medical_history) {
+        try {
+          const medHistory = typeof donorProfile.medical_history === 'string' 
+            ? JSON.parse(donorProfile.medical_history) 
+            : donorProfile.medical_history;
+          setMedicalData(medHistory);
+        } catch (e) {
+          console.error("Failed to parse medical history", e);
+        }
+      }
       // Fetch real donations from DB
       if (donorProfile.id) {
         setDonationsLoading(true);
         donationService.getByDonor(donorProfile.id).then(({ data }) => {
+          const completedDonations = (data || []).filter((d: any) => d.status === "completed");
           setDonations(data || []);
+          setStats({
+            totalDonations: completedDonations.length,
+            points: donorProfile.points || 0,
+            level: donorProfile.level || 1,
+            livesSaved: completedDonations.length * 3
+          });
           setDonationsLoading(false);
+        });
+
+        // Fetch points history
+        setPointsLoading(true);
+        Promise.all([
+          donationService.getByDonor(donorProfile.id),
+          redemptionService.getByDonor(donorProfile.id)
+        ]).then(([donationsRes, redemptionsRes]) => {
+          const earned = (donationsRes.data || [])
+            .filter((d: any) => d.status === "completed")
+            .map((d: any) => ({
+              id: `earned-${d.id}`,
+              type: "earned",
+              title: "Blood Donation",
+              description: d.drives?.name || d.hospitals?.name || "Donation",
+              points: d.points_earned || 100,
+              date: d.donation_date
+            }));
+          
+          const spent = (redemptionsRes.data || []).map((r: any) => ({
+            id: `spent-${r.id}`,
+            type: "spent",
+            title: "Reward Redemption",
+            description: r.item_name,
+            points: -(r.points_spent || 0),
+            date: r.created_at
+          }));
+
+          const combined = [...earned, ...spent].sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          
+          setPointsHistory(combined);
+          setPointsLoading(false);
         });
       }
     } else {
@@ -152,7 +393,10 @@ export default function Profile() {
     if (!user) return;
 
     try {
-      const result = await updateDonorProfile(formData);
+      const result = await updateDonorProfile({
+        ...formData,
+        medical_history: medicalData
+      });
       if (result.error) {
         toast({
           title: "Update Failed",
@@ -252,7 +496,7 @@ export default function Profile() {
                     </div>
                     <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
                       <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
-                        {(formData?.level || 1) * 3}
+                        {donations.length * 3}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Lives Saved
@@ -285,6 +529,7 @@ export default function Profile() {
               <TabsTrigger value="medical">Medical History</TabsTrigger>
               <TabsTrigger value="donations">Donation History</TabsTrigger>
               <TabsTrigger value="achievements">Achievements</TabsTrigger>
+              <TabsTrigger value="points">Points History</TabsTrigger>
             </TabsList>
 
             {/* Personal Information Tab */}
@@ -328,19 +573,6 @@ export default function Profile() {
                           }
                         />
                       </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData?.email || ""}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                      />
                     </div>
 
                     <div>
@@ -393,8 +625,6 @@ export default function Profile() {
                         </Select>
                       </div>
                     </div>
-
-                    {/* Additional fields removed - not in DonorProfile interface */}
                   </CardContent>
                 </Card>
 
@@ -762,108 +992,207 @@ export default function Profile() {
                     {donations.map((donation, index) => (
                       <div
                         key={donation.id || index}
-                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm"
+                        className="flex items-center justify-between p-5 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,10%)] border border-border rounded-sm hover:border-[hsl(0,80%,50%)]/50 transition-colors"
                       >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center flex-shrink-0">
-                            <Heart className="w-5 h-5 text-white fill-current" />
+                        <div className="flex items-center space-x-5">
+                          <div className="w-12 h-12 bg-[hsl(0,80%,50%)]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Heart className="w-6 h-6 text-[hsl(0,80%,50%)] fill-[hsl(0,80%,50%)]/20" />
                           </div>
                           <div>
-                            <p className="font-medium">
+                            <p className="font-bold text-foreground">
                               {donation.drives?.name ||
                                 donation.hospitals?.name ||
                                 "Donation"}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                              {donation.donation_date
-                                ? format(
-                                    new Date(donation.donation_date),
-                                    "EEEE, MMMM dd, yyyy",
-                                  )
-                                : "Date unknown"}
-                            </p>
-                            {donation.blood_type && (
-                              <p className="text-xs text-muted-foreground">
-                                Blood Type: {donation.blood_type}
+                            <div className="flex items-center space-x-2 mt-0.5">
+                              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                              <p className="text-sm text-muted-foreground">
+                                {donation.donation_date
+                                  ? format(
+                                      new Date(donation.donation_date),
+                                      "EEEE, MMMM dd, yyyy",
+                                    )
+                                  : "Date unknown"}
                               </p>
-                            )}
+                            </div>
+                            <div className="flex items-center space-x-3 mt-2">
+                              {donation.blood_type && (
+                                <Badge variant="outline" className="text-[10px] py-0 h-4 border-[hsl(0,80%,50%)]/30 text-[hsl(0,80%,50%)]">
+                                  Type {donation.blood_type}
+                                </Badge>
+                              )}
+                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                {donation.drives?.location || "Hospital Site"}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <Badge
-                            className={`${
-                              donation.status === "completed"
-                                ? "bg-success/10 text-success"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {donation.status || "completed"}
-                          </Badge>
-                          {donation.points_earned != null && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              +{donation.points_earned} pts
-                            </p>
-                          )}
-                          {donation.quantity_ml && (
-                            <p className="text-xs text-muted-foreground">
-                              {donation.quantity_ml} ml
-                            </p>
-                          )}
+                        <div className="text-right flex flex-col items-end space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Badge
+                              className={
+                                donation.status === "completed"
+                                  ? "bg-success text-white"
+                                  : "bg-muted text-muted-foreground"
+                              }
+                            >
+                              {donation.status?.toUpperCase() || "COMPLETED"}
+                            </Badge>
+                            {donation.status === "completed" && (
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-8 w-8 p-0"
+                                 onClick={() => handleViewCertificate(donation)}
+                                 title="View Certificate"
+                               >
+                                 <Award className="h-4 w-4 text-[hsl(0,80%,50%)]" />
+                               </Button>
+                            )}
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <span className="text-sm font-bold text-[hsl(0,80%,50%)]">
+                              +{donation.points_earned || 0} PTS
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {donation.quantity_ml || 450}ml donated
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-
+            </TabsContent>            
+            
             {/* Achievements Tab */}
             <TabsContent value="achievements" className="space-y-6 mt-6">
               <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Award className="w-5 h-5" />
+                    <Award className="w-5 h-5 text-[hsl(0,80%,50%)]" />
                     <span>Achievements & Badges</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Achievement cards would go here */}
-                    <div className="text-center p-6 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
-                      <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <Award className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-[hsl(0,80%,50%)]">
-                        Hero Badge
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        10+ donations completed
-                      </p>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {achievementList.map((achievement) => {
+                      const isEarned = achievement.requirement(stats);
+                      const progress = achievement.progress(stats);
+                      
+                      return (
+                        <div 
+                          key={achievement.id}
+                          className={`relative overflow-hidden p-6 rounded-sm transition-all duration-300 ${
+                            isEarned 
+                              ? "bg-[hsl(0,80%,50%)]/5 border-2 border-[hsl(0,80%,50%)]" 
+                              : "bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,10%)] border-2 border-dashed border-muted"
+                          }`}
+                        >
+                          <div className="flex flex-col items-center text-center">
+                            <div className={`w-16 h-16 rounded-full mb-4 flex items-center justify-center ${
+                              isEarned ? "bg-[hsl(0,80%,50%)] shadow-lg shadow-[hsl(0,80%,50%)]/20" : "bg-muted"
+                            }`}>
+                              {React.cloneElement(achievement.icon as React.ReactElement, {
+                                className: `w-8 h-8 ${isEarned ? "text-white" : "text-muted-foreground"}`
+                              })}
+                            </div>
+                            <h3 className={`font-bold mb-1 ${isEarned ? "text-[hsl(0,80%,50%)]" : "text-muted-foreground"}`}>
+                              {achievement.name}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mb-4">
+                              {achievement.description}
+                            </p>
+                            
+                            {!isEarned && (
+                              <div className="w-full space-y-2">
+                                <div className="flex justify-between text-[10px] text-muted-foreground">
+                                  <span>Progress</span>
+                                  <span>{Math.round(progress)}%</span>
+                                </div>
+                                <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                                  <div 
+                                    className="bg-[hsl(0,80%,50%)] h-full transition-all duration-500" 
+                                    style={{ width: `${progress}%` }}
+                                  />
+                                </div>
+                                <p className="text-[10px] font-medium text-[hsl(0,80%,50%)]">
+                                  Goal: {achievement.threshold}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {isEarned && (
+                              <Badge className="bg-success text-white hover:bg-success pointer-events-none">
+                                Unlocked
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                    <div className="text-center p-6 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
-                      <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <Heart className="w-8 h-8 text-white fill-current" />
-                      </div>
-                      <h3 className="font-semibold text-[hsl(0,80%,50%)]">
-                        Life Saver
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Saved 30+ lives
+            {/* Points History Tab */}
+            <TabsContent value="points" className="space-y-6 mt-6">
+              <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <History className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                    <span>Points Transaction History</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {pointsLoading && (
+                      <p className="text-muted-foreground text-center py-8">
+                        Loading points history...
                       </p>
-                    </div>
-
-                    <div className="text-center p-6 border-2 border-dashed border-muted rounded-sm">
-                      <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <Award className="w-8 h-8 text-muted-foreground" />
+                    )}
+                    {!pointsLoading && pointsHistory.length === 0 && (
+                      <div className="text-center py-12">
+                        <ArrowUpDown className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                        <p className="font-medium">No transactions yet</p>
+                        <p className="text-sm text-muted-foreground">
+                          Earn points by donating or use them in the Rewards Store.
+                        </p>
                       </div>
-                      <h3 className="font-semibold text-muted-foreground">
-                        Champion
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        5 more donations needed
-                      </p>
-                    </div>
+                    )}
+                    {pointsHistory.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,10%)] border border-border rounded-sm"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            item.type === "earned" ? "bg-success/10" : "bg-warning/10"
+                          }`}>
+                            <ArrowUpDown className={`w-5 h-5 ${
+                              item.type === "earned" ? "text-success" : "text-warning"
+                            }`} />
+                          </div>
+                          <div>
+                            <p className="font-bold">{item.title}</p>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              {format(new Date(item.date), "MMM dd, yyyy HH:mm")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-lg font-bold ${
+                            item.type === "earned" ? "text-success" : "text-warning"
+                          }`}>
+                            {item.points > 0 ? "+" : ""}{item.points} PTS
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>

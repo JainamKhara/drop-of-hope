@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { Drive } from "../lib/supabase";
-import { driveService } from "@/lib/db-services";
+import { driveService, feedbackService } from "@/lib/db-services";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -42,6 +43,7 @@ import {
   RefreshCw,
   Star,
   MessageSquare,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -66,6 +68,20 @@ export default function BloodDrives() {
   const [feedbackDriveId, setFeedbackDriveId] = useState<string | null>(null);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [isHostDialogOpen, setIsHostDialogOpen] = useState(false);
+  const [isSubmittingHost, setIsSubmittingHost] = useState(false);
+  const [hostFormData, setHostFormData] = useState({
+    name: "",
+    description: "",
+    location: "",
+    address: "",
+    city: "",
+    state: "",
+    startDate: "",
+    endDate: "",
+    capacity: 20
+  });
 
   // Load drives from database on mount
   useEffect(() => {
@@ -157,6 +173,18 @@ export default function BloodDrives() {
     if (percentage >= 90) return "Almost Full";
     if (percentage >= 70) return "Filling Up";
     return "Available";
+  };
+
+  /** Returns true if the drive's end_date+end_time is in the past */
+  const isDriveExpired = (drive: DriveWithDetails): boolean => {
+    try {
+      const endTime = drive.end_time || "23:59:59";
+      const timePart = endTime.length === 5 ? `${endTime}:00` : endTime;
+      const endDT = new Date(`${drive.end_date}T${timePart}`);
+      return endDT < new Date();
+    } catch {
+      return false;
+    }
   };
 
   if (loading) {
@@ -261,9 +289,18 @@ export default function BloodDrives() {
               </Popover>
 
               {/* Clear Filters */}
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => setIsHostDialogOpen(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Host a Drive
+                </Button>
+              </div>
             </div>
 
             <div className="mt-4 flex items-center justify-between">
@@ -275,7 +312,6 @@ export default function BloodDrives() {
                 size="sm"
                 onClick={loadBloodDrives}
                 className="flex items-center space-x-2"
-                disabled
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Refresh</span>
@@ -287,15 +323,24 @@ export default function BloodDrives() {
         {/* Blood Drives Grid */}
         {filteredDrives.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDrives.map((drive) => (
+            {filteredDrives.map((drive) => {
+              const expired = isDriveExpired(drive) || drive.is_active === false;
+              const isFull = (drive.registered_count ?? 0) >= drive.capacity;
+              return (
               <Card
                 key={drive.id}
-                className="border-2 border-[hsl(0,80%,50%)] hover:shadow-lg transition-shadow"
+                className={`border-2 transition-shadow ${
+                  expired
+                    ? "border-gray-300 dark:border-gray-600 opacity-70"
+                    : "border-[hsl(0,80%,50%)] hover:shadow-lg"
+                }`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg text-[hsl(0,80%,50%)] line-clamp-2">
+                      <CardTitle className={`text-lg line-clamp-2 ${
+                        expired ? "text-gray-400" : "text-[hsl(0,80%,50%)]"
+                      }`}>
                         {drive.name}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
@@ -305,18 +350,24 @@ export default function BloodDrives() {
                           "Unknown Organizer"}
                       </p>
                     </div>
-                    <Badge
-                      variant="secondary"
-                      className={`${getAvailabilityColor(
-                        drive.registered_count || 0,
-                        drive.capacity,
-                      )} bg-transparent border`}
-                    >
-                      {getAvailabilityText(
-                        drive.registered_count || 0,
-                        drive.capacity,
-                      )}
-                    </Badge>
+                    {expired ? (
+                      <Badge variant="secondary" className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-0">
+                        Ended
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="secondary"
+                        className={`${getAvailabilityColor(
+                          drive.registered_count || 0,
+                          drive.capacity,
+                        )} bg-transparent border`}
+                      >
+                        {getAvailabilityText(
+                          drive.registered_count || 0,
+                          drive.capacity,
+                        )}
+                      </Badge>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -389,17 +440,21 @@ export default function BloodDrives() {
                     {/* Actions */}
                     <div className="flex space-x-2 pt-2">
                       <Button
-                        asChild
-                        className="flex-1 bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
-                        disabled={
-                          (drive.registered_count ?? 0) >= drive.capacity
-                        }
+                        asChild={!expired && !isFull}
+                        className={`flex-1 text-white ${
+                          expired
+                            ? "bg-gray-400 cursor-not-allowed hover:bg-gray-400"
+                            : "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90"
+                        }`}
+                        disabled={expired || isFull}
                       >
-                        <Link to={`/book-appointment/${drive.id}`}>
-                          {(drive.registered_count ?? 0) >= drive.capacity
-                            ? "Full"
-                            : "Book Appointment"}
-                        </Link>
+                        {expired || isFull ? (
+                          <span>{expired ? "Drive Ended" : "Full"}</span>
+                        ) : (
+                          <Link to={`/book-appointment/${drive.id}`}>
+                            Book Appointment
+                          </Link>
+                        )}
                       </Button>
                       {drive.latitude && drive.longitude && (
                         <Button
@@ -415,28 +470,27 @@ export default function BloodDrives() {
                           <Navigation className="w-4 h-4" />
                         </Button>
                       )}
-                      {/* Feedback button for past/completed drives */}
-                      {drive.end_date &&
-                        new Date(drive.end_date) < new Date() &&
-                        isSignedIn && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            title="Leave Feedback"
-                            onClick={() => {
-                              setFeedbackDriveId(drive.id);
-                              setFeedbackRating(0);
-                              setFeedbackText("");
-                            }}
-                          >
-                            <MessageSquare className="w-4 h-4" />
-                          </Button>
-                        )}
+                      {/* Feedback button for ended drives */}
+                      {expired && isSignedIn && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title="Leave Feedback"
+                          onClick={() => {
+                            setFeedbackDriveId(drive.id);
+                            setFeedbackRating(0);
+                            setFeedbackText("");
+                          }}
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <Card className="border-2 border-[hsl(0,80%,50%)]">
@@ -534,16 +588,168 @@ export default function BloodDrives() {
             </Button>
             <Button
               className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
-              disabled={feedbackRating === 0}
-              onClick={() => {
-                toast({
-                  title: "Feedback submitted!",
-                  description: `Thank you for your ${feedbackRating}-star rating.`,
-                });
-                setFeedbackDriveId(null);
+              disabled={feedbackRating === 0 || isSubmittingFeedback}
+              onClick={async () => {
+                if (!donorProfile?.id || !feedbackDriveId) return;
+                
+                try {
+                  setIsSubmittingFeedback(true);
+                  const { error } = await feedbackService.submit({
+                    donor_id: donorProfile.id,
+                    drive_id: feedbackDriveId,
+                    rating: feedbackRating,
+                    comment: feedbackText
+                  });
+
+                  if (error) throw error;
+
+                  toast({
+                    title: "Feedback submitted!",
+                    description: `Thank you for your ${feedbackRating}-star rating.`,
+                  });
+                  setFeedbackDriveId(null);
+                } catch (error) {
+                  console.error("Feedback submission error:", error);
+                  toast({
+                    title: "Submission failed",
+                    description: "We couldn't save your feedback. Please try again.",
+                    variant: "destructive"
+                  });
+                } finally {
+                  setIsSubmittingFeedback(false);
+                }
               }}
             >
-              Submit Feedback
+              {isSubmittingFeedback ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                "Submit Feedback"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Host Drive Dialog */}
+      <Dialog open={isHostDialogOpen} onOpenChange={setIsHostDialogOpen}>
+        <DialogContent className="max-w-2xl bg-white border-2 border-success rounded-sm">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-success flex items-center">
+              <Plus className="w-6 h-6 mr-2" />
+              Host a Personal Blood Drive
+            </DialogTitle>
+            <DialogDescription>
+              Organize a virtual or local drive for your friends, family, or community.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Drive Name</label>
+              <Input 
+                placeholder="e.g. Smith Family Blood Drive" 
+                value={hostFormData.name}
+                onChange={(e) => setHostFormData({...hostFormData, name: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Description</label>
+              <Textarea 
+                placeholder="Why are you hosting this drive?" 
+                value={hostFormData.description}
+                onChange={(e) => setHostFormData({...hostFormData, description: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Location Name</label>
+              <Input 
+                placeholder="e.g. Community Center" 
+                value={hostFormData.location}
+                onChange={(e) => setHostFormData({...hostFormData, location: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">City</label>
+              <Input 
+                placeholder="City" 
+                value={hostFormData.city}
+                onChange={(e) => setHostFormData({...hostFormData, city: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Start Date</label>
+              <Input 
+                type="date" 
+                value={hostFormData.startDate}
+                onChange={(e) => setHostFormData({...hostFormData, startDate: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">End Date</label>
+              <Input 
+                type="date" 
+                value={hostFormData.endDate}
+                onChange={(e) => setHostFormData({...hostFormData, endDate: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setIsHostDialogOpen(false)}
+              disabled={isSubmittingHost}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-success hover:bg-success/90 text-white"
+              disabled={!hostFormData.name || !hostFormData.startDate || isSubmittingHost}
+              onClick={async () => {
+                if (!donorProfile?.id) return;
+                try {
+                  setIsSubmittingHost(true);
+                  const { error } = await driveService.create({
+                    name: hostFormData.name,
+                    description: hostFormData.description,
+                    organizer_id: donorProfile.id,
+                    location: hostFormData.location,
+                    address: hostFormData.address || hostFormData.location,
+                    city: hostFormData.city,
+                    state: hostFormData.state || "Active",
+                    start_date: hostFormData.startDate,
+                    end_date: hostFormData.endDate || hostFormData.startDate,
+                    start_time: "09:00",
+                    end_time: "17:00",
+                    capacity: hostFormData.capacity,
+                    blood_types_needed: ["A+", "B+", "O+", "AB+"]
+                  });
+
+                  if (error) throw error;
+
+                  toast({
+                    title: "Drive created successfully!",
+                    description: "Your personal blood drive is now live.",
+                  });
+                  setIsHostDialogOpen(false);
+                  // Refresh list
+                  const { data } = await driveService.getAll();
+                  if (data) setDrives(data);
+                } catch (error) {
+                  console.error("Error creating drive:", error);
+                  toast({
+                    title: "Creation failed",
+                    description: "Something went wrong. Please try again.",
+                    variant: "destructive"
+                  });
+                } finally {
+                  setIsSubmittingHost(false);
+                }
+              }}
+            >
+              {isSubmittingHost ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                "Create Drive"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

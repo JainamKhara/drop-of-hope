@@ -138,112 +138,50 @@ export default function ChatbotWidget() {
     setMessages((prev) => [...prev, newMessage]);
   };
 
-  const generateBotResponse = (userMessage: string) => {
-    const message = userMessage.toLowerCase();
+  const handleSendMessage = async (customMessage?: string) => {
+    const textToSend = customMessage || inputValue;
+    if (!textToSend.trim()) return;
 
-    // Eligibility
-    if (
-      message.includes("eligible") ||
-      message.includes("qualify") ||
-      message.includes("can i donate") ||
-      message.includes("requirement") ||
-      message.includes("medication") ||
-      message.includes("travel") ||
-      message.includes("cold") ||
-      message.includes("sick")
-    ) {
-      return botResponses.eligibility;
+    if (!customMessage) {
+      addUserMessage(textToSend);
+      setInputValue("");
     }
-    // Scheduling
-    else if (
-      message.includes("schedule") ||
-      message.includes("appointment") ||
-      message.includes("book") ||
-      message.includes("find drive") ||
-      message.includes("near me") ||
-      message.includes("location")
-    ) {
-      return botResponses.scheduling;
-    }
-    // Process / Pain / Time
-    else if (
-      message.includes("process") ||
-      message.includes("expect") ||
-      message.includes("happen") ||
-      message.includes("hurt") ||
-      message.includes("pain") ||
-      message.includes("long") ||
-      message.includes("time")
-    ) {
-      return botResponses.process;
-    }
-    // Preparation / Food
-    else if (
-      message.includes("prepare") ||
-      message.includes("before") ||
-      message.includes("after") ||
-      message.includes("eat") ||
-      message.includes("drink") ||
-      message.includes("food") ||
-      message.includes("water") ||
-      message.includes("exercise")
-    ) {
-      return botResponses.preparation;
-    }
-    // Rewards
-    else if (
-      message.includes("reward") ||
-      message.includes("point") ||
-      message.includes("badge") ||
-      message.includes("gift") ||
-      message.includes("benefit")
-    ) {
-      return botResponses.rewards;
-    }
-    // Greetings / General
-    else if (
-      message.includes("hi") ||
-      message.includes("hello") ||
-      message.includes("hey") ||
-      message.includes("start") ||
-      message.includes("menu") ||
-      message.includes("help")
-    ) {
-      return botResponses.greeting;
-    }
-    // Default fallback
-    else {
-      return botResponses.default;
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-
-    addUserMessage(inputValue);
-    setInputValue("");
+    
     setIsTyping(true);
 
-    // Simulate typing delay
-    setTimeout(
-      () => {
-        const response = generateBotResponse(inputValue);
-        setIsTyping(false);
-        addBotMessage(response.content, response.suggestions);
-      },
-      1000 + Math.random() * 1000,
-    );
+    try {
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: textToSend,
+          history: messages.slice(-10), // Send last 10 messages for context
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get response");
+      }
+
+      setIsTyping(false);
+      addBotMessage(data.content);
+    } catch (error: any) {
+      console.error("Chatbot error:", error);
+      setIsTyping(false);
+      const errorMessage = error.message && error.message !== "Failed to get response" 
+        ? `Error: ${error.message}` 
+        : "I'm sorry, I'm having trouble connecting right now. Please try again later.";
+      addBotMessage(errorMessage);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     addUserMessage(suggestion);
-    setIsTyping(true);
-
-    setTimeout(() => {
-      const response = generateBotResponse(suggestion);
-      setIsTyping(false);
-      addBotMessage(response.content, response.suggestions);
-    }, 800);
+    handleSendMessage(suggestion);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -392,7 +330,7 @@ export default function ChatbotWidget() {
                 disabled={isTyping}
               />
               <Button
-                onClick={handleSendMessage}
+                onClick={() => handleSendMessage()}
                 size="default"
                 corners="crisp"
                 disabled={!inputValue.trim() || isTyping}
@@ -401,7 +339,7 @@ export default function ChatbotWidget() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Ask about eligibility, scheduling, or the donation process
+              Hope AI answers blood donation related questions only.
             </p>
           </div>
         </CardContent>
