@@ -5,6 +5,7 @@ import { Drive } from "../lib/supabase";
 import { driveService, feedbackService } from "@/lib/db-services";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaginationControls } from "@/components/PaginationControls";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -69,19 +70,11 @@ export default function BloodDrives() {
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  const [isHostDialogOpen, setIsHostDialogOpen] = useState(false);
-  const [isSubmittingHost, setIsSubmittingHost] = useState(false);
-  const [hostFormData, setHostFormData] = useState({
-    name: "",
-    description: "",
-    location: "",
-    address: "",
-    city: "",
-    state: "",
-    startDate: "",
-    endDate: "",
-    capacity: 20
-  });
+
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9; // 3x3 grid
 
   // Load drives from database on mount
   useEffect(() => {
@@ -159,7 +152,20 @@ export default function BloodDrives() {
     setSelectedBloodType("");
     setSelectedDate(undefined);
     setCityFilter("");
+    setCurrentPage(1);
   };
+
+  // Pagination logic
+  const paginatedDrives = filteredDrives.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+  const totalPages = Math.ceil(filteredDrives.length / itemsPerPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedBloodType, selectedDate, cityFilter]);
 
   const getAvailabilityColor = (registered: number, capacity: number) => {
     const percentage = (registered / capacity) * 100;
@@ -290,15 +296,8 @@ export default function BloodDrives() {
 
               {/* Clear Filters */}
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={clearFilters}>
+                <Button variant="outline" className="w-full" onClick={clearFilters}>
                   Clear Filters
-                </Button>
-                <Button 
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => setIsHostDialogOpen(true)}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Host a Drive
                 </Button>
               </div>
             </div>
@@ -322,175 +321,182 @@ export default function BloodDrives() {
 
         {/* Blood Drives Grid */}
         {filteredDrives.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDrives.map((drive) => {
-              const expired = isDriveExpired(drive) || drive.is_active === false;
-              const isFull = (drive.registered_count ?? 0) >= drive.capacity;
-              return (
-              <Card
-                key={drive.id}
-                className={`border-2 transition-shadow ${
-                  expired
-                    ? "border-gray-300 dark:border-gray-600 opacity-70"
-                    : "border-[hsl(0,80%,50%)] hover:shadow-lg"
-                }`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className={`text-lg line-clamp-2 ${
-                        expired ? "text-gray-400" : "text-[hsl(0,80%,50%)]"
-                      }`}>
-                        {drive.name}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        by{" "}
-                        {drive.profiles?.name ||
-                          drive.hospitals?.name ||
-                          "Unknown Organizer"}
-                      </p>
-                    </div>
-                    {expired ? (
-                      <Badge variant="secondary" className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-0">
-                        Ended
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="secondary"
-                        className={`${getAvailabilityColor(
-                          drive.registered_count || 0,
-                          drive.capacity,
-                        )} bg-transparent border`}
-                      >
-                        {getAvailabilityText(
-                          drive.registered_count || 0,
-                          drive.capacity,
-                        )}
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Location */}
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-4 h-4 text-[hsl(0,80%,50%)] mt-1 flex-shrink-0" />
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedDrives.map((drive) => {
+                const expired = isDriveExpired(drive) || drive.is_active === false;
+                const isFull = (drive.registered_count ?? 0) >= drive.capacity;
+                return (
+                <Card
+                  key={drive.id}
+                  className={`border-2 transition-shadow ${
+                    expired
+                      ? "border-gray-300 dark:border-gray-600 opacity-70"
+                      : "border-[hsl(0,80%,50%)] hover:shadow-lg"
+                  }`}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm font-medium">{drive.location}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {drive.address}, {drive.city}, {drive.state}
+                        <CardTitle className={`text-lg line-clamp-2 ${
+                          expired ? "text-gray-400" : "text-[hsl(0,80%,50%)]"
+                        }`}>
+                          {drive.name}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          by{" "}
+                          {drive.profiles?.name ||
+                            drive.hospitals?.name ||
+                            "Unknown Organizer"}
                         </p>
                       </div>
+                      {expired ? (
+                        <Badge variant="secondary" className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-0">
+                          Ended
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="secondary"
+                          className={`${getAvailabilityColor(
+                            drive.registered_count || 0,
+                            drive.capacity,
+                          )} bg-transparent border`}
+                        >
+                          {getAvailabilityText(
+                            drive.registered_count || 0,
+                            drive.capacity,
+                          )}
+                        </Badge>
+                      )}
                     </div>
-
-                    {/* Date and Time */}
-                    <div className="flex items-center space-x-2">
-                      <CalendarIcon className="w-4 h-4 text-[hsl(0,80%,50%)]" />
-                      <p className="text-sm">
-                        {new Date(drive.start_date).toLocaleDateString()}
-                        {drive.start_date !== drive.end_date &&
-                          ` - ${new Date(drive.end_date).toLocaleDateString()}`}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-[hsl(0,80%,50%)]" />
-                      <p className="text-sm">
-                        {drive.start_time} - {drive.end_time}
-                      </p>
-                    </div>
-
-                    {/* Capacity */}
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-[hsl(0,80%,50%)]" />
-                      <p className="text-sm">
-                        {drive.registered_count || 0}/{drive.capacity}{" "}
-                        registered
-                      </p>
-                    </div>
-
-                    {/* Blood Types Needed */}
-                    {drive.blood_types_needed &&
-                      drive.blood_types_needed.length > 0 && (
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Location */}
+                      <div className="flex items-start space-x-2">
+                        <MapPin className="w-4 h-4 text-[hsl(0,80%,50%)] mt-1 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium mb-2">
-                            Blood Types Needed:
+                          <p className="text-sm font-medium">{drive.location}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {drive.address}, {drive.city}, {drive.state}
                           </p>
-                          <div className="flex flex-wrap gap-1">
-                            {drive.blood_types_needed.map((type) => (
-                              <Badge
-                                key={type}
-                                variant="outline"
-                                className="text-xs border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)]"
-                              >
-                                {type}
-                              </Badge>
-                            ))}
-                          </div>
                         </div>
-                      )}
+                      </div>
 
-                    {/* Description */}
-                    {drive.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {drive.description}
-                      </p>
-                    )}
+                      {/* Date and Time */}
+                      <div className="flex items-center space-x-2">
+                        <CalendarIcon className="w-4 h-4 text-[hsl(0,80%,50%)]" />
+                        <p className="text-sm">
+                          {new Date(drive.start_date).toLocaleDateString()}
+                          {drive.start_date !== drive.end_date &&
+                            ` - ${new Date(drive.end_date).toLocaleDateString()}`}
+                        </p>
+                      </div>
 
-                    {/* Actions */}
-                    <div className="flex space-x-2 pt-2">
-                      <Button
-                        asChild={!expired && !isFull}
-                        className={`flex-1 text-white ${
-                          expired
-                            ? "bg-gray-400 cursor-not-allowed hover:bg-gray-400"
-                            : "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90"
-                        }`}
-                        disabled={expired || isFull}
-                      >
-                        {expired || isFull ? (
-                          <span>{expired ? "Drive Ended" : "Full"}</span>
-                        ) : (
-                          <Link to={`/book-appointment/${drive.id}`}>
-                            Book Appointment
-                          </Link>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="w-4 h-4 text-[hsl(0,80%,50%)]" />
+                        <p className="text-sm">
+                          {drive.start_time} - {drive.end_time}
+                        </p>
+                      </div>
+
+                      {/* Capacity */}
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-4 h-4 text-[hsl(0,80%,50%)]" />
+                        <p className="text-sm">
+                          {drive.registered_count || 0}/{drive.capacity}{" "}
+                          registered
+                        </p>
+                      </div>
+
+                      {/* Blood Types Needed */}
+                      {drive.blood_types_needed &&
+                        drive.blood_types_needed.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">
+                              Blood Types Needed:
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {drive.blood_types_needed.map((type) => (
+                                <Badge
+                                  key={type}
+                                  variant="outline"
+                                  className="text-xs border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)]"
+                                >
+                                  {type}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
                         )}
-                      </Button>
-                      {drive.latitude && drive.longitude && (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            window.open(
-                              `https://maps.google.com/?q=${drive.latitude},${drive.longitude}`,
-                              "_blank",
-                            )
-                          }
-                        >
-                          <Navigation className="w-4 h-4" />
-                        </Button>
+
+                      {/* Description */}
+                      {drive.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {drive.description}
+                        </p>
                       )}
-                      {/* Feedback button for ended drives */}
-                      {expired && isSignedIn && (
+
+                      {/* Actions */}
+                      <div className="flex space-x-2 pt-2">
                         <Button
-                          variant="outline"
-                          size="icon"
-                          title="Leave Feedback"
-                          onClick={() => {
-                            setFeedbackDriveId(drive.id);
-                            setFeedbackRating(0);
-                            setFeedbackText("");
-                          }}
+                          asChild={!expired && !isFull}
+                          className={`flex-1 text-white ${
+                            expired
+                              ? "bg-gray-400 cursor-not-allowed hover:bg-gray-400"
+                              : "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90"
+                          }`}
+                          disabled={expired || isFull}
                         >
-                          <MessageSquare className="w-4 h-4" />
+                          {expired || isFull ? (
+                            <span>{expired ? "Drive Ended" : "Full"}</span>
+                          ) : (
+                            <Link to={`/book-appointment/${drive.id}`}>
+                              Book Appointment
+                            </Link>
+                          )}
                         </Button>
-                      )}
+                        {drive.latitude && drive.longitude && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              window.open(
+                                `https://maps.google.com/?q=${drive.latitude},${drive.longitude}`,
+                                "_blank",
+                              )
+                            }
+                          >
+                            <Navigation className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {/* Feedback button for ended drives */}
+                        {expired && isSignedIn && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title="Leave Feedback"
+                            onClick={() => {
+                              setFeedbackDriveId(drive.id);
+                              setFeedbackRating(0);
+                              setFeedbackText("");
+                            }}
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              );
-            })}
+                  </CardContent>
+                </Card>
+                );
+              })}
+            </div>
+            <PaginationControls 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={setCurrentPage} 
+            />
           </div>
         ) : (
           <Card className="border-2 border-[hsl(0,80%,50%)]">
@@ -624,131 +630,6 @@ export default function BloodDrives() {
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 "Submit Feedback"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Host Drive Dialog */}
-      <Dialog open={isHostDialogOpen} onOpenChange={setIsHostDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white border-2 border-success rounded-sm">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-success flex items-center">
-              <Plus className="w-6 h-6 mr-2" />
-              Host a Personal Blood Drive
-            </DialogTitle>
-            <DialogDescription>
-              Organize a virtual or local drive for your friends, family, or community.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Drive Name</label>
-              <Input 
-                placeholder="e.g. Smith Family Blood Drive" 
-                value={hostFormData.name}
-                onChange={(e) => setHostFormData({...hostFormData, name: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Description</label>
-              <Textarea 
-                placeholder="Why are you hosting this drive?" 
-                value={hostFormData.description}
-                onChange={(e) => setHostFormData({...hostFormData, description: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Location Name</label>
-              <Input 
-                placeholder="e.g. Community Center" 
-                value={hostFormData.location}
-                onChange={(e) => setHostFormData({...hostFormData, location: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">City</label>
-              <Input 
-                placeholder="City" 
-                value={hostFormData.city}
-                onChange={(e) => setHostFormData({...hostFormData, city: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Start Date</label>
-              <Input 
-                type="date" 
-                value={hostFormData.startDate}
-                onChange={(e) => setHostFormData({...hostFormData, startDate: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">End Date</label>
-              <Input 
-                type="date" 
-                value={hostFormData.endDate}
-                onChange={(e) => setHostFormData({...hostFormData, endDate: e.target.value})}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() => setIsHostDialogOpen(false)}
-              disabled={isSubmittingHost}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-success hover:bg-success/90 text-white"
-              disabled={!hostFormData.name || !hostFormData.startDate || isSubmittingHost}
-              onClick={async () => {
-                if (!donorProfile?.id) return;
-                try {
-                  setIsSubmittingHost(true);
-                  const { error } = await driveService.create({
-                    name: hostFormData.name,
-                    description: hostFormData.description,
-                    organizer_id: donorProfile.id,
-                    location: hostFormData.location,
-                    address: hostFormData.address || hostFormData.location,
-                    city: hostFormData.city,
-                    state: hostFormData.state || "Active",
-                    start_date: hostFormData.startDate,
-                    end_date: hostFormData.endDate || hostFormData.startDate,
-                    start_time: "09:00",
-                    end_time: "17:00",
-                    capacity: hostFormData.capacity,
-                    blood_types_needed: ["A+", "B+", "O+", "AB+"]
-                  });
-
-                  if (error) throw error;
-
-                  toast({
-                    title: "Drive created successfully!",
-                    description: "Your personal blood drive is now live.",
-                  });
-                  setIsHostDialogOpen(false);
-                  // Refresh list
-                  const { data } = await driveService.getAll();
-                  if (data) setDrives(data);
-                } catch (error) {
-                  console.error("Error creating drive:", error);
-                  toast({
-                    title: "Creation failed",
-                    description: "Something went wrong. Please try again.",
-                    variant: "destructive"
-                  });
-                } finally {
-                  setIsSubmittingHost(false);
-                }
-              }}
-            >
-              {isSubmittingHost ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                "Create Drive"
               )}
             </Button>
           </DialogFooter>

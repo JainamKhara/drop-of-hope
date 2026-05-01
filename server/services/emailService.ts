@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 interface EmailOptions {
   to: string;
@@ -6,49 +6,47 @@ interface EmailOptions {
   html: string;
 }
 
-let resend: Resend | null = null;
+let transporter: nodemailer.Transporter | null = null;
 
-function getResend(): Resend {
-  if (resend) {
-    return resend;
+function getTransporter(): nodemailer.Transporter {
+  if (transporter) {
+    return transporter;
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing RESEND_API_KEY environment variable");
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+
+  if (!user || !pass) {
+    throw new Error("Missing EMAIL_USER or EMAIL_PASS environment variables for Gmail SMTP");
   }
 
-  resend = new Resend(apiKey);
-  return resend;
+  transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: user,
+      pass: pass,
+    },
+  });
+
+  return transporter;
 }
 
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   try {
-    let emailFromAddress = process.env.EMAIL_FROM_ADDRESS || "onboarding@resend.dev";
-    
-    // If the user hasn't replaced the placeholder in .env or if it's the specific placeholder string
-    if (emailFromAddress === "[EMAIL_ADDRESS]") {
-      emailFromAddress = "onboarding@resend.dev";
-    }
-    
     const emailFromName = process.env.EMAIL_FROM_NAME || "Drop of Hope";
+    const emailFromAddress = process.env.EMAIL_USER;
 
-    const result = await getResend().emails.send({
-      from: `${emailFromName} <${emailFromAddress}>`,
+    const result = await getTransporter().sendMail({
+      from: `"${emailFromName}" <${emailFromAddress}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
     });
 
-    if (result.error) {
-      console.error("Error sending email:", result.error);
-      return false;
-    }
-
-    console.log(`Email sent: ${result.data?.id}`);
+    console.log(`Email sent: ${result.messageId}`);
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email via Gmail:", error);
     return false;
   }
 };

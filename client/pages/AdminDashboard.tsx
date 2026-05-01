@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { handleError } from "@/lib/error-handler";
 import { useToast } from "@/hooks/use-toast";
+import { PaginationControls } from "@/components/PaginationControls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +57,7 @@ import {
   PieChart,
   LineChart,
   Clock,
-  CheckCircle,
+  CheckCircle2 as CheckCircle,
   XCircle,
   Hospital,
   Building,
@@ -98,6 +99,15 @@ interface AnalyticsData {
   monthlyGrowth: number;
   donationsThisMonth: number;
   upcomingAppointments: number;
+  bloodTypeStats: Record<string, number>;
+}
+
+interface BroadcastForm {
+  title: string;
+  message: string;
+  priority: "low" | "medium" | "high";
+  bloodTypeFilter: string;
+  actionUrl: string;
 }
 
 export default function AdminDashboard() {
@@ -120,6 +130,7 @@ export default function AdminDashboard() {
     monthlyGrowth: 12.5,
     donationsThisMonth: 0,
     upcomingAppointments: 0,
+    bloodTypeStats: {},
   });
   const [recentDonors, setRecentDonors] = useState<any[]>([]);
   const [leaderboardDonors, setLeaderboardDonors] = useState<any[]>([]);
@@ -138,13 +149,22 @@ export default function AdminDashboard() {
   // Notification broadcast state
   const [isBroadcastDialogOpen, setIsBroadcastDialogOpen] = useState(false);
   const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
-  const [broadcastForm, setBroadcastForm] = useState({
+  const [broadcastForm, setBroadcastForm] = useState<BroadcastForm>({
     title: "",
     message: "",
     priority: "medium",
-    bloodTypeFilter: "",
+    bloodTypeFilter: "all",
     actionUrl: "",
   });
+
+  // Pagination state
+  const [donorsPage, setDonorsPage] = useState(1);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [drivesPage, setDrivesPage] = useState(1);
+  const [hospitalsPage, setHospitalsPage] = useState(1);
+  const [appointmentsPage, setAppointmentsPage] = useState(1);
+  const [requestsPage, setRequestsPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Dialog states
   const [isDriveDialogOpen, setIsDriveDialogOpen] = useState(false);
@@ -240,6 +260,7 @@ export default function AdminDashboard() {
           monthlyGrowth: statsResult.monthlyGrowth || 0,
           donationsThisMonth: statsResult.donationsThisMonth || 0,
           upcomingAppointments: appointmentsResult.data?.length || 0,
+          bloodTypeStats: statsResult.bloodTypeStats || {},
         });
       }
 
@@ -338,6 +359,48 @@ export default function AdminDashboard() {
       setDataLoading(false);
     }
   };
+
+  // Pagination logic
+  const paginatedDonors = recentDonors.slice((donorsPage - 1) * itemsPerPage, donorsPage * itemsPerPage);
+  const donorsTotalPages = Math.ceil(recentDonors.length / itemsPerPage);
+
+  const paginatedLeaderboard = leaderboardDonors.slice((leaderboardPage - 1) * itemsPerPage, leaderboardPage * itemsPerPage);
+  const leaderboardTotalPages = Math.ceil(leaderboardDonors.length / itemsPerPage);
+
+  const paginatedDrives = bloodDrives.slice((drivesPage - 1) * itemsPerPage, drivesPage * itemsPerPage);
+  const drivesTotalPages = Math.ceil(bloodDrives.length / itemsPerPage);
+
+  const paginatedHospitals = hospitals.slice((hospitalsPage - 1) * itemsPerPage, hospitalsPage * itemsPerPage);
+  const hospitalsTotalPages = Math.ceil(hospitals.length / itemsPerPage);
+
+  const paginatedAppointments = appointments.slice((appointmentsPage - 1) * itemsPerPage, appointmentsPage * itemsPerPage);
+  const appointmentsTotalPages = Math.ceil(appointments.length / itemsPerPage);
+
+  const paginatedRequests = bloodRequests.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage);
+  const requestsTotalPages = Math.ceil(bloodRequests.length / itemsPerPage);
+
+  // Filtered Donors Logic
+  const filteredDonors = recentDonors.filter((donor) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      donor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donor.bloodType.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "eligible" && donor.status === "active") ||
+      (filterStatus === "pending" && donor.status === "pending") ||
+      (filterStatus === "ineligible" && donor.status === "inactive");
+
+    const matchesBloodType =
+      filterBloodType === "all" || donor.bloodType === filterBloodType;
+
+    return matchesSearch && matchesStatus && matchesBloodType;
+  });
+
+  const paginatedDonorsList = filteredDonors.slice((donorsPage - 1) * itemsPerPage, donorsPage * itemsPerPage);
+  const donorsListTotalPages = Math.ceil(filteredDonors.length / itemsPerPage);
 
   const handleSignOut = async () => {
     await supabaseSignOut();
@@ -809,7 +872,7 @@ export default function AdminDashboard() {
                     {analyticsData.livesImpacted.toLocaleString()}
                   </p>
                   <p className="text-sm text-[hsl(120,71%,43%)]">
-                    +3,672 this month
+                    +{analyticsData.donationsThisMonth * 3} this month
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
@@ -995,43 +1058,51 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[...leaderboardDonors].slice(0, 10).map((donor, index) => (
-                    <div
-                      key={donor.id}
-                      className="flex items-center gap-4 p-3 rounded-sm hover:bg-muted/50 transition-colors"
-                    >
+                  {paginatedLeaderboard.map((donor, index) => {
+                    const rank = (leaderboardPage - 1) * itemsPerPage + index + 1;
+                    return (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                          index === 0
-                            ? "bg-amber-400 text-white"
-                            : index === 1
-                              ? "bg-slate-400 text-white"
-                              : index === 2
-                                ? "bg-orange-400 text-white"
-                                : "bg-muted text-muted-foreground"
-                        }`}
+                        key={donor.id}
+                        className="flex items-center gap-4 p-3 rounded-sm hover:bg-muted/50 transition-colors"
                       >
-                        {index + 1}
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                            rank === 1
+                              ? "bg-amber-400 text-white"
+                              : rank === 2
+                                ? "bg-slate-400 text-white"
+                                : rank === 3
+                                  ? "bg-orange-400 text-white"
+                                  : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {rank}
+                        </div>
+                        <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                          {donor.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{donor.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {donor.bloodType} · {donor.status}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-bold text-[hsl(0,80%,50%)]">
+                            {donor.points}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            pts · Lv{donor.level}
+                          </p>
+                        </div>
                       </div>
-                      <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                        {donor.name.substring(0, 2).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{donor.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {donor.bloodType} · {donor.status}
-                        </p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-[hsl(0,80%,50%)]">
-                          {donor.points}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          pts · Lv{donor.level}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                  <PaginationControls 
+                    currentPage={leaderboardPage} 
+                    totalPages={leaderboardTotalPages} 
+                    onPageChange={setLeaderboardPage} 
+                  />
                   {leaderboardDonors.length === 0 && (
                     <p className="text-muted-foreground text-center py-8">
                       No donor data yet
@@ -1180,7 +1251,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {appointments.map((appointment: any) => (
+                    {paginatedAppointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
                         className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
@@ -1285,6 +1356,11 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))}
+                    <PaginationControls 
+                      currentPage={appointmentsPage} 
+                      totalPages={appointmentsTotalPages} 
+                      onPageChange={setAppointmentsPage} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -1311,7 +1387,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {bloodRequests.map((request: any) => (
+                    {paginatedRequests.map((request: any) => (
                       <div
                         key={request.id}
                         className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-orange-50 dark:bg-orange-900/20 rounded-sm border border-orange-200 dark:border-orange-800"
@@ -1418,6 +1494,11 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))}
+                    <PaginationControls 
+                      currentPage={requestsPage} 
+                      totalPages={requestsTotalPages} 
+                      onPageChange={setRequestsPage} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -1528,90 +1609,64 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(() => {
-                    const filteredDonors = recentDonors.filter((donor) => {
-                      const matchesSearch =
-                        searchTerm === "" ||
-                        donor.name
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase()) ||
-                        donor.email
-                          ?.toLowerCase()
-                          .includes(searchTerm.toLowerCase()) ||
-                        donor.bloodType
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase());
-
-                      const matchesStatus =
-                        filterStatus === "all" ||
-                        (filterStatus === "eligible" &&
-                          donor.status === "active") ||
-                        (filterStatus === "pending" &&
-                          donor.status === "pending") ||
-                        (filterStatus === "ineligible" &&
-                          donor.status === "inactive");
-
-                      const matchesBloodType =
-                        filterBloodType === "all" ||
-                        donor.bloodType === filterBloodType;
-
-                      return matchesSearch && matchesStatus && matchesBloodType;
-                    });
-
-                    if (filteredDonors.length === 0) {
-                      return (
-                        <div className="text-center py-12">
-                          <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">
-                            No donors found matching your filters
-                          </p>
-                        </div>
-                      );
-                    }
-
-                    return filteredDonors.map((donor) => (
-                      <div
-                        key={donor.id}
-                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
-                            {donor.name
-                              .split(" ")
-                              .map((n: string) => n[0])
-                              .join("")}
+                  {paginatedDonorsList.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        No donors found matching your filters
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {paginatedDonorsList.map((donor) => (
+                        <div
+                          key={donor.id}
+                          className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-[hsl(0,0%,98%)] dark:bg-card rounded-sm"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
+                              {donor.name
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")}
+                            </div>
+                            <div>
+                              <p className="font-medium">{donor.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {donor.bloodType} • {donor.donations} donations •
+                                Last:{" "}
+                                {format(new Date(donor.lastDonation), "MMM dd")}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{donor.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {donor.bloodType} • {donor.donations} donations •
-                              Last:{" "}
-                              {format(new Date(donor.lastDonation), "MMM dd")}
-                            </p>
+                          <div className="flex items-center space-x-3">
+                            <Badge className={getStatusColor(donor.status)}>
+                              {getStatusIcon(donor.status)}
+                              <span className="ml-1 capitalize">
+                                {donor.status}
+                              </span>
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setViewingDonor(donor);
+                                setIsDonorDialogOpen(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              View
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
-                          <Badge className={getStatusColor(donor.status)}>
-                            {getStatusIcon(donor.status)}
-                            <span className="ml-1 capitalize">
-                              {donor.status}
-                            </span>
-                          </Badge>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setViewingDonor(donor);
-                              setIsDonorDialogOpen(true);
-                            }}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                    ));
-                  })()}
+                      ))}
+                      <PaginationControls 
+                        currentPage={donorsPage} 
+                        totalPages={donorsListTotalPages} 
+                        onPageChange={setDonorsPage} 
+                      />
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1735,7 +1790,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bloodDrives.map((drive) => (
+                  {paginatedDrives.map((drive: any) => (
                     <div key={drive.id} className="p-4 border rounded-sm">
                       <div className="flex items-center justify-between mb-3">
                         <div>
@@ -1815,6 +1870,11 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
+                  <PaginationControls 
+                    currentPage={drivesPage} 
+                    totalPages={drivesTotalPages} 
+                    onPageChange={setDrivesPage} 
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -1840,7 +1900,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {hospitals.map((hospital) => (
+                  {paginatedHospitals.map((hospital: any) => (
                     <div
                       key={hospital.id}
                       className="p-3 sm:p-4 border rounded-sm space-y-3"
@@ -1907,6 +1967,11 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
+                  <PaginationControls 
+                    currentPage={hospitalsPage} 
+                    totalPages={hospitalsTotalPages} 
+                    onPageChange={setHospitalsPage} 
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -1926,21 +1991,43 @@ export default function AdminDashboard() {
                 <CardContent className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={Object.entries(
-                        recentDonors.reduce(
-                          (acc: Record<string, number>, d) => {
-                            acc[d.bloodType] = (acc[d.bloodType] || 0) + 1;
-                            return acc;
-                          },
-                          {},
-                        ),
-                      ).map(([type, count]) => ({ type, count }))}
+                      data={["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"]
+                        .map((type) => ({
+                          type,
+                          count: analyticsData.bloodTypeStats[type] || 0,
+                        }))
+                        .concat(
+                          Object.entries(analyticsData.bloodTypeStats)
+                            .filter(
+                              ([type]) =>
+                                ![
+                                  "O+",
+                                  "O-",
+                                  "A+",
+                                  "A-",
+                                  "B+",
+                                  "B-",
+                                  "AB+",
+                                  "AB-",
+                                ].includes(type),
+                            )
+                            .map(([type, count]) => ({ type, count })),
+                        )}
                       margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
                       <XAxis dataKey="type" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      />
                       <Bar
                         dataKey="count"
                         name="Donors"
@@ -1999,7 +2086,15 @@ export default function AdminDashboard() {
                         <Cell fill="#22c55e" />
                         <Cell fill="#ef4444" />
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                      />
                       <Legend />
                     </RechartsPieChart>
                   </ResponsiveContainer>
@@ -2017,17 +2112,20 @@ export default function AdminDashboard() {
                 <CardContent className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={bloodDrives.slice(0, 8).map((d: any) => ({
-                        name:
-                          d.name.length > 18
-                            ? d.name.slice(0, 16) + "…"
-                            : d.name,
-                        Capacity: d.capacity,
-                        Registered: d.registered,
-                      }))}
+                      data={bloodDrives
+                        .filter((d: any) => d.status === "active")
+                        .slice(0, 8)
+                        .map((d: any) => ({
+                          name:
+                            d.name.length > 18
+                              ? d.name.slice(0, 16) + "…"
+                              : d.name,
+                          Capacity: d.capacity,
+                          Registered: d.registered,
+                        }))}
                       margin={{ top: 5, right: 10, left: -20, bottom: 40 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
                       <XAxis
                         dataKey="name"
                         tick={{ fontSize: 11 }}
@@ -2035,7 +2133,16 @@ export default function AdminDashboard() {
                         textAnchor="end"
                       />
                       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      />
                       <Legend />
                       <Bar
                         dataKey="Capacity"
@@ -2622,7 +2729,7 @@ export default function AdminDashboard() {
                 <Select
                   value={broadcastForm.priority}
                   onValueChange={(value) =>
-                    setBroadcastForm({ ...broadcastForm, priority: value })
+                    setBroadcastForm({ ...broadcastForm, priority: value as "low" | "medium" | "high" })
                   }
                 >
                   <SelectTrigger>

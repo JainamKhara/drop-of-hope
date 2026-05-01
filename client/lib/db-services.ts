@@ -1443,7 +1443,8 @@ export const statsService = {
       { count: activeDrives },
       { count: totalHospitals },
       { count: donationsThisMonth },
-      { count: activeDonorsCount }
+      { count: activeDonorsCount },
+      { data: bloodTypeData }
     ] = await Promise.all([
       donorService.getCount(),
       donationService.getTotalCount(),
@@ -1453,8 +1454,19 @@ export const statsService = {
       // Donations this month
       supabase.from("donations").select("*", { count: "exact", head: true }).gte("donation_date", startOfMonth),
       // Active donors (donated in last 6 months)
-      supabase.from("donors").select("*", { count: "exact", head: true }).gte("last_donation_date", sixMonthsAgo)
+      supabase.from("donors").select("*", { count: "exact", head: true }).gte("last_donation_date", sixMonthsAgo),
+      // Blood type distribution
+      supabase.from("donors").select("blood_type")
     ]);
+
+    // Process blood type distribution
+    const bloodTypeStats: Record<string, number> = {};
+    if (bloodTypeData) {
+      bloodTypeData.forEach((d: any) => {
+        const type = d.blood_type || "Unknown";
+        bloodTypeStats[type] = (bloodTypeStats[type] || 0) + 1;
+      });
+    }
 
     // Calculate growth (mocked for now as we don't have historical snapshots easily without a dedicated stats table, 
     // but at least it's based on real counts)
@@ -1469,7 +1481,8 @@ export const statsService = {
       activeDrives: activeDrives || 0,
       partnerships: totalHospitals || 0,
       donationsThisMonth: donationsThisMonth || 0,
-      monthlyGrowth: growth
+      monthlyGrowth: growth,
+      bloodTypeStats
     };
   },
 };

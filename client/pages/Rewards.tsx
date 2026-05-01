@@ -25,7 +25,10 @@ import {
   Ticket,
   ShieldCheck,
   ShoppingBag,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { PaginationControls } from "@/components/PaginationControls";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import {
   rewardService,
@@ -200,6 +203,8 @@ export default function Rewards() {
   const [earnedBadges, setEarnedBadges] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [completedDonations, setCompletedDonations] = useState(0);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Derived donor stats from donorProfile
   const currentPoints = donorProfile?.points || 0;
@@ -283,7 +288,7 @@ export default function Rewards() {
       const [badgesResult, leaderboardResult, appointmentsResult] =
         await Promise.allSettled([
           rewardService.getByDonor(donorProfile.id),
-          rewardService.getLeaderboard(10),
+          rewardService.getLeaderboard(50),
           appointmentService.getByDonor(donorProfile.id, "completed"),
         ]);
 
@@ -368,6 +373,9 @@ export default function Rewards() {
     );
     return level?.name || "Bronze";
   };
+
+  const leaderboardTotalPages = Math.ceil(leaderboard.length / itemsPerPage);
+  const paginatedLeaderboard = leaderboard.slice((leaderboardPage - 1) * itemsPerPage, leaderboardPage * itemsPerPage);
 
   if (loading) {
     return (
@@ -681,13 +689,14 @@ export default function Rewards() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {leaderboard.length === 0 ? (
+                  {paginatedLeaderboard.length === 0 ? (
                     <p className="text-muted-foreground text-center py-8">
                       No leaderboard data available yet.
                     </p>
                   ) : (
-                    leaderboard.map((user: any, index: number) => {
-                      const rank = index + 1;
+                    <>
+                    {paginatedLeaderboard.map((user: any, index: number) => {
+                      const rank = (leaderboardPage - 1) * itemsPerPage + index + 1;
                       const isCurrentUser = user.id === donorProfile?.id;
                       return (
                         <div
@@ -738,7 +747,13 @@ export default function Rewards() {
                           </div>
                         </div>
                       );
-                    })
+                    })}
+                    <PaginationControls 
+                      currentPage={leaderboardPage} 
+                      totalPages={leaderboardTotalPages} 
+                      onPageChange={setLeaderboardPage} 
+                    />
+                    </>
                   )}
                 </div>
               </CardContent>

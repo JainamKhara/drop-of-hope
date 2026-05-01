@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import ChatbotWidget from "@/components/ChatbotWidget";
+import { PaginationControls } from "@/components/PaginationControls";
 import {
   Heart,
   Plus,
@@ -22,6 +23,7 @@ import {
   Trophy,
   Crown,
   Loader2,
+  CheckCircle2 as CheckCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { communityService, donorService } from "@/lib/db-services";
@@ -91,6 +93,16 @@ export default function Community() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [totalDonors, setTotalDonors] = useState(0);
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+  const [comments, setComments] = useState<Record<string, any[]>>({});
+  const [commenting, setCommenting] = useState<Record<string, boolean>>({});
+  const [newComments, setNewComments] = useState<Record<string, string>>({});
+  const [joining, setJoining] = useState<string | null>(null);
+
+  // Pagination state
+  const [postsPage, setPostsPage] = useState(1);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Load posts + leaderboard + blood type groups
   useEffect(() => {
@@ -113,6 +125,150 @@ export default function Community() {
     };
     load();
   }, []);
+
+  // Pagination logic
+  const paginatedPosts = posts.slice((postsPage - 1) * itemsPerPage, postsPage * itemsPerPage);
+  const postsTotalPages = Math.ceil(posts.length / itemsPerPage);
+
+  const paginatedLeaderboard = leaderboard.slice((leaderboardPage - 1) * itemsPerPage, leaderboardPage * itemsPerPage);
+  const leaderboardTotalPages = Math.ceil(leaderboard.length / itemsPerPage);
+
+  const handleJoinGroup = async (bloodType: string) => {
+    if (!donorProfile?.id) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to join a community group.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (donorProfile.blood_type === bloodType) {
+      toast({
+        title: "Already a Member",
+        description: `You are already a member of the ${bloodType} group!`,
+      });
+      return;
+    }
+
+    try {
+      setJoining(bloodType);
+      const { error } = await donorService.update(donorProfile.id, {
+        blood_type: bloodType as any,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Group Joined!",
+        description: `Welcome to the ${bloodType} community! Your profile has been updated.`,
+      });
+
+      // Refresh groups to see updated count
+      const groupsRes = await communityService.getBloodTypeGroups();
+      if (groupsRes.data) setBloodTypeGroups(groupsRes.data);
+      
+      // Update local donor profile if possible or just rely on re-fetch
+      window.location.reload(); // Simplest way to update global state for now
+    } catch (error) {
+      console.error("Error joining group:", error);
+      toast({
+        title: "Error",
+        description: "Failed to join the group. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setJoining(null);
+    }
+  };
+
+  const toggleComments = async (postId: string) => {
+    const newExpanded = new Set(expandedComments);
+    if (newExpanded.has(postId)) {
+      newExpanded.delete(postId);
+    } else {
+      newExpanded.add(postId);
+      // Load comments if not already loaded
+      if (!comments[postId]) {
+        try {
+          const { data } = await communityService.getComments(postId);
+          if (data) {
+            setComments((prev) => ({ ...prev, [postId]: data }));
+          }
+        } catch (error) {
+          console.error("Error loading comments:", error);
+        }
+      }
+    }
+    setExpandedComments(newExpanded);
+  };
+
+  const submitComment = async (postId: string) => {
+    if (!donorProfile?.id) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to leave a comment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const content = newComments[postId]?.trim();
+    if (!content) return;
+
+    try {
+      setCommenting((prev) => ({ ...prev, [postId]: true }));
+      const { data, error } = await communityService.addComment({
+        post_id: postId,
+        author_id: donorProfile.id,
+        content: content,
+      });
+
+      if (error) throw error;
+
+      // Update local comments
+      const newCommentWithAuthor = {
+        ...data,
+        donors: {
+          id: donorProfile.id,
+          name: donorProfile.name,
+          profile_pic_url: donorProfile.profile_pic_url,
+        },
+      };
+
+      setComments((prev) => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), newCommentWithAuthor],
+      }));
+
+      // Update comment count on post
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, comments_count: (p.comments_count || 0) + 1 }
+            : p,
+        ),
+      );
+
+      // Clear input
+      setNewComments((prev) => ({ ...prev, [postId]: "" }));
+    } catch (error: any) {
+      console.error("Error adding comment:", error);
+      
+      let errorMessage = "Failed to add comment. Please try again.";
+      if (error.code === "23503") {
+        errorMessage = "Database constraint error: Your donor profile is not linked to the community users table. Please contact support.";
+      }
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setCommenting((prev) => ({ ...prev, [postId]: false }));
+    }
+  };
 
   const handleLike = async (postId: string) => {
     if (!donorProfile?.id) {
@@ -314,7 +470,7 @@ export default function Community() {
                     </CardContent>
                   </Card>
                 ) : (
-                  posts.map((post) => {
+                  paginatedPosts.map((post) => {
                     const author = post.donors || {};
                     const level = author.level || 1;
                     const isLiked = likedPosts.has(post.id);
@@ -387,7 +543,12 @@ export default function Community() {
                               />
                               {post.likes_count || 0}
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => toggleComments(post.id)}
+                              className={expandedComments.has(post.id) ? "text-[hsl(0,80%,50%)]" : ""}
+                            >
                               <MessageCircle className="w-4 h-4 mr-2" />
                               {post.comments_count || 0}
                             </Button>
@@ -405,11 +566,86 @@ export default function Community() {
                               Share
                             </Button>
                           </div>
+
+                          {expandedComments.has(post.id) && (
+                            <div className="mt-4 pt-4 border-t space-y-4">
+                              <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
+                                {comments[post.id]?.length === 0 ? (
+                                  <p className="text-sm text-center text-muted-foreground py-2">
+                                    No comments yet. Be the first to reply!
+                                  </p>
+                                ) : (
+                                  comments[post.id]?.map((comment) => (
+                                    <div key={comment.id} className="flex gap-3">
+                                      <Avatar className="w-8 h-8">
+                                        <AvatarImage src={comment.donors?.profile_pic_url} />
+                                        <AvatarFallback>
+                                          {comment.donors?.name?.charAt(0) || "U"}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <div className="bg-muted/30 dark:bg-slate-800/50 border border-border/50 rounded-lg p-3 flex-1">
+                                        <div className="flex justify-between items-center mb-1">
+                                          <span className="text-xs font-semibold">
+                                            {comment.donors?.name || "User"}
+                                          </span>
+                                          <span className="text-[10px] text-muted-foreground">
+                                            {format(new Date(comment.created_at), "MMM d, h:mm a")}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm">{comment.content}</p>
+                                      </div>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+
+                              <div className="flex gap-2 items-start pt-2">
+                                <Avatar className="w-8 h-8 mt-1">
+                                  <AvatarImage src={donorProfile?.profile_pic_url} />
+                                  <AvatarFallback>
+                                    {donorProfile?.name?.charAt(0) || "U"}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 space-y-2">
+                                  <Textarea
+                                    placeholder="Write a reply..."
+                                    className="min-h-[80px] bg-background border-2 border-border/50 focus-visible:ring-[hsl(0,80%,50%)] resize-none"
+                                    value={newComments[post.id] || ""}
+                                    onChange={(e) =>
+                                      setNewComments((prev) => ({
+                                        ...prev,
+                                        [post.id]: e.target.value,
+                                      }))
+                                    }
+                                  />
+                                  <div className="flex justify-end">
+                                    <Button
+                                      size="sm"
+                                      disabled={!newComments[post.id]?.trim() || commenting[post.id]}
+                                      onClick={() => submitComment(post.id)}
+                                    >
+                                      {commenting[post.id] ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <Send className="w-3 h-3 mr-1" />
+                                      )}
+                                      Reply
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     );
                   })
                 )}
+                <PaginationControls 
+                  currentPage={postsPage} 
+                  totalPages={postsTotalPages} 
+                  onPageChange={setPostsPage} 
+                />
               </div>
 
               {/* Sidebar */}
@@ -498,62 +734,70 @@ export default function Community() {
                   </p>
                 ) : (
                   <div className="space-y-4">
-                    {leaderboard.map((donor, index) => (
-                      <div
-                        key={donor.id}
-                        className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)] rounded-sm"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                              index === 0
-                                ? "bg-amber-400 text-white"
-                                : index === 1
-                                  ? "bg-slate-400 text-white"
-                                  : index === 2
-                                    ? "bg-orange-400 text-white"
-                                    : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {index === 0 ? (
-                              <Crown className="w-5 h-5" />
-                            ) : index === 1 ? (
-                              <Award className="w-5 h-5" />
-                            ) : index === 2 ? (
-                              <Trophy className="w-5 h-5" />
-                            ) : (
-                              index + 1
-                            )}
+                    {paginatedLeaderboard.map((donor, index) => {
+                      const rank = (leaderboardPage - 1) * itemsPerPage + index + 1;
+                      return (
+                        <div
+                          key={donor.id}
+                          className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,6%)] rounded-sm"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                                rank === 1
+                                  ? "bg-amber-400 text-white"
+                                  : rank === 2
+                                    ? "bg-slate-400 text-white"
+                                    : rank === 3
+                                      ? "bg-orange-400 text-white"
+                                      : "bg-muted text-muted-foreground"
+                              }`}
+                            >
+                              {rank === 1 ? (
+                                <Crown className="w-5 h-5" />
+                              ) : rank === 2 ? (
+                                <Award className="w-5 h-5" />
+                              ) : rank === 3 ? (
+                                <Trophy className="w-5 h-5" />
+                              ) : (
+                                rank
+                              )}
+                            </div>
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage
+                                src={donor.profile_pic_url || undefined}
+                              />
+                              <AvatarFallback className="bg-[hsl(0,80%,50%)] text-white text-sm">
+                                {(donor.name || "U")
+                                  .substring(0, 2)
+                                  .toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold">{donor.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {donor.points} points ·{" "}
+                                <span className={getLevelColor(donor.level || 1)}>
+                                  {getLevelLabel(donor.level || 1)}
+                                </span>
+                              </p>
+                            </div>
                           </div>
-                          <Avatar className="w-10 h-10">
-                            <AvatarImage
-                              src={donor.profile_pic_url || undefined}
-                            />
-                            <AvatarFallback className="bg-[hsl(0,80%,50%)] text-white text-sm">
-                              {(donor.name || "U")
-                                .substring(0, 2)
-                                .toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">{donor.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {donor.points} points ·{" "}
-                              <span className={getLevelColor(donor.level || 1)}>
-                                {getLevelLabel(donor.level || 1)}
-                              </span>
-                            </p>
-                          </div>
+                          {donor.blood_type && (
+                            <Badge
+                              className={getBloodTypeColor(donor.blood_type)}
+                            >
+                              {donor.blood_type}
+                            </Badge>
+                          )}
                         </div>
-                        {donor.blood_type && (
-                          <Badge
-                            className={getBloodTypeColor(donor.blood_type)}
-                          >
-                            {donor.blood_type}
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
+                    <PaginationControls 
+                      currentPage={leaderboardPage} 
+                      totalPages={leaderboardTotalPages} 
+                      onPageChange={setLeaderboardPage} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -583,9 +827,29 @@ export default function Community() {
                     <h3 className="font-semibold text-lg mb-1">
                       {group.count ?? group.members ?? 0} Members
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mb-4">
                       {BLOOD_TYPE_DESCRIPTIONS[group.type] || ""}
                     </p>
+                    <Button 
+                      variant={donorProfile?.blood_type === group.type ? "outline" : "default"}
+                      className={`w-full ${donorProfile?.blood_type === group.type ? "border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)]" : "bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,90%,45%)]"}`}
+                      disabled={joining === group.type || donorProfile?.blood_type === group.type}
+                      onClick={() => handleJoinGroup(group.type)}
+                    >
+                      {joining === group.type ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : donorProfile?.blood_type === group.type ? (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Joined
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Join Group
+                        </>
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
               ))}

@@ -30,6 +30,7 @@ interface DonorInfo {
   id: string;
   name: string;
   clerk_user_id?: string;
+  email?: string;
 }
 
 interface DriveInfo {
@@ -124,6 +125,7 @@ export const sendAppointmentReminder = async (
   appointmentTime: string,
   reminderType: "1_day" | "1_hour",
   clerkUserId?: string,
+  donorEmail?: string,
 ) => {
   if (!clerkUserId) {
     return { data: null, error: "Clerk user ID required" };
@@ -132,6 +134,7 @@ export const sendAppointmentReminder = async (
   try {
     const timeLabel = reminderType === "1_day" ? "tomorrow" : "in 1 hour";
 
+    // 1. Create in-app notification
     const { data, error } = await getSupabase()
       .from("notifications")
       .insert([
@@ -147,6 +150,20 @@ export const sendAppointmentReminder = async (
       ])
       .select()
       .single();
+
+    // 2. Send email notification if email is provided
+    if (donorEmail) {
+      const { sendReminderEmail } = await import("../services/emailService");
+      await sendReminderEmail(
+        donorEmail,
+        donorName,
+        driveName,
+        location,
+        appointmentDate,
+        appointmentTime,
+        reminderType
+      ).catch(err => console.error(`Error sending reminder email to ${donorEmail}:`, err));
+    }
 
     return { data, error };
   } catch (error) {
@@ -245,7 +262,7 @@ export const sendScheduledReminders = async () => {
         appointment_date,
         appointment_time,
         status,
-        donors (id, name, clerk_user_id),
+        donors (id, name, clerk_user_id, email),
         drives (name, location)
       `,
       )
@@ -279,6 +296,7 @@ export const sendScheduledReminders = async () => {
           apt.appointment_time,
           "1_day",
           donorInfo.clerk_user_id,
+          donorInfo.email,
         );
         processed++;
       } else if (
@@ -294,6 +312,7 @@ export const sendScheduledReminders = async () => {
           apt.appointment_time,
           "1_hour",
           donorInfo.clerk_user_id,
+          donorInfo.email,
         );
         processed++;
       }

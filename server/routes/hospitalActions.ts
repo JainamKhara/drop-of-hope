@@ -4,6 +4,7 @@ import {
   sendAcceptanceEmail,
   sendCompletionEmail,
   sendBadgeEmail,
+  sendNoShowEmail,
 } from "../services/emailService";
 
 let supabase: SupabaseClient | null = null;
@@ -319,6 +320,85 @@ export const handleMarkDonationComplete = async (
     });
   } catch (error) {
     console.error("Error completing donation:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+// ─── POST /api/appointments/:id/no-show ──────────────────────────────────────
+export const handleNoShowAppointment = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch appointment with donor info
+    const { data: apt, error: aptErr } = await getSupabase()
+      .from("appointments")
+      .select(
+        `id, donor_id, appointment_date, appointment_time, status,
+         donors (id, name, email),
+         drives (id, name)`,
+      )
+      .eq("id", id)
+      .single();
+
+    if (aptErr || !apt) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    if (apt.status === "completed" || apt.status === "no_show") {
+      return res.status(400).json({ error: "Appointment already processed" });
+    }
+
+    // 1. Update status to no_show
+    const { error: updateErr } = await getSupabase()
+      .from("appointments")
+      .update({
+        status: "no_show",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (updateErr) throw updateErr;
+
+    const donor = Array.isArray(apt.donors) ? apt.donors[0] : apt.donors;
+    const drive = Array.isArray(apt.drives) ? apt.drives[0] : apt.drives;
+
+    // 2. Send no-show email
+    let emailSent = false;
+    if (donor?.email) {
+      emailSent = await sendNoShowEmail(
+        donor.email,
+        donor.name || "Donor",
+        drive?.name || "Blood Drive",
+        apt.appointment_date,
+        apt.appointment_time,
+      );
+    }
+
+    // 3. Create in-app notification
+    if (donor?.id) {
+      await createNotification({
+        donor_id: donor.id,
+        type: "appointment",
+        title: "📅 Missed Appointment",
+        message: `We missed you at ${drive?.name || "the blood drive"} today. Don't worry, you can easily book a new appointment whenever you're ready!`,
+        priority: "medium",
+        action_url: "/drives",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      emailSent,
+      message: "Appointment marked as no-show and donor notified",
+    });
+  } catch (error) {
+    console.error("Error marking no-show:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error instanceof Error ? error.message : "Unknown error",

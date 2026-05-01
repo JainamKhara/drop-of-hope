@@ -46,7 +46,7 @@ import {
   RefreshCw,
   Download,
   Send,
-  CheckCircle,
+  CheckCircle2 as CheckCircle,
   XCircle,
   LogOut,
   Eye,
@@ -71,6 +71,7 @@ import {
 } from "recharts";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { PaginationControls } from "@/components/PaginationControls";
 
 interface BloodInventoryItem {
   type: string;
@@ -143,6 +144,12 @@ export default function HospitalPortal() {
     urgency: "high",
     patientInfo: "",
   });
+
+  // Pagination state
+  const [requestsPage, setRequestsPage] = useState(1);
+  const [appointmentsPage, setAppointmentsPage] = useState(1);
+  const [drivesPage, setDrivesPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Redirect if not authenticated as hospital
   useEffect(() => {
@@ -284,6 +291,16 @@ export default function HospitalPortal() {
       setDataLoading(false);
     }
   };
+
+  // Pagination logic
+  const paginatedRequests = bloodRequests.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage);
+  const requestsTotalPages = Math.ceil(bloodRequests.length / itemsPerPage);
+
+  const paginatedAppointments = donorAppointments.slice((appointmentsPage - 1) * itemsPerPage, appointmentsPage * itemsPerPage);
+  const appointmentsTotalPages = Math.ceil(donorAppointments.length / itemsPerPage);
+
+  const paginatedDrives = hospitalDrives.slice((drivesPage - 1) * itemsPerPage, drivesPage * itemsPerPage);
+  const drivesTotalPages = Math.ceil(hospitalDrives.length / itemsPerPage);
 
   const handleSignOut = async () => {
     await supabaseSignOut();
@@ -740,7 +757,7 @@ export default function HospitalPortal() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {donorAppointments.map((appointment: any) => (
+                    {paginatedAppointments.map((appointment: any) => (
                       <div
                         key={appointment.id}
                         className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-sm border border-blue-200 dark:border-blue-800"
@@ -906,6 +923,11 @@ export default function HospitalPortal() {
                         </div>
                       </div>
                     ))}
+                    <PaginationControls 
+                      currentPage={appointmentsPage} 
+                      totalPages={appointmentsTotalPages} 
+                      onPageChange={setAppointmentsPage} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -1026,7 +1048,7 @@ export default function HospitalPortal() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bloodRequests.map((request) => (
+                  {paginatedRequests.map((request) => (
                     <div key={request.id} className="p-4 border rounded-sm">
                       <div className="flex items-center justify-between mb-3">
                         <div>
@@ -1224,6 +1246,11 @@ export default function HospitalPortal() {
                       </div>
                     </div>
                   ))}
+                  <PaginationControls 
+                    currentPage={requestsPage} 
+                    totalPages={requestsTotalPages} 
+                    onPageChange={setRequestsPage} 
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -1252,7 +1279,7 @@ export default function HospitalPortal() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {hospitalDrives.map((drive: any) => (
+                    {paginatedDrives.map((drive: any) => (
                       <div key={drive.id} className="p-4 border rounded-sm">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold">{drive.name}</h3>
@@ -1352,6 +1379,11 @@ export default function HospitalPortal() {
                         </div>
                       </div>
                     ))}
+                    <PaginationControls 
+                      currentPage={drivesPage} 
+                      totalPages={drivesTotalPages} 
+                      onPageChange={setDrivesPage} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -1504,10 +1536,19 @@ export default function HospitalPortal() {
                       }))}
                       margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.2)" />
                       <XAxis dataKey="type" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      />
                       <Legend />
                       <Bar
                         dataKey="Units"
@@ -1567,7 +1608,15 @@ export default function HospitalPortal() {
                         <Cell fill="#22c55e" />
                         <Cell fill="#ef4444" />
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>

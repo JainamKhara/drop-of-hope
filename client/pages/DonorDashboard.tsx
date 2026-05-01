@@ -9,7 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import NotificationCenter from "@/components/NotificationCenter";
+import { PaginationControls } from "@/components/PaginationControls";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import {
+  generateGoogleCalendarUrl,
+  parseAppointmentDateTime,
+} from "@/lib/calendar";
 import {
   appointmentService,
   donationService,
@@ -29,6 +34,7 @@ import {
   Star,
   Shield,
   Activity,
+  ExternalLink,
 } from "lucide-react";
 
 interface DashboardData {
@@ -55,6 +61,9 @@ export default function DonorDashboard() {
   );
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [hasRedirected, setHasRedirected] = useState(false);
+  const [donationsPage, setDonationsPage] = useState(1);
+  const [appointmentsPage, setAppointmentsPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Redirect if not signed in or not a donor
   useEffect(() => {
@@ -110,9 +119,9 @@ export default function DonorDashboard() {
         : 0;
 
       setDashboardData({
-        appointments: appointments.slice(0, 3),
-        donations: donations.slice(0, 5),
-        rewards: rewards.slice(0, 5),
+        appointments,
+        donations,
+        rewards,
         upcomingDrives,
         stats: {
           totalDonations: donations.length,
@@ -160,6 +169,37 @@ export default function DonorDashboard() {
 
   const { stats, appointments, donations, rewards, upcomingDrives } =
     dashboardData;
+
+  const paginatedDonations = donations.slice(
+    (donationsPage - 1) * itemsPerPage,
+    donationsPage * itemsPerPage,
+  );
+  const donationsTotalPages = Math.ceil(donations.length / itemsPerPage);
+
+  const paginatedAppointments = appointments.slice(
+    (appointmentsPage - 1) * itemsPerPage,
+    appointmentsPage * itemsPerPage,
+  );
+  const appointmentsTotalPages = Math.ceil(appointments.length / itemsPerPage);
+
+  const getCalendarUrl = (appointment: any) => {
+    const startDateTime = parseAppointmentDateTime(
+      appointment.appointment_date,
+      appointment.appointment_time,
+    );
+    if (!startDateTime) return "#";
+
+    // Assume 30 minute duration
+    const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+
+    return generateGoogleCalendarUrl({
+      title: `Blood Donation: ${appointment.drives?.name}`,
+      description: `Blood donation appointment at ${appointment.drives?.name}. Thank you for saving lives!`,
+      location: `${appointment.drives?.location}, ${appointment.drives?.address || ""}`,
+      startDate: startDateTime,
+      endDate: endDateTime,
+    });
+  };
 
   const handleViewCertificate = (donation: any) => {
     const donorName = donorProfile?.name || "Valued Donor";
@@ -499,18 +539,18 @@ export default function DonorDashboard() {
 
           {donations.length > 0 ? (
             <div className="space-y-8">
-              {donations.map((donation, idx) => (
+              {paginatedDonations.map((donation, idx) => (
                 <div key={donation.id} className="relative">
                   {/* Timeline Line */}
-                  {idx < donations.length - 1 && (
+                  {idx < paginatedDonations.length - 1 && (
                     <div className="absolute left-6 top-12 w-0.5 h-16 bg-muted"></div>
                   )}
- 
+
                   {/* Timeline Dot */}
                   <div className="absolute left-0 top-0 w-12 h-12 bg-white border-2 border-[hsl(0,80%,50%)] rounded-none flex items-center justify-center z-10">
                     <Droplets className="w-6 h-6 text-[hsl(0,80%,50%)]" />
                   </div>
- 
+
                   {/* Timeline Content */}
                   <div className="ml-16 pt-2 pb-2">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -555,6 +595,16 @@ export default function DonorDashboard() {
                   </div>
                 </div>
               ))}
+              
+              {donationsTotalPages > 1 && (
+                <div className="mt-8 pt-8 border-t">
+                  <PaginationControls 
+                    currentPage={donationsPage} 
+                    totalPages={donationsTotalPages} 
+                    onPageChange={setDonationsPage} 
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="py-16 text-center border-2 border-dashed border-muted">
@@ -580,7 +630,7 @@ export default function DonorDashboard() {
             </h2>
 
             <div className="space-y-3">
-              {appointments.map((appointment) => (
+              {paginatedAppointments.map((appointment) => (
                 <div
                   key={appointment.id}
                   className="border-2 border-[hsl(0,80%,50%)] p-3 sm:p-4 md:p-5 rounded-none flex items-start justify-between"
@@ -603,6 +653,24 @@ export default function DonorDashboard() {
                       <MapPin className="w-3 h-3" />
                       {appointment.drives?.location}
                     </p>
+                    <div className="mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
+                        asChild
+                      >
+                        <a 
+                          href={getCalendarUrl(appointment)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                          Add to Calendar
+                        </a>
+                      </Button>
+                    </div>
                   </div>
                   <Badge
                     variant="outline"
@@ -612,6 +680,16 @@ export default function DonorDashboard() {
                   </Badge>
                 </div>
               ))}
+
+              {appointmentsTotalPages > 1 && (
+                <div className="mt-6 pt-6 border-t">
+                  <PaginationControls 
+                    currentPage={appointmentsPage} 
+                    totalPages={appointmentsTotalPages} 
+                    onPageChange={setAppointmentsPage} 
+                  />
+                </div>
+              )}
             </div>
           </div>
         </section>

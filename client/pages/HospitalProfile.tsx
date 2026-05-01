@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { hospitalService, driveService } from "@/lib/db-services";
 import { format } from "date-fns";
+import { PaginationControls } from "@/components/PaginationControls";
 
 export default function HospitalProfile() {
   const { id } = useParams<{ id: string }>();
@@ -45,6 +46,11 @@ export default function HospitalProfile() {
     };
     load();
   }, [id]);
+
+  const [drivesPage, setDrivesPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(drives.length / itemsPerPage);
+  const paginatedDrives = drives.slice((drivesPage - 1) * itemsPerPage, drivesPage * itemsPerPage);
 
   if (loading) {
     return (
@@ -146,7 +152,7 @@ export default function HospitalProfile() {
               </div>
             ) : (
               <div className="space-y-4">
-                {drives.map((drive: any) => (
+                {paginatedDrives.map((drive: any) => (
                   <div
                     key={drive.id}
                     className="p-4 border border-border rounded-sm hover:border-[hsl(0,80%,50%)]/30 transition-colors"
@@ -205,6 +211,16 @@ export default function HospitalProfile() {
                     </div>
                   </div>
                 ))}
+
+                {totalPages > 1 && (
+                  <div className="pt-4 border-t">
+                    <PaginationControls
+                      currentPage={drivesPage}
+                      totalPages={totalPages}
+                      onPageChange={setDrivesPage}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

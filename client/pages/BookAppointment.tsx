@@ -33,6 +33,7 @@ import {
   Calendar as CalendarIcon,
   CheckCircle,
   RefreshCw,
+  ExternalLink,
 } from "lucide-react";
 import {
   format,
@@ -42,6 +43,8 @@ import {
   isBefore,
   isSameDay,
 } from "date-fns";
+import { format as formatDate, addDays } from "date-fns";
+import { generateGoogleCalendarUrl as getGoogleCalendarUrl, parseAppointmentDateTime } from "@/lib/calendar";
 
 interface DriveWithDetails extends Drive {
   hospitals?: { name: string; city: string; state: string };
@@ -263,6 +266,8 @@ export default function BookAppointment() {
       }
 
       const appointmentData = await response.json();
+      setSubmitting(false);
+      setStep(4);
 
       // Award points to the donor for booking (50 points for booking)
       try {
@@ -273,14 +278,8 @@ export default function BookAppointment() {
 
       toast({
         title: "Appointment Booked!",
-        description:
-          "Your blood donation appointment has been successfully scheduled. You earned 50 points!",
+        description: "Your blood donation appointment has been successfully scheduled. You earned 50 points!",
       });
-
-      // Small delay before navigation for better UX
-      setTimeout(() => {
-        navigate("/appointments");
-      }, 500);
     } catch (error: any) {
       console.error("Error creating appointment:", error);
       toast({
@@ -293,6 +292,24 @@ export default function BookAppointment() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const generateGoogleCalendarUrl = () => {
+    if (!selectedDate || !selectedTime || !drive) return "#";
+    
+    const startDateTime = parseAppointmentDateTime(selectedDate.toISOString(), selectedTime);
+    if (!startDateTime) return "#";
+    
+    // Assume 30 minute duration
+    const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+    
+    return getGoogleCalendarUrl({
+      title: `Blood Donation: ${drive.name}`,
+      description: `Blood donation appointment at ${drive.name}. Please remember to stay hydrated and bring your ID.`,
+      location: drive.location,
+      startDate: startDateTime,
+      endDate: endDateTime
+    });
   };
 
   if (loading) {
@@ -824,6 +841,60 @@ export default function BookAppointment() {
                       )}
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="text-center py-8 space-y-6 animate-in fade-in duration-500">
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-12 h-12 text-green-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-[hsl(0,80%,50%)]">Appointment Confirmed!</h2>
+                    <p className="text-muted-foreground">
+                      Your appointment at <strong>{drive.name}</strong> has been successfully scheduled.
+                    </p>
+                  </div>
+
+                  <div className="bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] p-6 rounded-sm border-2 border-dashed border-[hsl(0,80%,50%)] max-w-md mx-auto text-left">
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <CalendarIcon className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                        <span className="font-medium">{selectedDate?.toLocaleDateString()} at {selectedTime}</span>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <MapPin className="w-5 h-5 text-[hsl(0,80%,50%)] mt-0.5" />
+                        <span className="font-medium">{drive.location}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    <Button
+                      className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white min-w-[200px]"
+                      asChild
+                    >
+                      <a 
+                        href={generateGoogleCalendarUrl()} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center"
+                      >
+                        <ExternalLink className="mr-2 w-4 h-4" />
+                        Add to Google Calendar
+                      </a>
+                    </Button>
+                    <Button variant="outline" asChild className="min-w-[200px]">
+                      <Link to="/appointments">View All Appointments</Link>
+                    </Button>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground pt-4">
+                    A confirmation email has been sent to <strong>{donorInfo.email}</strong>
+                  </p>
                 </div>
               )}
             </CardContent>

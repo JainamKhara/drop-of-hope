@@ -35,7 +35,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ### 🩸 For Donors
 
 | Feature | Description |
-|---|---|
+| :--- | :--- |
 | **Interactive Dashboard** | Personalized overview showing donation history, points, upcoming appointments, and a *Days Since Last Donation* countdown widget |
 | **Find Blood Drives** | Discover nearby donation events with search, city, blood type, and date filters |
 | **Book Appointments** | Schedule donation slots with calendar integration |
@@ -55,7 +55,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ### 🏥 For Hospitals
 
 | Feature | Description |
-|---|---|
+| :--- | :--- |
 | **Hospital Portal** | Dedicated control center with tabs: Inventory, Blood Requests, Appointments, Blood Drives, Analytics, Notifications |
 | **Blood Requests** | Create urgent, high-priority, or routine requisitions for specific blood types |
 | **Inventory Management** | Track available blood units in real-time; see per-blood-type unit counts and status badges |
@@ -74,12 +74,12 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ### 👨‍💼 For Administrators
 
 | Feature | Description |
-|---|---|
-| **Admin Dashboard** | 8-tab system-wide analytics and oversight dashboard |
+| :--- | :--- |
+| **Admin Dashboard** | 8-tab oversight dashboard with dynamic, real-time analytics fetching |
 | **User Management** | View, add, edit, and manage all donors and hospital accounts with full CRUD |
 | **Drive & Request Approval** | Review, approve, or reject blood drive requests and hospital blood requisitions |
-| **Data Analytics** | Recharts charts: Donors by Blood Type (BarChart), Blood Request Status (PieChart), Drive Capacity vs Registrations (BarChart) |
-| **Monthly Statistics** | Donation count this month shown in the overview stats grid |
+| **Dynamic Analytics** | Real-time Recharts: Donors by Blood Type (Full Distribution), Blood Request Status (PieChart), Active Drive Capacity vs Registrations (Filtered BarChart) |
+| **Real-time Statistics** | Accurate, database-driven metrics: Total Donors, Total Donations, Active Drives, and Lives Impacted (calculated as Donations × 3) |
 | **Top Donors Leaderboard** | Ranked list of top 20 donors sorted by points — shows name, blood type, pts & level badge |
 | **Export Full Report** | 4-section comprehensive CSV: Platform Summary, Top Donors, Blood Drives, Blood Requests |
 | **Export User List** | Download all donor data as a CSV from the Donors tab |
@@ -93,13 +93,14 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ### 🤖 General & UI/UX Features
 
 | Feature | Description |
-|---|---|
+| :--- | :--- |
 | **AI Chatbot Assistant** | Built-in floating chatbot with keyword matching, quick-action suggestion buttons on every page |
 | **Notification Center** | Dedicated notification bell icon with notification dropdown, mark as read/delete functionality |
 | **Contact Us Form** | Contact form wired to Supabase `contacts` table — messages stored and accessible to admins |
 | **Dark Mode Toggle** | Navbar toggle button switches between light and dark themes with localStorage persistence |
 | **Responsive Design** | Mobile-first TailwindCSS layouts with `md:` and `lg:` breakpoints throughout |
 | **Global Error Boundary** | Catches unhandled React component errors and displays user-friendly fallback UI |
+| **Accessibility Optimizations** | High-contrast chart tooltips and grid visibility tuned specifically for dark mode readability |
 | **Standardized Error Handling** | Centralized error handling utility with consistent logging and user notifications |
 
 ---
@@ -107,6 +108,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ## 🛠️ Technology Stack
 
 ### Frontend
+
 - **Framework:** React 18
 - **Language:** TypeScript (with strict mode enabled)
 - **Tooling:** Vite (lightning-fast dev server and bundler)
@@ -120,6 +122,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 - **Error Handling:** Centralized error handler utility + Global Error Boundary
 
 ### Backend & Auth
+
 - **BaaS:** Supabase (PostgreSQL database & auto-generated REST API)
 - **Donor Authentication:** Clerk (social logins, session management)
 - **Admin/Hospital Auth:** Direct Supabase authentication with input validation
@@ -131,12 +134,14 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 ## 🔐 Code Quality & Type Safety
 
 ### TypeScript Strict Mode
+
 - **Strict mode enabled** for enhanced type safety
 - **All type errors resolved** - zero implicit any types
 - **Comprehensive type annotations** throughout the codebase
 - **Runtime type validation** for critical data structures
 
 ### Error Handling
+
 - **Global Error Boundary:** Catches React component errors and prevents white-screen crashes
 - **Centralized Error Handler:** Standardized error logging and user notifications
 - **Input Validation:** Comprehensive validation for:
@@ -146,6 +151,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 - **Proper Error Responses:** All server errors returned to client with meaningful messages
 
 ### Code Organization
+
 - **Hybrid Authentication Context:** Manages Clerk (donors) and direct auth (admin/hospital) seamlessly
 - **Modular Component Structure:** Reusable UI components with proper separation of concerns
 - **Utility Functions:** Centralized validation, error handling, and database services
@@ -228,6 +234,7 @@ drop-of-hope/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js v18 or higher
 - `npm` or `pnpm` package manager
 
@@ -252,28 +259,33 @@ PORT=3000
 ### Installation & Execution
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Jainam116/drop-of-hope.git
    cd drop-of-hope
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    ```
    The app will be available at `http://localhost:5173` or as displayed in your terminal.
 
 4. **Build for production**
+
    ```bash
    npm run build
    ```
 
 5. **Type check (with strict mode)**
+
    ```bash
    npm run typecheck
    ```
@@ -285,7 +297,7 @@ PORT=3000
 The PostgreSQL database relies on these core tables:
 
 | Table | Purpose |
-|---|---|
+| :--- | :--- |
 | `donors` | Donor profiles synced from Clerk (id, name, blood_type, points, level, is_verified, city, email, phone, address) |
 | `admins` / `hospitals` | Internal secure access credentials with email + password |
 | `drives` | Blood drive events (location, times, capacity, registered_count, is_active) |
@@ -304,24 +316,28 @@ The PostgreSQL database relies on these core tables:
 ## 🛡️ Error Handling
 
 ### Global Error Boundary
+
 - Catches unhandled React component rendering errors
 - Displays user-friendly error UI with recovery options ("Try Again" / "Go Home")
 - Shows detailed error information in development mode
 - Prevents entire app crashes
 
 ### Centralized Error Handling
+
 - **Standardized Pattern:** All errors use `handleError()` utility
 - **Consistent Logging:** Errors logged to console with operation context
 - **User Notifications:** Toast notifications inform users of failures
 - **Error Recovery:** Graceful degradation with fallback UI
 
 ### Input Validation
+
 - **Admin/Hospital Login:** Email format validation + password strength checking
 - **Form Validation:** Real-time validation with user-friendly error messages
 - **Database Operations:** Null/undefined checks prevent runtime errors
 - **Type Safety:** TypeScript strict mode ensures type correctness
 
 ### Performance Safeguards
+
 - **Query Pagination:** Database queries limited to prevent excessive data fetching
 - **Race Condition Prevention:** Request tracking prevents duplicate simultaneous operations
 - **Dependency Optimization:** useEffect dependencies properly maintained
@@ -340,6 +356,7 @@ npm run build
 The build output is in the `dist/` directory.
 
 **Environment-Specific Configuration:**
+
 - Supports Netlify deployment via `netlify.toml`
 - Supabase connection uses environment variables
 - TypeScript strict mode ensures production safety
@@ -348,22 +365,18 @@ The build output is in the `dist/` directory.
 
 ## 📊 Recent Improvements (Latest Session)
 
-### Code Quality Enhancements
-- ✅ **TypeScript Strict Mode Enabled** - Enhanced type safety across entire codebase
-- ✅ **Global Error Boundary** - Prevents app-wide crashes from component errors
-- ✅ **Centralized Error Handler** - Unified error logging and user notifications
-- ✅ **Input Validation Improved** - Comprehensive form and credential validation
-- ✅ **All 18 Issues Resolved** - Critical, high, medium, and low priority issues fixed
+### Real-time Analytics & Dashboard Sync
 
-### Files Added
-- `client/components/ErrorBoundary.tsx` - Global error boundary component
-- `client/lib/error-handler.ts` - Centralized error handling utility
-- `client/lib/validation.ts` - Input validation utilities
+- ✅ **Dynamic Metrics** - Removed all hardcoded placeholders from Admin and Donor dashboards
+- ✅ **Filtered Analytics** - Drive capacity charts now filter for active drives to match summary counts
+- ✅ **Blood Distribution Accuracy** - "Donors by Blood Type" chart now aggregates the entire 100% database distribution
+- ✅ **Dark Mode Accessibility** - Optimized Recharts tooltips with high-contrast themes for better visibility
 
-### Type Safety Improvements
-- 9 TypeScript strict mode errors resolved
-- Proper type annotations for all state and props
-- Improved type inference with explicit declarations
+### Reliability & Data Integrity
+
+- ✅ **Relational Fixes** - Resolved foreign key constraint issues in community comments
+- ✅ **Pagination Stability** - Fixed list indexing and mapping errors in paginated views
+- ✅ **TypeScript Stability** - Resolved all remaining complex type errors in Dashboard and Portal forms
 
 ---
 
@@ -373,9 +386,9 @@ Have questions or want to collaborate?
 
 - **Email**: kharajaynam@gmail.com
 - **Phone**: +91 7779069774
-- **Repository**: [Drop of Hope GitHub](https://github.com/Jainam116/drop-of-hope)
+- **Repository**: [Drop of Hope GitHub](https://github.com/JainamKhara/drop-of-hope)
 
----
+--- 
 
-**Last Updated:** April 23, 2026  
-**Status:** ✅ Production Ready with TypeScript Strict Mode & Global Error Handling
+**Last Updated:** May 1, 2026  
+**Status:** ✅ Production Ready with Real-time Analytics & Advanced Error Handling

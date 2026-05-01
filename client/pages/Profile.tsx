@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PaginationControls } from "@/components/PaginationControls";
 import {
   Heart,
   ArrowLeft,
@@ -86,6 +87,10 @@ export default function Profile() {
   const [donationsLoading, setDonationsLoading] = useState(false);
   const [pointsHistory, setPointsHistory] = useState<any[]>([]);
   const [pointsLoading, setPointsLoading] = useState(false);
+ 
+  const [donationsPage, setDonationsPage] = useState(1);
+  const [pointsPage, setPointsPage] = useState(1);
+  const itemsPerPage = 5;
 
   const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
   const states = [
@@ -201,6 +206,18 @@ export default function Profile() {
     level: 1,
     livesSaved: 0
   });
+ 
+  const donationsTotalPages = Math.ceil(donations.length / itemsPerPage);
+  const paginatedDonations = donations.slice(
+    (donationsPage - 1) * itemsPerPage,
+    donationsPage * itemsPerPage,
+  );
+ 
+  const pointsTotalPages = Math.ceil(pointsHistory.length / itemsPerPage);
+  const paginatedPoints = pointsHistory.slice(
+    (pointsPage - 1) * itemsPerPage,
+    pointsPage * itemsPerPage,
+  );
 
   const handleViewCertificate = (donation: any) => {
     const donorName = donorProfile?.name || "Valued Donor";
@@ -989,7 +1006,7 @@ export default function Profile() {
                         </p>
                       </div>
                     )}
-                    {donations.map((donation, index) => (
+                    {paginatedDonations.map((donation, index) => (
                       <div
                         key={donation.id || index}
                         className="flex items-center justify-between p-5 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,10%)] border border-border rounded-sm hover:border-[hsl(0,80%,50%)]/50 transition-colors"
@@ -1062,6 +1079,16 @@ export default function Profile() {
                         </div>
                       </div>
                     ))}
+
+                    {donationsTotalPages > 1 && (
+                      <div className="mt-6 border-t pt-6">
+                        <PaginationControls
+                          currentPage={donationsPage}
+                          totalPages={donationsTotalPages}
+                          onPageChange={setDonationsPage}
+                        />
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1163,7 +1190,7 @@ export default function Profile() {
                         </p>
                       </div>
                     )}
-                    {pointsHistory.map((item) => (
+                    {paginatedPoints.map((item) => (
                       <div
                         key={item.id}
                         className="flex items-center justify-between p-4 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,10%)] border border-border rounded-sm"
@@ -1193,6 +1220,16 @@ export default function Profile() {
                         </div>
                       </div>
                     ))}
+
+                    {pointsTotalPages > 1 && (
+                      <div className="mt-6 border-t pt-6">
+                        <PaginationControls
+                          currentPage={pointsPage}
+                          totalPages={pointsTotalPages}
+                          onPageChange={setPointsPage}
+                        />
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -8,7 +8,7 @@ import {
   handleRunScheduledReminders,
 } from "./routes/notifications";
 import { handleCreateAppointment } from "./routes/appointments";
-import { handleAcceptAppointment, handleMarkDonationComplete } from "./routes/hospitalActions";
+import { handleAcceptAppointment, handleMarkDonationComplete, handleNoShowAppointment } from "./routes/hospitalActions";
 import { handleChatbotQuery } from "./routes/chatbot";
 import { startAppointmentReminderJob } from "./jobs/appointmentReminders";
 import { startExpirationJob, runExpirationChecks } from "./jobs/expirationJob";
@@ -38,6 +38,7 @@ export function createServer() {
   app.post("/api/appointments", handleCreateAppointment);
   app.post("/api/appointments/:id/accept", handleAcceptAppointment);
   app.post("/api/appointments/:id/complete", handleMarkDonationComplete);
+  app.post("/api/appointments/:id/no-show", handleNoShowAppointment);
   app.post("/api/chatbot", handleChatbotQuery);
 
   // Manual expiration trigger (for admin use)

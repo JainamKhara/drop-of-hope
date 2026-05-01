@@ -19,10 +19,15 @@ import {
   Plus,
   RefreshCw,
   Printer,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { format, isAfter, isBefore, addDays } from "date-fns";
+import { PaginationControls } from "@/components/PaginationControls";
+import { format, isAfter, isBefore, addDays, isSameDay } from "date-fns";
 import { useHybridAuth, DonorProfile } from "@/contexts/HybridAuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { generateGoogleCalendarUrl as getGoogleCalendarUrl, parseAppointmentDateTime } from "@/lib/calendar";
 
 interface AppointmentDisplay {
   id: string;
@@ -45,7 +50,52 @@ export default function MyAppointments() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load appointments from database
+  const [historyPage, setHistoryPage] = useState(1);
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [cancelledPage, setCancelledPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingAppointments = appointments.filter(
+    (apt) => {
+      const aptDate = new Date(apt.date);
+      aptDate.setHours(0, 0, 0, 0);
+      return !isBefore(aptDate, today) && (apt.status === "scheduled" || apt.status === "confirmed");
+    },
+  );
+
+  const completedAppointments = appointments.filter(
+    (apt) => apt.status === "completed",
+  );
+
+  const cancelledAppointments = appointments.filter(
+    (apt) => apt.status === "cancelled" || apt.status === "no_show",
+  );
+
+  // Filter and Paginate Upcoming
+  const filteredUpcoming = upcomingAppointments
+    .filter((apt) => !selectedDate || isSameDay(new Date(apt.date), selectedDate))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  const upcomingTotalPages = Math.ceil(filteredUpcoming.length / itemsPerPage);
+  const paginatedUpcoming = filteredUpcoming.slice((upcomingPage - 1) * itemsPerPage, upcomingPage * itemsPerPage);
+
+  // Filter and Paginate History
+  const filteredHistory = completedAppointments
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const historyTotalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+  const paginatedHistory = filteredHistory.slice((historyPage - 1) * itemsPerPage, historyPage * itemsPerPage);
+
+  // Filter and Paginate Cancelled
+  const filteredCancelled = cancelledAppointments
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const cancelledTotalPages = Math.ceil(filteredCancelled.length / itemsPerPage);
+  const paginatedCancelled = filteredCancelled.slice((cancelledPage - 1) * itemsPerPage, cancelledPage * itemsPerPage);
+
   useEffect(() => {
     if (donorProfile?.id) {
       loadAppointments();
@@ -98,44 +148,6 @@ export default function MyAppointments() {
     }
   };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Filter appointments by selected date for the list
-  const filteredAppointments = (tab: string) => {
-    const apps = tab === "upcoming" ? upcomingAppointments 
-               : tab === "completed" ? completedAppointments 
-               : cancelledAppointments;
-    
-    // If a date is selected on the calendar, filter the list to show only that day's appointments
-    // We only do this if there's actually an appointment on that day, 
-    // otherwise it might be confusing if the list suddenly becomes empty
-    const aptDateString = format(selectedDate, "yyyy-MM-dd");
-    const hasAptOnSelected = appointments.some(a => a.date === aptDateString);
-    
-    if (hasAptOnSelected) {
-      return apps.filter(a => a.date === aptDateString);
-    }
-    
-    return apps;
-  };
-
-  const upcomingAppointments = appointments.filter(
-    (apt) => {
-      const aptDate = new Date(apt.date);
-      aptDate.setHours(0, 0, 0, 0);
-      return !isBefore(aptDate, today) && (apt.status === "scheduled" || apt.status === "confirmed");
-    },
-  );
-
-  const completedAppointments = appointments.filter(
-    (apt) => apt.status === "completed",
-  );
-
-  const cancelledAppointments = appointments.filter(
-    (apt) => apt.status === "cancelled" || apt.status === "no_show",
-  );
-
   const handleCancelAppointment = async (id: string) => {
     if (window.confirm("Are you sure you want to cancel this appointment?")) {
       try {
@@ -170,6 +182,22 @@ export default function MyAppointments() {
     if (appointment) {
       window.location.href = "/drives";
     }
+  };
+
+  const generateGoogleCalendarUrl = (appointment: AppointmentDisplay) => {
+    const startDateTime = parseAppointmentDateTime(appointment.date, appointment.time);
+    if (!startDateTime) return "#";
+    
+    // Assume 30 minute duration
+    const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+    
+    return getGoogleCalendarUrl({
+      title: `Blood Donation: ${appointment.driveName}`,
+      description: `Blood donation appointment at ${appointment.driveName}. Thank you for saving lives!`,
+      location: `${appointment.location}, ${appointment.address}`,
+      startDate: startDateTime,
+      endDate: endDateTime
+    });
   };
 
   const handleViewCertificate = (appointment: AppointmentDisplay) => {
@@ -504,7 +532,7 @@ export default function MyAppointments() {
               </TabsList>
 
               <TabsContent value="upcoming" className="space-y-6 mt-6">
-                {filteredAppointments("upcoming").length === 0 ? (
+                {paginatedUpcoming.length === 0 ? (
                   <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                     <CardContent className="text-center py-12">
                       <CalendarIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -524,7 +552,8 @@ export default function MyAppointments() {
                     </CardContent>
                   </Card>
                 ) : (
-                  filteredAppointments("upcoming").map((appointment) => (
+                  <>
+                  {paginatedUpcoming.map((appointment) => (
                     <Card
                       key={appointment.id}
                       className="border-2 border-[hsl(0,80%,50%)] rounded-sm"
@@ -599,6 +628,21 @@ export default function MyAppointments() {
                         <div className="flex space-x-3 pt-4">
                           <Button
                             variant="outline"
+                            className="flex-1 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
+                            asChild
+                          >
+                            <a 
+                              href={generateGoogleCalendarUrl(appointment)} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center"
+                            >
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              Add to Calendar
+                            </a>
+                          </Button>
+                          <Button
+                            variant="outline"
                             className="flex-1"
                             onClick={() =>
                               handleRescheduleAppointment(appointment.id)
@@ -644,12 +688,18 @@ export default function MyAppointments() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))
+                  ))}
+                  <PaginationControls 
+                    currentPage={upcomingPage} 
+                    totalPages={upcomingTotalPages} 
+                    onPageChange={setUpcomingPage} 
+                  />
+                  </>
                 )}
               </TabsContent>
 
               <TabsContent value="completed" className="space-y-6 mt-6">
-                {filteredAppointments("completed").length === 0 ? (
+                {paginatedHistory.length === 0 ? (
                   <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                     <CardContent className="text-center py-12">
                       <CheckCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -662,7 +712,8 @@ export default function MyAppointments() {
                     </CardContent>
                   </Card>
                 ) : (
-                  filteredAppointments("completed").map((appointment) => (
+                  <>
+                  {paginatedHistory.map((appointment) => (
                     <Card
                       key={appointment.id}
                       className="border-2 border-[hsl(0,80%,50%)] rounded-sm"
@@ -760,12 +811,18 @@ export default function MyAppointments() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))
+                  ))}
+                  <PaginationControls 
+                    currentPage={historyPage} 
+                    totalPages={historyTotalPages} 
+                    onPageChange={setHistoryPage} 
+                  />
+                  </>
                 )}
               </TabsContent>
 
               <TabsContent value="cancelled" className="space-y-6 mt-6">
-                {filteredAppointments("cancelled").length === 0 ? (
+                {paginatedCancelled.length === 0 ? (
                   <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm">
                     <CardContent className="text-center py-12">
                       <XCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -778,7 +835,8 @@ export default function MyAppointments() {
                     </CardContent>
                   </Card>
                 ) : (
-                  filteredAppointments("cancelled").map((appointment) => (
+                  <>
+                  {paginatedCancelled.map((appointment) => (
                     <Card
                       key={appointment.id}
                       className="border-2 border-[hsl(0,80%,50%)] rounded-sm"
@@ -850,7 +908,13 @@ export default function MyAppointments() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))
+                  ))}
+                  <PaginationControls 
+                    currentPage={cancelledPage} 
+                    totalPages={cancelledTotalPages} 
+                    onPageChange={setCancelledPage} 
+                  />
+                  </>
                 )}
               </TabsContent>
             </Tabs>
