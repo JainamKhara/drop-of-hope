@@ -172,17 +172,23 @@ export const handleMarkDonationComplete = async (
     }
 
     // 1. Update appointment status to completed
-    await getSupabase()
+    console.log(`Marking appointment ${id} as complete...`);
+    const { error: updateAptError } = await getSupabase()
       .from("appointments")
       .update({
         status: "completed",
         updated_at: new Date().toISOString(),
       })
       .eq("id", id);
+    
+    if (updateAptError) {
+      console.error("Error updating appointment status:", updateAptError);
+      throw updateAptError;
+    }
 
     // 2. Create donation record
-    const donationDate = apt.appointment_date;
-    const { error: donationErr } = await getSupabase()
+    const donationDate = apt.appointment_date || new Date().toISOString().split("T")[0];
+    const { data: donation, error: donationErr } = await getSupabase()
       .from("donations")
       .insert([{
         donor_id: donor.id,
@@ -193,14 +199,65 @@ export const handleMarkDonationComplete = async (
         quantity_ml: 450,
         points_earned: POINTS_PER_DONATION,
         status: "completed",
-      }]);
+      }])
+      .select()
+      .single();
 
     if (donationErr) {
       console.error("Error creating donation record:", donationErr);
-      // We continue since the appointment was already updated, but logging is essential
+    } else {
+      console.log("Donation record created:", donation.id);
+      
+      // 3. Update blood inventory for the hospital
+      if (drive?.hospital_id && donor.blood_type) {
+        console.log(`Updating blood inventory for hospital ${drive.hospital_id}, blood type ${donor.blood_type}`);
+        try {
+          // Check if inventory item exists
+          const { data: inventoryItem, error: invFetchError } = await getSupabase()
+            .from("blood_inventory")
+            .select("*")
+            .eq("hospital_id", drive.hospital_id)
+            .eq("blood_type", donor.blood_type)
+            .order("expiry_date", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          
+          if (inventoryItem && !invFetchError) {
+            // Increment existing
+            await getSupabase()
+              .from("blood_inventory")
+              .update({ 
+                units_available: (inventoryItem.units_available || 0) + 1,
+                updated_at: new Date().toISOString()
+              })
+              .eq("id", inventoryItem.id);
+            console.log("Incremented existing inventory item");
+          } else {
+            // Create new
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 42); // 42 days for whole blood
+            
+            await getSupabase()
+              .from("blood_inventory")
+              .insert([{
+                hospital_id: drive.hospital_id,
+                blood_type: donor.blood_type,
+                units_available: 1,
+                units_reserved: 0,
+                expiry_date: expiryDate.toISOString().split("T")[0],
+                donation_id: donation.id,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }]);
+            console.log("Created new inventory item");
+          }
+        } catch (invErr) {
+          console.error("Failed to update inventory:", invErr);
+        }
+      }
     }
 
-    // 3. Add points to donor + update last_donation_date + recalculate level
+    // 4. Add points to donor + update last_donation_date + recalculate level
     const currentPoints = donor.points || 0;
     const newPoints = currentPoints + POINTS_PER_DONATION;
     let newLevel = 1;

@@ -151,6 +151,36 @@ export const handleCreateAppointment = async (
         .from("appointments")
         .update({ confirmation_email_sent_at: new Date().toISOString() })
         .eq("id", appointment.id);
+
+    // Increment registered_count in drives table - always do this regardless of email
+    try {
+      const { error: rpcError } = await getSupabase()
+        .rpc("increment_drive_registration", { drive_id: drive.id });
+      
+      if (rpcError) {
+        console.warn("RPC increment_drive_registration failed, trying manual update:", rpcError);
+        // Fallback: direct update
+        const { data: driveUpdate, error: fetchError } = await getSupabase()
+          .from("drives")
+          .select("registered_count")
+          .eq("id", drive.id)
+          .single();
+        
+        if (driveUpdate && !fetchError) {
+          await getSupabase()
+            .from("drives")
+            .update({ registered_count: (driveUpdate.registered_count || 0) + 1 })
+            .eq("id", drive.id);
+          console.log("Successfully updated registered_count manually");
+        } else if (fetchError) {
+          console.error("Failed to fetch drive for manual update:", fetchError);
+        }
+      } else {
+        console.log("Successfully incremented registered_count via RPC");
+      }
+    } catch (countError) {
+      console.error("Unexpected error updating drive count:", countError);
+    }
     }
 
     return res.status(201).json({

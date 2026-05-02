@@ -278,7 +278,7 @@ export default function Profile() {
           <div class="corner tl"></div><div class="corner tr"></div>
           <div class="corner bl"></div><div class="corner br"></div>
           <div class="logo">
-            <div class="logo-icon">🩸</div>
+            <img src="/drop_of_hope_logo.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; margin-bottom: 4px;">
             <div class="logo-name">Drop of Hope</div>
           </div>
           <div class="divider"></div>
@@ -303,7 +303,8 @@ export default function Profile() {
               <div class="sig-title">Program Director</div>
             </div>
             <div class="seal">
-              <div class="seal-text">Official<br>Seal<br>🩸</div>
+              <div class="seal-text">Official<br>Seal</div>
+              <img src="/drop_of_hope_logo.png" style="width: 24px; height: 24px; margin-top: 4px; object-fit: contain;">
             </div>
             <div class="sig-block">
               <div class="sig-line"></div>

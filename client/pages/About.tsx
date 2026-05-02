@@ -237,7 +237,7 @@ export default function About() {
 
       {/* Footer link back */}
       <footer className="py-12 border-t text-center text-muted-foreground">
-        <p>&copy; 2024 Drop of Hope. Saving lives, one drop at a time.</p>
+        <p>&copy; 2026 Drop of Hope. Saving lives, one drop at a time.</p>
       </footer>
     </div>
   );

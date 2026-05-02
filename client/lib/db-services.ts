@@ -404,6 +404,51 @@ export const appointmentService = {
       .single();
     return { data, error };
   },
+
+  /**
+   * Get appointments for a specific drive with donor details
+   */
+  getByDrive: async (driveId: string, status?: string) => {
+    let query = supabase
+      .from("appointments")
+      .select(`
+        *,
+        donors:donor_id (id, name, email, blood_type, phone)
+      `)
+      .eq("drive_id", driveId)
+      .order("appointment_date", { ascending: true });
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+
+    const { data, error } = await query;
+    
+    // Fallback: If no appointments found, maybe they are only in the donations table?
+    // This can happen if some legacy data exists.
+    if (!error && (!data || data.length === 0)) {
+      const { data: donations, error: donationsError } = await supabase
+        .from("donations")
+        .select(`
+          *,
+          donors:donor_id (id, name, email, blood_type, phone)
+        `)
+        .eq("drive_id", driveId);
+      
+      if (!donationsError && donations && donations.length > 0) {
+        // Map donations back to appointment format for the report
+        const syntheticAppointments = donations.map((d: any) => ({
+          ...d,
+          appointment_date: d.donation_date,
+          status: "completed",
+          is_synthetic: true
+        }));
+        return { data: syntheticAppointments, error: null };
+      }
+    }
+
+    return { data, error };
+  },
 };
 
 // ==================== DONATION SERVICES ====================

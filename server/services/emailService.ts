@@ -172,7 +172,7 @@ export const sendReminderEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <h1>🩸 Appointment Reminder</h1>
+          <h1>Appointment Reminder</h1>
         </div>
 
         <div class="content">
@@ -260,7 +260,7 @@ export const sendAcceptanceEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <h1>🩸 Appointment Accepted!</h1>
+          <h1>Appointment Accepted!</h1>
           <p>Your blood donation is confirmed by ${hospitalName}</p>
         </div>
         <div class="body">
@@ -338,7 +338,7 @@ export const sendCompletionEmail = async (
           </div>
           <div class="detail-box">
             <div class="detail-row"><span class="label">🏥 Blood Drive:</span> ${driveName}</div>
-            <div class="detail-row"><span class="label">🩸 Blood Type:</span> ${bloodType}</div>
+            <div class="detail-row"><span class="label">Blood Type:</span> ${bloodType}</div>
             <div class="detail-row"><span class="label">📅 Date:</span> ${donationDate}</div>
           </div>
           <p>Your donation certificate is available in your account. View your full donation history and achievements below.</p>
@@ -493,7 +493,7 @@ export const sendUrgentEmail = async (
           <p>Hi <strong>${donorName}</strong>,</p>
           <p>We are reaching out to you because there is a critical need for your blood type in your area.</p>
           <div class="urgent-box">
-            <div class="detail-row"><span class="label">🩸 Blood Type:</span> <strong>${bloodType}</strong></div>
+            <div class="detail-row"><span class="label">Blood Type:</span> <strong>${bloodType}</strong></div>
             <div class="detail-row"><span class="label">🏥 Hospital:</span> ${hospitalName}</div>
             <div class="detail-row"><span class="label">📦 Units Needed:</span> ${unitsNeeded}</div>
             ${location ? `<div class="detail-row"><span class="label">📍 Location:</span> ${location}</div>` : ""}

@@ -1,4 +1,4 @@
-# Drop of Hope ❤️🩸
+# Drop of Hope
 
 A comprehensive, modern web-based blood donation management platform connecting donors, hospitals, and administrators to facilitate and streamline the life-saving process of blood donation.
 
@@ -8,21 +8,21 @@ A comprehensive, modern web-based blood donation management platform connecting 
 
 ## 📋 Table of Contents
 
-- [About the Project](#-about-the-project)
-- [Key Features & Functionalities](#-key-features--functionalities)
-- [Technology Stack](#️-technology-stack)
-- [Code Quality & Type Safety](#-code-quality--type-safety)
-- [Authentication Architecture](#-authentication-architecture)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Database Schema](#️-database-schema-supabase)
-- [Error Handling](#️-error-handling)
-- [Deployment](#-deployment)
-- [Contact](#-contact)
+- [About the Project](#about-the-project)
+- [Key Features & Functionalities](#key-features--functionalities)
+- [Technology Stack](#technology-stack)
+- [Code Quality & Type Safety](#code-quality--type-safety)
+- [Authentication Architecture](#authentication-architecture)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Database Schema](#database-schema-supabase)
+- [System Reliability](#system-reliability)
+- [Deployment](#deployment)
+- [Contact](#contact)
 
 ---
 
-## 💡 About the Project
+## About the Project
 
 **Drop of Hope** was built to solve the communication gap between individuals willing to donate blood and the hospitals or organizations in desperate need of it.
 
@@ -30,9 +30,9 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-## 🚀 Key Features & Functionalities
+## Key Features & Functionalities
 
-### 🩸 For Donors
+### For Donors
 
 | Feature | Description |
 | :--- | :--- |
@@ -52,7 +52,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-### 🏥 For Hospitals
+### For Hospitals
 
 | Feature | Description |
 | :--- | :--- |
@@ -71,7 +71,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-### 👨‍💼 For Administrators
+### For Administrators
 
 | Feature | Description |
 | :--- | :--- |
@@ -90,7 +90,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-### 🤖 General & UI/UX Features
+### General & UI/UX Features
 
 | Feature | Description |
 | :--- | :--- |
@@ -105,7 +105,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
 
@@ -131,7 +131,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-## 🔐 Code Quality & Type Safety
+## Code Quality & Type Safety
 
 ### TypeScript Strict Mode
 
@@ -159,7 +159,7 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ---
 
-## 🔐 Authentication Architecture
+## Authentication Architecture
 
 The platform uses a **Hybrid Authentication** model:
 
@@ -178,7 +178,7 @@ The platform uses a **Hybrid Authentication** model:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 drop-of-hope/
@@ -231,7 +231,7 @@ drop-of-hope/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -276,6 +276,7 @@ PORT=3000
    ```bash
    npm run dev
    ```
+
    The app will be available at `http://localhost:5173` or as displayed in your terminal.
 
 4. **Build for production**
@@ -292,7 +293,7 @@ PORT=3000
 
 ---
 
-## 🗄️ Database Schema (Supabase)
+## Database Schema (Supabase)
 
 The PostgreSQL database relies on these core tables:
 
@@ -313,7 +314,7 @@ The PostgreSQL database relies on these core tables:
 
 ---
 
-## 🛡️ Error Handling
+## System Reliability
 
 ### Global Error Boundary
 
@@ -344,11 +345,12 @@ The PostgreSQL database relies on these core tables:
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 The project is configured for deployment to various platforms.
 
 **Build for production:**
+
 ```bash
 npm run build
 ```
@@ -363,7 +365,7 @@ The build output is in the `dist/` directory.
 
 ---
 
-## 📊 Recent Improvements (Latest Session)
+## Recent Improvements (Latest Session)
 
 ### Real-time Analytics & Dashboard Sync
 
@@ -380,15 +382,14 @@ The build output is in the `dist/` directory.
 
 ---
 
-## 🤝 Contact
+## Contact
 
 Have questions or want to collaborate?
 
-- **Email**: kharajaynam@gmail.com
+- **Email**: <kharajaynam@gmail.com>
 - **Phone**: +91 7779069774
 - **Repository**: [Drop of Hope GitHub](https://github.com/JainamKhara/drop-of-hope)
 
---- 
-
+---
 **Last Updated:** May 1, 2026  
 **Status:** ✅ Production Ready with Real-time Analytics & Advanced Error Handling

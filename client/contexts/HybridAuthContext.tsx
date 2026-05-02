@@ -72,6 +72,7 @@ export interface DonorProfile {
   level?: number;
   is_verified?: boolean;
   last_donation_date?: string;
+  medical_history?: any;
   created_at?: string;
   updated_at?: string;
 }

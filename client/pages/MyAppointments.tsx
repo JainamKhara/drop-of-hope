@@ -44,7 +44,7 @@ interface AppointmentDisplay {
 
 export default function MyAppointments() {
   const { donorProfile } = useHybridAuth();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("upcoming");
   const [appointments, setAppointments] = useState<AppointmentDisplay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -249,7 +249,7 @@ export default function MyAppointments() {
           <div class="corner tl"></div><div class="corner tr"></div>
           <div class="corner bl"></div><div class="corner br"></div>
           <div class="logo">
-            <div class="logo-icon">🩸</div>
+            <img src="/drop_of_hope_logo.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; margin-bottom: 4px;">
             <div class="logo-name">Drop of Hope</div>
           </div>
           <div class="divider"></div>
@@ -274,7 +274,8 @@ export default function MyAppointments() {
               <div class="sig-title">Program Director</div>
             </div>
             <div class="seal">
-              <div class="seal-text">Official<br>Seal<br>🩸</div>
+              <div class="seal-text">Official<br>Seal</div>
+              <img src="/drop_of_hope_logo.png" style="width: 24px; height: 24px; margin-top: 4px; object-fit: contain;">
             </div>
             <div class="sig-block">
               <div class="sig-line"></div>
@@ -437,7 +438,21 @@ export default function MyAppointments() {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
+                  onSelect={setSelectedDate}
+                  footer={
+                    selectedDate && (
+                      <div className="mt-2 flex justify-center">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-xs h-8 text-[hsl(0,80%,50%)] hover:text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/10"
+                          onClick={() => setSelectedDate(undefined)}
+                        >
+                          Show All Upcoming
+                        </Button>
+                      </div>
+                    )
+                  }
                   modifiers={{
                     hasActiveAppointment: activeAppointmentDates,
                     hasOtherAppointment: otherAppointmentDates,

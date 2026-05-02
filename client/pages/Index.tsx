@@ -328,9 +328,11 @@ export default function Index() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-white fill-current" />
-                </div>
+                <img 
+                  src="/drop_of_hope_logo.png" 
+                  alt="Drop of Hope Logo" 
+                  className="w-8 h-8 object-contain"
+                />
                 <span className="font-bold font-display text-lg">
                   Drop of Hope
                 </span>
@@ -406,11 +408,11 @@ export default function Index() {
               <div className="space-y-2 text-gray-400 text-sm">
                 <div className="flex items-center space-x-2">
                   <Phone className="w-4 h-4" />
-                  <span>1-800-DONATE</span>
+                  <span>+91 7779069774</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="w-4 h-4" />
-                  <span>help@dropofhope.org</span>
+                  <span>kharajaynam@gmail.com</span>
                 </div>
               </div>
             </div>
@@ -418,7 +420,7 @@ export default function Index() {
 
           <div className="border-t border-[hsl(0,80%,50%)] pt-8 text-center text-gray-400 text-sm">
             <p>
-              &copy; 2024 Drop of Hope. All rights reserved. Saving lives, one
+              &copy; 2026 Drop of Hope. All rights reserved. Saving lives, one
               drop at a time.
             </p>
           </div>

@@ -123,8 +123,8 @@ export default function DonorRegister() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Heart className="w-6 h-6 text-white fill-current" />
+          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
+            <img src="/drop_of_hope_logo.png" alt="Loading..." className="w-full h-full object-contain" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
         </div>

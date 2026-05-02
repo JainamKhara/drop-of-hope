@@ -93,12 +93,16 @@ const Navbar = () => {
             className="flex items-center space-x-2 hover:scale-105 transition-transform"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white fill-current" />
+            <div className="flex items-center space-x-2">
+              <img 
+                src="/drop_of_hope_logo.png" 
+                alt="Drop of Hope Logo" 
+                className="w-10 h-10 object-contain"
+              />
+              <span className="text-xl md:text-2xl font-bold tracking-tighter text-[hsl(0,80%,50%)] select-none">
+                DROP OF HOPE
+              </span>
             </div>
-            <span className="font-display font-bold text-base sm:text-lg md:text-xl text-[hsl(0,80%,50%)]">
-              Drop of Hope
-            </span>
             {userRole === "admin" && (
               <Badge className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)] ml-2 border-none">
                 Admin

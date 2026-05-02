@@ -39,8 +39,8 @@ export default function ForgotPassword() {
     <div className="min-h-screen bg-white dark:bg-[hsl(0,0%,6%)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[hsl(0,80%,50%)] rounded-sm mx-auto mb-4 flex items-center justify-center">
-            <Heart className="w-8 h-8 text-white fill-current" />
+          <div className="w-20 h-20 mx-auto mb-4">
+            <img src="/drop_of_hope_logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)]">
             Forgot Password

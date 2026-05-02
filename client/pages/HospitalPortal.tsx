@@ -311,8 +311,8 @@ export default function HospitalPortal() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Heart className="w-5 h-5 text-white fill-current" />
+          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
+            <img src="/drop_of_hope_logo.png" alt="Loading..." className="w-full h-full object-contain" />
           </div>
           <p className="text-muted-foreground">Loading...</p>
         </div>
@@ -1279,106 +1279,157 @@ export default function HospitalPortal() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {paginatedDrives.map((drive: any) => (
-                      <div key={drive.id} className="p-4 border rounded-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold">{drive.name}</h3>
-                          <Badge
-                            className={
-                              drive.is_active
-                                ? "bg-success/10 text-success"
-                                : "bg-muted"
-                            }
-                          >
-                            {drive.is_active ? "Active" : "Inactive"}
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {drive.start_date
-                              ? format(
-                                  new Date(drive.start_date),
-                                  "MMM dd, yyyy",
-                                )
-                              : "TBD"}
+                    {paginatedDrives.map((drive: any) => {
+                      const driveAppointments = donorAppointments.filter(apt => apt.drive_id === drive.id);
+                      const completedCount = driveAppointments.filter(apt => apt.status === 'completed').length;
+                      const registeredCount = driveAppointments.filter(apt => apt.status !== 'cancelled').length;
+                      const progress = Math.min((completedCount / drive.capacity) * 100, 100);
+
+                      return (
+                        <div key={drive.id} className="p-4 border rounded-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-semibold">{drive.name}</h3>
+                            <Badge
+                              className={
+                                drive.is_active
+                                  ? "bg-success/10 text-success"
+                                  : "bg-muted"
+                              }
+                            >
+                              {drive.is_active ? "Active" : "Inactive"}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Activity className="w-4 h-4" />
-                            {drive.location}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {drive.start_date
+                                ? format(
+                                    new Date(drive.start_date),
+                                    "MMM dd, yyyy",
+                                  )
+                                : "TBD"}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Activity className="w-4 h-4" />
+                              {drive.location}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Users className="w-4 h-4" />
+                              {registeredCount} / {drive.capacity} registered
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            {drive.registered_count ?? 0} / {drive.capacity}{" "}
-                            registered
+                          
+                          <div className="mt-3 flex items-center gap-2 text-success text-xs font-medium">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            {completedCount} donations completed
                           </div>
-                        </div>
-                        <div className="mt-3">
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="h-2 rounded-full bg-[hsl(0,80%,50%)]"
-                              style={{
-                                width: `${Math.min(((drive.registered_count ?? 0) / drive.capacity) * 100, 100)}%`,
+
+                          <div className="mt-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="h-2 rounded-full bg-[hsl(0,80%,50%)]"
+                                style={{
+                                  width: `${progress}%`,
+                                }}
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {Math.round(progress)}% capacity filled (by donations)
+                            </p>
+                          </div>
+                          {/* Drive Attendance Report */}
+                          <div className="mt-3 flex justify-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                try {
+                                  // Fetch appointments for this drive
+                                  const { data: appointments, error } = await appointmentService.getByDrive(drive.id);
+                                  
+                                  if (error) throw error;
+
+                                  const headers = [
+                                    "Donor Name",
+                                    "Email",
+                                    "Blood Type",
+                                    "Phone",
+                                    "Appointment Date",
+                                    "Time",
+                                    "Status",
+                                    "Points Earned"
+                                  ];
+
+                                  const attendeeRows = (appointments || []).map((apt: any) => {
+                                    const donor = Array.isArray(apt.donors) ? apt.donors[0] : apt.donors;
+                                    return [
+                                      donor?.name || "Unknown",
+                                      donor?.email || "N/A",
+                                      donor?.blood_type || "N/A",
+                                      donor?.phone || "N/A",
+                                      apt.appointment_date,
+                                      apt.appointment_time || "N/A",
+                                      apt.status,
+                                      apt.status === 'completed' ? '100' : '0'
+                                    ];
+                                  });
+
+                                  const completedCount = (appointments || []).filter((apt: any) => apt.status === 'completed').length;
+                                  const attendanceRate = appointments && appointments.length > 0 
+                                    ? Math.round((completedCount / appointments.length) * 100) 
+                                    : 0;
+
+                                  const summaryRows = [
+                                    [],
+                                    ["Drive Summary"],
+                                    ["Drive Name", drive.name],
+                                    ["Date", format(new Date(drive.start_date), "MMM dd, yyyy")],
+                                    ["Location", drive.location],
+                                    ["Total Registered", (appointments || []).filter((apt: any) => apt.status !== 'cancelled').length],
+                                    ["Total Appointments", appointments?.length || 0],
+                                    ["Donations Completed", completedCount],
+                                    ["Attendance Rate", `${attendanceRate}%`],
+                                    ["Capacity", drive.capacity],
+                                    ["Status", drive.is_active ? "Active" : "Inactive"]
+                                  ];
+
+                                  const allRows = [headers, ...attendeeRows, ...summaryRows];
+                                  
+                                  const csv = allRows
+                                    .map((r) => r.map(cell => `"${cell}"`).join(","))
+                                    .join("\n");
+                                  
+                                  const blob = new Blob([csv], {
+                                    type: "text/csv",
+                                  });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement("a");
+                                  a.href = url;
+                                  a.download = `attendance_report_${drive.name.replace(/\s+/g, '_')}_${drive.id}.csv`;
+                                  a.click();
+                                  URL.revokeObjectURL(url);
+                                  
+                                  toast({
+                                    title: "Success",
+                                    description: "Attendance report generated successfully.",
+                                  });
+                                } catch (err) {
+                                  console.error("Error generating report:", err);
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to generate attendance report.",
+                                    variant: "destructive",
+                                  });
+                                }
                               }}
-                            />
+                              className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
+                            >
+                              Attendance Report
+                            </Button>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {Math.round(
-                              ((drive.registered_count ?? 0) / drive.capacity) *
-                                100,
-                            )}
-                            % capacity filled
-                          </p>
                         </div>
-                        {/* Drive Attendance Report */}
-                        <div className="mt-3 flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              const rows = [
-                                [
-                                  "Drive",
-                                  "Date",
-                                  "Location",
-                                  "Registered",
-                                  "Capacity",
-                                  "Status",
-                                ],
-                                [
-                                  drive.name,
-                                  drive.start_date
-                                    ? format(
-                                        new Date(drive.start_date),
-                                        "MMM dd, yyyy",
-                                      )
-                                    : "TBD",
-                                  drive.location,
-                                  drive.registered_count ?? 0,
-                                  drive.capacity,
-                                  drive.is_active ? "Active" : "Inactive",
-                                ],
-                              ];
-                              const csv = rows
-                                .map((r) => r.join(","))
-                                .join("\n");
-                              const blob = new Blob([csv], {
-                                type: "text/csv",
-                              });
-                              const url = URL.createObjectURL(blob);
-                              const a = document.createElement("a");
-                              a.href = url;
-                              a.download = `drive_attendance_${drive.id}.csv`;
-                              a.click();
-                              URL.revokeObjectURL(url);
-                            }}
-                            className="border-[hsl(0,80%,50%)]/20 text-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)] hover:text-white"
-                          >
-                            Attendance Report
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <PaginationControls 
                       currentPage={drivesPage} 
                       totalPages={drivesTotalPages} 
