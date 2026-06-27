@@ -48,28 +48,35 @@ function parseDateTime(date: string, time: string): Date {
  * Helper to wrap async operations with simple retry logic
  * Useful for handling transient "fetch failed" / "socket closed" errors
  */
-async function withRetry<T>(
-  operation: () => Promise<T>,
+async function withRetry(
+  operation: () => any,
   retries = 3,
   delay = 1000
-): Promise<T> {
-  try {
-    return await operation();
-  } catch (err: any) {
+): Promise<any> {
+  const result = await operation();
+  
+  // Supabase returns errors in the 'error' property rather than throwing
+  const error = result?.error;
+  
+  if (error) {
+    const errorMessage = error.message?.toLowerCase() || "";
     const isNetworkError = 
-      err?.message?.includes("fetch failed") || 
-      err?.message?.includes("SocketError") ||
-      err?.code === "UND_ERR_SOCKET";
+      errorMessage.includes("fetch failed") || 
+      errorMessage.includes("socket") ||
+      errorMessage.includes("timeout") ||
+      error.code === "UND_ERR_CONNECT_TIMEOUT" ||
+      error.code === "ECONNRESET";
 
     if (retries > 0 && isNetworkError) {
-      console.warn(`[ExpirationJob] Retrying operation due to network error... (${retries} left)`);
+      console.warn(`[ExpirationJob] Retrying operation due to network error: ${errorMessage}. (${retries} left)`);
       await new Promise(resolve => setTimeout(resolve, delay));
-      // On network error, we also clear the cached supabase client to force a fresh connection on retry
+      // Force a fresh connection on retry
       supabase = null;
       return withRetry(operation, retries - 1, delay * 2);
     }
-    throw err;
   }
+  
+  return result;
 }
 
 // ─── 1. Expire Drives ─────────────────────────────────────────────────────────
@@ -77,14 +84,14 @@ async function withRetry<T>(
 const expireDrives = async (): Promise<{ expired: number; error: any }> => {
   try {
     const now = new Date();
-    const todayISO = now.toISOString().split("T")[0]; // YYYY-MM-DD
-    const nowTime = now.toTimeString().slice(0, 8); // HH:MM:SS
-
-    // Fetch active drives
-    const { data: drives, error: fetchErr } = await getSupabase()
-      .from("drives")
-      .select("id, name, end_date, end_time")
-      .eq("is_active", true);
+    
+    // Fetch active drives with retry
+    const { data: drives, error: fetchErr } = await withRetry(() =>  
+      getSupabase()
+        .from("drives")
+        .select("id, name, end_date, end_time")
+        .eq("is_active", true)
+    );
 
     if (fetchErr) {
       console.error("[ExpirationJob] Error fetching active drives:", fetchErr);
@@ -112,11 +119,13 @@ const expireDrives = async (): Promise<{ expired: number; error: any }> => {
       return { expired: 0, error: null };
     }
 
-    // Bulk deactivate
-    const { error: updateErr } = await getSupabase()
-      .from("drives")
-      .update({ is_active: false, updated_at: now.toISOString() })
-      .in("id", expiredIds);
+    // Bulk deactivate with retry
+    const { error: updateErr } = await withRetry(() => 
+      getSupabase()
+        .from("drives")
+        .update({ is_active: false, updated_at: now.toISOString() })
+        .in("id", expiredIds)
+    );
 
     if (updateErr) {
       console.error("[ExpirationJob] Error deactivating drives:", updateErr);
@@ -145,27 +154,30 @@ const expireAppointments = async (): Promise<{
     // Grace period: mark as no_show only 2 hours AFTER the appointment time
     const gracePeriodMs = 2 * 60 * 60 * 1000;
 
-    // Fetch scheduled and confirmed appointments
-    // We use a single query for efficiency, but handle the case where 'confirmed' might not exist in the enum
-    let { data: appointments, error: fetchErr } = await getSupabase()
-      .from("appointments")
-      .select(
-        `id, donor_id, appointment_date, appointment_time, status,
-         donors (id, name),
-         drives (name)`,
-      )
-      .in("status", ["scheduled", "confirmed"]);
-
-    // If the enum doesn't support 'confirmed' yet, PostgREST returns a 22P02 error
-    if (fetchErr && fetchErr.code === "22P02") {
-      const fallback = await getSupabase()
+    // Fetch scheduled and confirmed appointments with retry
+    let { data: appointments, error: fetchErr } = await withRetry(() => 
+      getSupabase()
         .from("appointments")
         .select(
           `id, donor_id, appointment_date, appointment_time, status,
-           donors (id, name),
+           donors (id, name, email),
            drives (name)`,
         )
-        .eq("status", "scheduled");
+        .in("status", ["scheduled", "confirmed"])
+    );
+
+    // If the enum doesn't support 'confirmed' yet, PostgREST returns a 22P02 error
+    if (fetchErr && fetchErr.code === "22P02") {
+      const fallback = await withRetry(() => 
+        getSupabase()
+          .from("appointments")
+          .select(
+            `id, donor_id, appointment_date, appointment_time, status,
+             donors (id, name, email),
+             drives (name)`,
+          )
+          .eq("status", "scheduled")
+      );
       
       appointments = fallback.data;
       fetchErr = fallback.error;
@@ -232,14 +244,16 @@ const expireAppointments = async (): Promise<{
       return { expired: 0, error: null };
     }
 
-    // Bulk update to no_show
-    const { error: updateErr } = await getSupabase()
-      .from("appointments")
-      .update({
-        status: "no_show",
-        updated_at: now.toISOString(),
-      })
-      .in("id", expiredIds);
+    // Bulk update to no_show with retry
+    const { error: updateErr } = await withRetry(() => 
+      getSupabase()
+        .from("appointments")
+        .update({
+          status: "no_show",
+          updated_at: now.toISOString(),
+        })
+        .in("id", expiredIds)
+    );
 
     if (updateErr) {
       console.error(
@@ -249,9 +263,11 @@ const expireAppointments = async (): Promise<{
       return { expired: 0, error: updateErr };
     }
 
-    // Insert notifications
+    // Insert notifications with retry
     if (notificationRows.length > 0) {
-      await getSupabase().from("notifications").insert(notificationRows);
+      await withRetry(() => 
+        getSupabase().from("notifications").insert(notificationRows)
+      );
     }
 
     console.log(

@@ -1673,6 +1673,56 @@ export default function HospitalPortal() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+
+              {/* Blood Inventory Distribution */}
+              <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Package className="w-5 h-5 text-[hsl(0,80%,50%)]" />
+                    <span>Blood Inventory Distribution</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={bloodInventory
+                          .map((item) => ({
+                            name: item.type,
+                            value: item.units,
+                          }))
+                          .filter((d) => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={85}
+                        paddingAngle={2}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                        labelLine={false}
+                      >
+                        {bloodInventory.map((item, index) => {
+                          const colors = [
+                            "#ef4444", "#f97316", "#f59e0b", "#10b981", 
+                            "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6"
+                          ];
+                          return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                        })}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111', 
+                          border: '1px solid hsl(0, 80%, 50%)', 
+                          borderRadius: '2px',
+                          color: '#fff'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </div>
 
             <Card className="border-2 border-[hsl(0,80%,50%)] shadow-none rounded-sm">

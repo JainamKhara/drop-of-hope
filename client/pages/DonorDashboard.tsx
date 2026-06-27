@@ -170,6 +170,13 @@ export default function DonorDashboard() {
   const { stats, appointments, donations, rewards, upcomingDrives } =
     dashboardData;
 
+  const lastDonationDate = donorProfile?.last_donation_date
+    ? new Date(donorProfile.last_donation_date)
+    : null;
+  const daysSinceLastDonation = lastDonationDate
+    ? Math.floor((Date.now() - lastDonationDate.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+
   const paginatedDonations = donations.slice(
     (donationsPage - 1) * itemsPerPage,
     donationsPage * itemsPerPage,
@@ -384,150 +391,159 @@ export default function DonorDashboard() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="border-b-2 border-[hsl(0,80%,50%)] py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8"
+        className="relative overflow-hidden py-12 md:py-16 px-4 bg-gradient-to-b from-red-50/40 via-white to-white dark:from-[hsl(0,80%,10%)]/20 dark:via-background dark:to-background border-b border-border"
       >
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 items-center">
-            {/* Left - Profile & Eligibility Status */}
-            <div>
-              <div className="flex items-center space-x-4 mb-6">
-                <Avatar className="w-16 h-16 border-2 border-[hsl(0,80%,50%)]">
-                  <AvatarImage
-                    src={donorProfile.profile_pic_url}
-                    alt={donorProfile.name}
-                  />
-                  <AvatarFallback className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)]">
-                    <User className="w-8 h-8" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h1 className="h2-brutal select-none">{donorProfile.name}</h1>
-                  <Badge
-                    variant="outline"
-                    className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent"
-                  >
-                    Level {stats.level} Donor
-                  </Badge>
-                </div>
-              </div>
+        {/* Abstract Grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none"></div>
 
-              {/* Donation Status */}
-              <div className="space-y-4">
-                <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
-                  <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                    Donation Status
-                  </p>
-                  <p className="h2-brutal text-[hsl(0,80%,50%)] select-none">
-                    {stats.daysUntilNextDonation === 0
-                      ? "READY"
-                      : "IN PROGRESS"}
-                  </p>
-                  <p className="text-sm text-foreground mt-1">
-                    {stats.daysUntilNextDonation === 0
-                      ? "You can donate today!"
-                      : `${stats.daysUntilNextDonation} days until eligible`}
-                  </p>
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="bg-white/95 dark:bg-card/95 backdrop-blur-md border border-border/80 rounded-2xl p-6 md:p-8 shadow-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+              {/* Left - Profile & Eligibility Status */}
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="w-16 h-16 border-2 border-[hsl(0,80%,50%)]">
+                    <AvatarImage
+                      src={donorProfile.profile_pic_url}
+                      alt={donorProfile.name}
+                    />
+                    <AvatarFallback className="bg-[hsl(0,80%,50%)]/10 text-[hsl(0,80%,50%)]">
+                      <User className="w-8 h-8" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">{donorProfile.name}</h1>
+                    <Badge
+                      variant="outline"
+                      className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent font-semibold mt-1"
+                    >
+                      Level {stats.level} Donor
+                    </Badge>
+                  </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      DONATION CYCLE
-                    </span>
-                    <span className="text-xs font-bold text-[hsl(0,80%,50%)]">
-                      {Math.floor(
+                {/* Donation Status */}
+                <div className="space-y-3">
+                  <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                      Donation Status
+                    </p>
+                    <p className="text-2xl font-extrabold text-[hsl(0,80%,50%)] tracking-tight">
+                      {stats.daysUntilNextDonation === 0
+                        ? "READY TO DONATE"
+                        : "IN PROGRESS"}
+                    </p>
+                    <p className="text-sm text-foreground mt-0.5">
+                      {stats.daysUntilNextDonation === 0
+                        ? "You can donate today!"
+                        : `${stats.daysUntilNextDonation} days until eligible`}
+                    </p>
+                    {daysSinceLastDonation !== null && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        ({daysSinceLastDonation} days since last donation)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        Donation Cycle
+                      </span>
+                      <span className="text-[10px] font-extrabold text-[hsl(0,80%,50%)]">
+                        {Math.floor(
+                          ((56 - stats.daysUntilNextDonation) / 56) * 100,
+                        )}
+                        % Complete
+                      </span>
+                    </div>
+                    <Progress
+                      value={Math.floor(
                         ((56 - stats.daysUntilNextDonation) / 56) * 100,
                       )}
-                      %
-                    </span>
+                      className="h-2 rounded-full"
+                    />
                   </div>
-                  <Progress
-                    value={Math.floor(
-                      ((56 - stats.daysUntilNextDonation) / 56) * 100,
-                    )}
-                    className="h-2"
-                  />
                 </div>
               </div>
-            </div>
 
-            {/* Center - Key Stats */}
-            <div className="space-y-4">
-              <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
-                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                  Total Donations
-                </p>
-                <p className="stat-hero text-[hsl(0,80%,50%)]">
-                  {stats.totalDonations}
-                </p>
-                <p className="text-sm text-foreground">
-                  {stats.totalDonations * 3} lives potentially saved
-                </p>
+              {/* Center - Key Stats */}
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-6 lg:border-x lg:border-border lg:px-8">
+                <div className="border-l-4 border-[hsl(0,80%,50%)] pl-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                    Total Donations
+                  </p>
+                  <p className="text-4xl font-extrabold text-[hsl(0,80%,50%)]">
+                    {stats.totalDonations}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {stats.totalDonations * 3} lives potentially saved
+                  </p>
+                </div>
+
+                <div className="border-l-4 border-green-500 pl-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                    Points Earned
+                  </p>
+                  <p className="text-4xl font-extrabold text-green-500">
+                    {stats.totalPoints.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Redeemable for rewards
+                  </p>
+                </div>
               </div>
 
-              <div className="border-l-4 border-[hsl(120,71%,43%)] pl-4">
-                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                  Points Earned
+              {/* Right - Quick Actions */}
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">
+                  Quick Actions
                 </p>
-                <p className="text-4xl font-bold text-[hsl(120,71%,43%)]">
-                  {stats.totalPoints.toLocaleString()}
-                </p>
-                <p className="text-sm text-foreground">
-                  Redeemable for rewards
-                </p>
+                <Button
+                  size="lg"
+                  className="w-full justify-start bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white rounded-none shadow-md shadow-red-500/10 hover:-translate-y-0.5 transition-transform"
+                  asChild
+                >
+                  <Link to="/drives">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Find Blood Drives
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full justify-start rounded-none border-2 hover:bg-muted hover:-translate-y-0.5 transition-transform"
+                  asChild
+                >
+                  <Link to="/appointments">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    My Appointments
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full justify-start rounded-none border-2 hover:bg-muted hover:-translate-y-0.5 transition-transform"
+                  asChild
+                >
+                  <Link to="/profile">
+                    <User className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full justify-start rounded-none border-2 hover:bg-muted hover:-translate-y-0.5 transition-transform"
+                  asChild
+                >
+                  <Link to="/rewards">
+                    <Award className="w-4 h-4 mr-2" />
+                    View Rewards
+                  </Link>
+                </Button>
               </div>
-            </div>
-
-            {/* Right - Quick Actions */}
-            <div className="space-y-3">
-              <Button
-                size="lg"
-                corners="crisp"
-                className="w-full justify-start"
-                asChild
-              >
-                <Link to="/drives">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Find Drives
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                corners="crisp"
-                className="w-full justify-start"
-                asChild
-              >
-                <Link to="/appointments">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  My Appointments
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                corners="crisp"
-                className="w-full justify-start"
-                asChild
-              >
-                <Link to="/profile">
-                  <User className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                corners="crisp"
-                className="w-full justify-start"
-                asChild
-              >
-                <Link to="/rewards">
-                  <Award className="w-4 h-4 mr-2" />
-                  View Rewards
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

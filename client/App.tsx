@@ -35,6 +35,7 @@ import BloodTypes from "./pages/BloodTypes";
 import DonationTips from "./pages/DonationTips";
 import ForgotPassword from "./pages/ForgotPassword";
 import HospitalProfile from "./pages/HospitalProfile";
+import ResetPassword from "./pages/ResetPassword";
 
 import {
   AdminOnlyRoute,
@@ -189,6 +190,7 @@ const AppContent = () => (
           <Route path="/blood-types" element={<BloodTypes />} />
           <Route path="/tips" element={<DonationTips />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/hospital/:id" element={<HospitalProfile />} />
 
           {/* ✅ Catch-all */}

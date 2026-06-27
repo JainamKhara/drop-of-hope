@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
+import { Heart, ArrowLeft, CheckCircle2, XCircle, TrendingUp, TrendingDown } from "lucide-react";
 
 const BLOOD_TYPES = ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"] as const;
 
@@ -63,6 +63,8 @@ const FACTS: Record<string, { label: string; color: string; fact: string }> = {
 };
 
 export default function BloodTypes() {
+  const [selectedType, setSelectedType] = React.useState<string>("O-");
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[hsl(0,0%,98%)] to-white dark:from-[hsl(14,100%,50%)] dark:to-background">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -118,6 +120,88 @@ export default function BloodTypes() {
             </Card>
           ))}
         </div>
+
+        {/* Interactive Compatibility Calculator */}
+        <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8 overflow-hidden">
+          <CardHeader className="bg-[hsl(0,80%,50%)]/5">
+            <CardTitle className="flex items-center space-x-2 text-[hsl(0,80%,50%)]">
+              <Heart className="w-5 h-5 fill-current text-[hsl(0,80%,50%)]" />
+              <span>Interactive Blood Compatibility Calculator</span>
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Select a blood type below to visualize compatibility rules instantly
+            </p>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex flex-wrap gap-2 justify-center mb-6">
+              {BLOOD_TYPES.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedType(type)}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-all ${
+                    selectedType === type
+                      ? "bg-[hsl(0,80%,50%)] border-[hsl(0,80%,50%)] text-white scale-110 shadow-lg"
+                      : "bg-background border-border hover:border-[hsl(0,80%,50%)]/50 text-foreground"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Can Give To */}
+              <div className="p-4 rounded-sm border border-border bg-muted/10">
+                <h3 className="font-bold text-lg mb-3 flex items-center text-[hsl(0,80%,50%)]">
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  <span>If you are {selectedType}, you can give to:</span>
+                </h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {BLOOD_TYPES.map((type) => {
+                    const isCompatible = COMPATIBILITY[selectedType].includes(type);
+                    return (
+                      <div
+                        key={type}
+                        className={`p-3 rounded-sm text-center font-bold border transition-all ${
+                          isCompatible
+                            ? "bg-green-100 dark:bg-green-950/30 border-green-500 text-green-700 dark:text-green-400"
+                            : "bg-muted/30 border-transparent text-muted-foreground/30"
+                        }`}
+                      >
+                        {type}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Can Receive From */}
+              <div className="p-4 rounded-sm border border-border bg-muted/10">
+                <h3 className="font-bold text-lg mb-3 flex items-center text-[hsl(0,80%,50%)]">
+                  <TrendingDown className="w-5 h-5 mr-2" />
+                  <span>If you are {selectedType}, you can receive from:</span>
+                </h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {BLOOD_TYPES.map((type) => {
+                    const isCompatible = COMPATIBILITY[type].includes(selectedType);
+                    return (
+                      <div
+                        key={type}
+                        className={`p-3 rounded-sm text-center font-bold border transition-all ${
+                          isCompatible
+                            ? "bg-blue-100 dark:bg-blue-950/30 border-blue-500 text-blue-700 dark:text-blue-400"
+                            : "bg-muted/30 border-transparent text-muted-foreground/30"
+                        }`}
+                      >
+                        {type}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Compatibility Table */}
         <Card className="border-2 border-[hsl(0,80%,50%)] rounded-sm mb-8">

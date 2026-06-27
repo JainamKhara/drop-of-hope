@@ -487,9 +487,41 @@ export default function Profile() {
 
                 {/* Profile Info */}
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)] mb-2">
-                    {formData?.name || user?.fullName || "User"}
-                  </h1>
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
+                    <h1 className="text-3xl font-bold text-[hsl(0,80%,50%)]">
+                      {formData?.name || user?.fullName || "User"}
+                    </h1>
+                    {isEditing ? (
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={handleSave}
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-none"
+                        >
+                          Save Changes
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setIsEditing(false);
+                            if (donorProfile) setFormData(donorProfile);
+                          }}
+                          className="rounded-none border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                        className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white rounded-none"
+                      >
+                        Edit Profile
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-muted-foreground mb-4">
                     Blood Type: {formData?.blood_type || "Not Set"}
                   </p>
@@ -722,7 +754,7 @@ export default function Profile() {
                       <Label className="text-base font-medium">
                         Emergency Contact
                       </Label>
-                      <div className="grid grid-cols-2 gap-4 mt-3">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                         <div>
                           <Label htmlFor="ec_name" className="text-sm">
                             Contact Name
@@ -757,6 +789,25 @@ export default function Profile() {
                               setFormData({
                                 ...formData,
                                 emergency_contact_phone: e.target.value,
+                              } as any)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="ec_relation" className="text-sm">
+                            Contact Relation
+                          </Label>
+                          <Input
+                            id="ec_relation"
+                            placeholder="e.g. Spouse, Parent, Friend"
+                            value={
+                              (formData as any)?.emergency_contact_relation || ""
+                            }
+                            disabled={!isEditing}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                emergency_contact_relation: e.target.value,
                               } as any)
                             }
                           />

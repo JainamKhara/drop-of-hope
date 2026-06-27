@@ -1003,6 +1003,34 @@ export const donorService = {
   },
 
   /**
+   * Approve a donor (Server-side)
+   */
+  approve: async (id: string) => {
+    try {
+      console.log(`[donorService] Requesting approval for donor: ${id}`);
+      const response = await fetch(`/api/admin/donors/${id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(`[donorService] Approval failed with status ${response.status}:`, errorData);
+        return { data: null, error: errorData.error || `Server error: ${response.status}` };
+      }
+
+      const result = await response.json();
+      console.log(`[donorService] Approval successful for donor: ${id}`, result);
+      return { data: result, error: null };
+    } catch (err) {
+      console.error(`[donorService] Network error during approval for ${id}:`, err);
+      return { data: null, error: err };
+    }
+  },
+
+
+
+  /**
    * Add points to donor
    */
   addPoints: async (id: string, points: number) => {

@@ -102,7 +102,7 @@ export default function MyAppointments() {
     }
   }, [donorProfile]);
 
-  const loadAppointments = async () => {
+  const loadAppointments = async (retryCount = 0) => {
     if (!donorProfile?.id) return;
 
     try {
@@ -112,7 +112,25 @@ export default function MyAppointments() {
       );
 
       if (error) {
+        // Handle specific timeout/network errors with automatic retry
+        // PostgrestError has message, details, hint, and code
+        const isNetworkError = 
+          error.message?.toLowerCase().includes("fetch") || 
+          error.message?.toLowerCase().includes("timeout") ||
+          error.code === "UND_ERR_CONNECT_TIMEOUT";
+        
+        if (isNetworkError && retryCount < 2) {
+          console.warn(`Connection timeout, retrying... (${retryCount + 1}/2)`);
+          setTimeout(() => loadAppointments(retryCount + 1), 2000);
+          return;
+        }
+
         console.error("Error loading appointments:", error);
+        toast({
+          title: "Connection Error",
+          description: "Failed to reach the database. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -141,8 +159,19 @@ export default function MyAppointments() {
         },
       );
       setAppointments(displayAppointments);
-    } catch (error) {
-      console.error("Error loading appointments:", error);
+    } catch (error: any) {
+      console.error("Unexpected error loading appointments:", error);
+      
+      // Attempt retry on unexpected network failures
+      if (retryCount < 2) {
+        setTimeout(() => loadAppointments(retryCount + 1), 2000);
+      } else {
+        toast({
+          title: "Fetch Failed",
+          description: "An unexpected error occurred while loading your appointments.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

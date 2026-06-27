@@ -106,7 +106,7 @@ const sendReminderNotifications = async () => {
         drives (name, location)
       `,
       )
-      .eq("status", "scheduled");
+      .in("status", ["scheduled", "confirmed"]);
 
     if (error) {
       console.error("Error fetching appointments:", error);
@@ -114,7 +114,7 @@ const sendReminderNotifications = async () => {
     }
 
     if (!appointments || appointments.length === 0) {
-      console.log("No scheduled appointments found");
+      console.log("No scheduled or confirmed appointments found");
       return { processed: 0, error: null };
     }
 

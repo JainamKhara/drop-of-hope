@@ -576,6 +576,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApproveDonor = async (id: string) => {
+    try {
+      const { error } = await donorService.approve(id);
+      if (error) throw error;
+
+      
+      toast({
+        title: "Donor Approved",
+        description: "The donor account has been verified and activated.",
+      });
+      loadDashboardData();
+    } catch (err) {
+      handleError(err);
+    }
+  };
+
+
   // Show loading while checking authentication
   if (loading) {
     return (
@@ -1646,17 +1663,33 @@ export default function AdminDashboard() {
                                 {donor.status}
                               </span>
                             </Badge>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setViewingDonor(donor);
-                                setIsDonorDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              View
-                            </Button>
+                            <div className="flex items-center space-x-2">
+                              {donor.status === "pending" && (
+                                <Button
+                                  size="sm"
+                                  className="bg-success hover:bg-success/90 text-white"
+                                  onClick={() => {
+                                    console.log("Approve button clicked for donor:", donor.id);
+                                    handleApproveDonor(donor.id);
+                                  }}
+                                >
+
+                                  <UserCheck className="w-4 h-4 mr-1" />
+                                  Approve
+                                </Button>
+                              )}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setViewingDonor(donor);
+                                  setIsDonorDialogOpen(true);
+                                }}
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                View
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       ))}

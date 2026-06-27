@@ -32,6 +32,9 @@ export interface Donor {
   updated_at?: string;
   user_id?: string; // filled by Supabase
   medical_history?: any;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  emergency_contact_relation?: string;
 }
 
 export interface Hospital {

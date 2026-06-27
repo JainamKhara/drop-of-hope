@@ -121,106 +121,130 @@ export default function Index() {
         </div>
       </div>
 
-      {/* Hero Section - Asymmetric Layout */}
-      <section className="py-12 md:py-20 px-4 border-b-2 border-[hsl(0,80%,50%)]">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 items-center">
-            {/* Left Section - 10% - Hero Image (subtle) - Hidden on mobile */}
-            <div className="hidden lg:flex lg:col-span-1 justify-center">
-              <div className="w-16 h-96 bg-[hsl(0,80%,50%)] rounded-none"></div>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-16 md:py-24 px-4 bg-gradient-to-b from-red-50/40 via-white to-white dark:from-[hsl(0,80%,10%)]/20 dark:via-background dark:to-background border-b border-border">
+        {/* Abstract Grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none"></div>
+        
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left - Hero Text */}
+            <div className="lg:col-span-7 space-y-6">
+              <Badge
+                variant="outline"
+                className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-red-50/50 dark:bg-red-950/20 text-sm py-1 px-3 rounded-full animate-bounce"
+              >
+                💧 Every Drop Counts
+              </Badge>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground select-none">
+                Give Blood, <br />
+                <span className="text-[hsl(0,80%,50%)] bg-gradient-to-r from-[hsl(0,80%,50%)] to-[hsl(14,100%,50%)] bg-clip-text text-transparent">
+                  Share the Gift of Life.
+                </span>
+              </h1>
+
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                Connect with local drives, track your donation stats, earn rewards, and join a community of lifesavers. Your contribution is someone's second chance.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                {isSignedIn ? (
+                  <>
+                    <Button size="lg" className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white rounded-none shadow-lg shadow-red-500/20 transition-all hover:scale-105" asChild>
+                      <Link to={dashboardLink}>Go to Dashboard</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="rounded-none border-2 hover:bg-muted"
+                      asChild
+                    >
+                      <Link to="/drives">Find Drives Near Me</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="lg" className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white rounded-none shadow-lg shadow-red-500/20 transition-all hover:scale-105" asChild>
+                      <Link to="/register">Become a Donor</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="rounded-none border-2 hover:bg-muted"
+                      asChild
+                    >
+                      <Link to="/request">Request Blood</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Right Section - 90% on desktop, full width on mobile */}
-            <div className="lg:col-span-11">
-              <div className="space-y-4 md:space-y-6">
-                <Badge
-                  variant="outline"
-                  className="border-2 border-[hsl(0,80%,50%)] text-[hsl(0,80%,50%)] bg-transparent text-sm md:text-base"
-                >
-                  💧 Every Drop Counts
-                </Badge>
-
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono text-[hsl(0,80%,50%)] select-none">
-                  SAVE LIVES.
-                </h1>
-
-                <p className="text-base md:text-lg text-foreground max-w-2xl leading-relaxed">
-                  Connect donors with those in need. Every donation is a second
-                  chance at life. Drop of Hope unites communities through the
-                  power of blood donation.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                  {isSignedIn ? (
-                    <>
-                      <Button size="lg" corners="crisp" asChild>
-                        <Link to={dashboardLink}>Go to Dashboard</Link>
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        corners="crisp"
-                        asChild
-                      >
-                        <Link to="/drives">Find Drives Near Me</Link>
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button size="lg" corners="crisp" asChild>
-                        <Link to="/register">Become a Donor</Link>
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        corners="crisp"
-                        asChild
-                      >
-                        <Link to="/request">Request Blood</Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
+            {/* Right - Premium Heartbeat SVG Illustration */}
+            <div className="lg:col-span-5 flex justify-center items-center">
+              <div className="relative w-full max-w-md h-72 flex items-center justify-center p-4 bg-white/50 dark:bg-black/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
+                <svg className="w-full h-full" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Heartbeat trace */}
+                  <path
+                    d="M10 100 H100 L110 70 L120 130 L130 100 H160 L170 50 L185 150 L195 100 H290"
+                    stroke="hsl(0, 80%, 50%)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="animate-pulse"
+                    style={{ strokeDasharray: 600, strokeDashoffset: 0 }}
+                  />
+                  {/* Glowing pulse drop in center */}
+                  <g transform="translate(145, 80) scale(0.8)">
+                    <path
+                      d="M20 0 C20 0 40 24 40 38 C40 49 31 58 20 58 C9 58 0 49 0 38 C0 24 20 0 20 0 Z"
+                      fill="url(#bloodDropGradient)"
+                      className="animate-bounce"
+                      style={{ animationDuration: '2s' }}
+                    />
+                  </g>
+                  <defs>
+                    <linearGradient id="bloodDropGradient" x1="20" y1="0" x2="20" y2="58" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="hsl(0, 100%, 60%)" />
+                      <stop offset="1" stopColor="hsl(0, 80%, 40%)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section - Staggered Alignment */}
+      {/* Stats Section */}
       <section
         ref={statsRef}
-        className="py-12 md:py-20 px-4 bg-[hsl(0,0%,98%)] dark:bg-card border-b border-border"
+        className="py-12 md:py-16 px-4 bg-muted/30 border-b border-border"
       >
-        <div className="container mx-auto space-y-8 md:space-y-12">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className={`flex items-center gap-4 md:gap-8 ${
-                index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-              }`}
-              style={{
-                animation: `slide-in-${index % 2 === 0 ? "left" : "right"} 600ms ease-out forwards`,
-                animationDelay: `${index * 100}ms`,
-                opacity: 0,
-              }}
-            >
-              {/* Left/Right - Icon */}
-              <div className="flex-shrink-0 w-12 h-12 md:w-20 md:h-20 bg-[hsl(0,80%,50%)] rounded-none flex items-center justify-center">
-                <stat.icon className="w-6 md:w-10 h-6 md:h-10 text-white" />
-              </div>
-
-              {/* Center - Stats */}
-              <div className="flex-1">
-                <div className="text-3xl md:text-5xl lg:text-6xl font-bold font-mono text-[hsl(0,80%,50%)]">
-                  {stat.value.toLocaleString()}+
-                </div>
-                <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {stats.map((stat, index) => (
+              <Card
+                key={index}
+                className="border border-border/60 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80 dark:bg-background/80 backdrop-blur-sm rounded-xl overflow-hidden group"
+              >
+                <CardContent className="p-6 text-center space-y-3">
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-950/20 text-[hsl(0,80%,50%)] rounded-full flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
+                    <stat.icon className="w-6 h-6 fill-current" />
+                  </div>
+                  <div>
+                    <div className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+                      {stat.value.toLocaleString()}+
+                    </div>
+                    <div className="text-xs md:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      {stat.label}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 

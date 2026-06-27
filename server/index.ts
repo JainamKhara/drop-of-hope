@@ -9,6 +9,7 @@ import {
 } from "./routes/notifications";
 import { handleCreateAppointment } from "./routes/appointments";
 import { handleAcceptAppointment, handleMarkDonationComplete, handleNoShowAppointment } from "./routes/hospitalActions";
+import { handleApproveDonor } from "./routes/adminActions";
 import { handleChatbotQuery } from "./routes/chatbot";
 import { startAppointmentReminderJob } from "./jobs/appointmentReminders";
 import { startExpirationJob, runExpirationChecks } from "./jobs/expirationJob";
@@ -50,6 +51,9 @@ export function createServer() {
       res.status(500).json({ error: "Expiration check failed" });
     }
   });
+
+  app.post("/api/admin/donors/:id/approve", handleApproveDonor);
+
 
   // Initialize background jobs
   startAppointmentReminderJob();

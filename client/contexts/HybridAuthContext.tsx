@@ -73,6 +73,9 @@ export interface DonorProfile {
   is_verified?: boolean;
   last_donation_date?: string;
   medical_history?: any;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  emergency_contact_relation?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -223,6 +226,18 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
   // ------------------ Donor Profile ------------------
 
+  // Helper to merge Clerk metadata into Supabase donor profile
+  const mergeMetadata = useCallback((donor: any) => {
+    if (!donor) return null;
+    return {
+      ...donor,
+      medical_history: clerkUser?.unsafeMetadata?.medical_history || null,
+      emergency_contact_name: clerkUser?.unsafeMetadata?.emergency_contact_name || null,
+      emergency_contact_phone: clerkUser?.unsafeMetadata?.emergency_contact_phone || null,
+      emergency_contact_relation: clerkUser?.unsafeMetadata?.emergency_contact_relation || null,
+    };
+  }, [clerkUser]);
+
   // Wrap loadDonorProfile in useCallback to stabilize its reference
   const loadDonorProfile = useCallback(async () => {
     // Prevent duplicate simultaneous requests (race condition fix)
@@ -315,7 +330,7 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
             is_verified: false,
           });
         } else {
-          setDonorProfile(insertData);
+          setDonorProfile(mergeMetadata(insertData));
         }
       } else {
         // Update profile with latest Clerk data
@@ -347,9 +362,9 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
 
         if (updateError) {
           console.error("Error updating donor profile:", updateError);
-          setDonorProfile(data);
+          setDonorProfile(mergeMetadata(data));
         } else {
-          setDonorProfile(updatedData);
+          setDonorProfile(mergeMetadata(updatedData));
         }
       }
     } catch (err) {
@@ -522,16 +537,67 @@ export const HybridAuthProvider = ({ children }: HybridAuthProviderProps) => {
         return { data: null, error: new Error("No donor profile loaded") };
       }
       try {
-        const { data, error } = await supabase
-          .from("donors")
-          .update({ ...updates, updated_at: new Date().toISOString() })
-          .eq("id", donorProfile.id)
-          .select()
-          .single();
-        if (!error && data) {
-          setDonorProfile(data);
+        const {
+          medical_history,
+          emergency_contact_name,
+          emergency_contact_phone,
+          emergency_contact_relation,
+          ...dbUpdates
+        } = updates;
+
+        const metadataUpdates: Record<string, any> = {};
+        if (medical_history !== undefined) metadataUpdates.medical_history = medical_history;
+        if (emergency_contact_name !== undefined) metadataUpdates.emergency_contact_name = emergency_contact_name;
+        if (emergency_contact_phone !== undefined) metadataUpdates.emergency_contact_phone = emergency_contact_phone;
+        if (emergency_contact_relation !== undefined) metadataUpdates.emergency_contact_relation = emergency_contact_relation;
+
+        if (clerkUser && Object.keys(metadataUpdates).length > 0) {
+          const newMetadata = {
+            ...clerkUser.unsafeMetadata,
+            ...metadataUpdates,
+          };
+          await clerkUser.update({ unsafeMetadata: newMetadata });
         }
-        return { data, error };
+
+        let dbData = null;
+        let dbError = null;
+
+        if (Object.keys(dbUpdates).length > 0) {
+          const { data, error } = await supabase
+            .from("donors")
+            .update({ ...dbUpdates, updated_at: new Date().toISOString() })
+            .eq("id", donorProfile.id)
+            .select()
+            .single();
+          dbData = data;
+          dbError = error;
+        } else {
+          const { data, error } = await supabase
+            .from("donors")
+            .select("*")
+            .eq("id", donorProfile.id)
+            .single();
+          dbData = data;
+          dbError = error;
+        }
+
+        if (!dbError && dbData) {
+          const merged = {
+            ...dbData,
+            medical_history: clerkUser?.unsafeMetadata?.medical_history || medical_history || null,
+            emergency_contact_name: clerkUser?.unsafeMetadata?.emergency_contact_name || emergency_contact_name || null,
+            emergency_contact_phone: clerkUser?.unsafeMetadata?.emergency_contact_phone || emergency_contact_phone || null,
+            emergency_contact_relation: clerkUser?.unsafeMetadata?.emergency_contact_relation || emergency_contact_relation || null,
+          };
+          if (medical_history !== undefined) merged.medical_history = medical_history;
+          if (emergency_contact_name !== undefined) merged.emergency_contact_name = emergency_contact_name;
+          if (emergency_contact_phone !== undefined) merged.emergency_contact_phone = emergency_contact_phone;
+          if (emergency_contact_relation !== undefined) merged.emergency_contact_relation = emergency_contact_relation;
+
+          setDonorProfile(merged);
+          return { data: merged, error: null };
+        }
+        return { data: null, error: dbError };
       } catch (err) {
         return { data: null, error: err as Error };
       }
