@@ -10,11 +10,11 @@ import {
   LogOut,
   User,
   Bell,
-  Settings,
   Menu,
   X,
   Sun,
   Moon,
+  LayoutDashboard,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -150,25 +150,26 @@ const Navbar = () => {
                   {userRole === "donor" && <NotificationCenter />}
 
                   {userRole === "admin" && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        corners="crisp"
-                        className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
-                      >
-                        <Bell className="w-5 h-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        corners="crisp"
-                        className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
-                      >
-                        <Settings className="w-5 h-5" />
-                      </Button>
-                    </>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      corners="crisp"
+                      className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
+                    >
+                      <Bell className="w-5 h-5" />
+                    </Button>
                   )}
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    corners="crisp"
+                    className="text-muted-foreground hover:text-[hsl(0,80%,50%)]"
+                    onClick={() => navigate(dashboardLink)}
+                    title="Dashboard"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                  </Button>
                 </div>
 
                 <Link

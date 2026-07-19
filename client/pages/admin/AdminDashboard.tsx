@@ -1216,7 +1216,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 border rounded-sm bg-[hsl(0,80%,50%)]/5">
+                  <div className="p-4 border border-[hsl(0,80%,50%)]/20 rounded-sm bg-[hsl(0,80%,50%)]/5 dark:bg-[hsl(0,80%,50%)]/10">
                     <p className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                       {analyticsData.totalDonors}
                     </p>
@@ -1224,8 +1224,8 @@ export default function AdminDashboard() {
                       Total Donors
                     </p>
                   </div>
-                  <div className="p-4 border rounded-sm bg-orange-50">
-                    <p className="text-2xl font-bold text-orange-600">
+                  <div className="p-4 border border-orange-200 dark:border-orange-900/30 rounded-sm bg-orange-50 dark:bg-orange-950/20">
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                       {
                         bloodRequests.filter((r: any) => r.status === "pending")
                           .length
@@ -1235,8 +1235,8 @@ export default function AdminDashboard() {
                       Pending Requests
                     </p>
                   </div>
-                  <div className="p-4 border rounded-sm bg-blue-50">
-                    <p className="text-2xl font-bold text-blue-600">
+                  <div className="p-4 border border-blue-200 dark:border-blue-900/30 rounded-sm bg-blue-50 dark:bg-blue-950/20">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {analyticsData.upcomingAppointments}
                     </p>
                     <p className="text-sm text-muted-foreground">

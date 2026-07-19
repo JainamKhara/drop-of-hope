@@ -66,6 +66,21 @@ export default function HospitalLogin() {
     }
   };
 
+  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+
+    // Auto-submit after setting demo credentials
+    setTimeout(() => {
+      const form = document.querySelector("form");
+      if (form) {
+        form.dispatchEvent(
+          new Event("submit", { cancelable: true, bubbles: true }),
+        );
+      }
+    }, 100);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -186,6 +201,35 @@ export default function HospitalLogin() {
                   {isLoading ? "Signing In..." : "Access Hospital Portal"}
                 </button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* Demo Credentials */}
+          <Card className="mt-6 border-green-200 bg-green-50 dark:bg-green-950">
+            <CardHeader>
+              <CardTitle className="text-green-800 dark:text-green-200 text-center">
+                Demo Credentials
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <p className="text-sm text-green-700 dark:text-green-300 text-center mb-3">
+                  Use these test credentials to access the hospital portal:
+                </p>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-green-700 border-green-300 hover:bg-green-100 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-900/50"
+                    onClick={() =>
+                      handleDemoLogin("info@citygeneral.com", "hospital123")
+                    }
+                    disabled={isLoading}
+                  >
+                    City General Hospital
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
