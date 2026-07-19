@@ -34,74 +34,74 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 
 ### For Donors
 
-| Feature | Description |
-| :--- | :--- |
-| **Interactive Dashboard** | Personalized overview showing donation history, points, upcoming appointments, and a *Days Since Last Donation* countdown widget |
-| **Find Blood Drives** | Discover nearby donation events with search, city, blood type, and date filters |
-| **Book Appointments** | Schedule donation slots with calendar integration |
-| **Appointment Management** | View, reschedule, or cancel bookings; generate a **Print Appointment Slip** for any upcoming appointment |
-| **Profile Management** | Update personal info, blood type, contact details, eligibility status, **Emergency Contact** details (name, phone, relation), and view donation CSV export |
-| **Rewards System (Gamification)** | Earn points, unlock badges, climb levels — **Share any badge** via Web Share API or clipboard fallback |
-| **Community Feed** | Social feed to share stories, post pictures, like and comment |
-| **Donation History Export** | Download full donation history as a CSV file directly from the Profile donations tab |
-| **Blood Type Info Page** | Dedicated `/blood-types` page with blood type compatibility chart and donation facts |
-| **Donation Tips & FAQs** | `/tips` page with categorized pre/post donation care tips and accordion FAQ |
-| **Feedback Form** | Star-rating + comment dialog for past blood drives — appears on completed drives |
-| **Forgot Password** | `/forgot-password` page that sends a Supabase password reset email |
-| **Input Validation** | Form validation with real-time error feedback and user-friendly error messages |
+| Feature                           | Description                                                                                                                                                |
+| :-------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Interactive Dashboard**         | Personalized overview showing donation history, points, upcoming appointments, and a _Days Since Last Donation_ countdown widget                           |
+| **Find Blood Drives**             | Discover nearby donation events with search, city, blood type, and date filters                                                                            |
+| **Book Appointments**             | Schedule donation slots with calendar integration                                                                                                          |
+| **Appointment Management**        | View, reschedule, or cancel bookings; generate a **Print Appointment Slip** for any upcoming appointment                                                   |
+| **Profile Management**            | Update personal info, blood type, contact details, eligibility status, **Emergency Contact** details (name, phone, relation), and view donation CSV export |
+| **Rewards System (Gamification)** | Earn points, unlock badges, climb levels — **Share any badge** via Web Share API or clipboard fallback                                                     |
+| **Community Feed**                | Social feed to share stories, post pictures, like and comment                                                                                              |
+| **Donation History Export**       | Download full donation history as a CSV file directly from the Profile donations tab                                                                       |
+| **Blood Type Info Page**          | Dedicated `/blood-types` page with blood type compatibility chart and donation facts                                                                       |
+| **Donation Tips & FAQs**          | `/tips` page with categorized pre/post donation care tips and accordion FAQ                                                                                |
+| **Feedback Form**                 | Star-rating + comment dialog for past blood drives — appears on completed drives                                                                           |
+| **Forgot Password**               | `/forgot-password` page that sends a Supabase password reset email                                                                                         |
+| **Input Validation**              | Form validation with real-time error feedback and user-friendly error messages                                                                             |
 
 ---
 
 ### For Hospitals
 
-| Feature | Description |
-| :--- | :--- |
-| **Hospital Portal** | Dedicated control center with tabs: Inventory, Blood Requests, Appointments, Blood Drives, Analytics, Notifications |
-| **Blood Requests** | Create urgent, high-priority, or routine requisitions for specific blood types |
-| **Inventory Management** | Track available blood units in real-time; see per-blood-type unit counts and status badges |
-| **Low Stock Alert** | Red alert banner automatically fires when any blood type falls critically low |
-| **Blood Inventory Chart** | Analytics tab contains a Recharts PieChart showing inventory distribution by blood type |
-| **Drive Management** | View blood drives assigned to the hospital with capacity progress bars |
-| **Drive Attendance Report** | Download a CSV attendance report for any specific drive directly from the Drives tab |
-| **Request Status Tracker** | 4-step inline stepper per request (Pending → Approved → Processing → Fulfilled) |
-| **Print Blood Request** | Opens a formatted print slip for any blood request in a new browser window |
-| **Hospital Profile Page** | Public-facing `/hospital/:id` page showing hospital info, contact details, and services |
-| **Urgent Notifications** | Alert donors about urgent blood needs with targeted messaging |
-| **Input Validation** | Credential validation with email format checking and password strength requirements |
+| Feature                     | Description                                                                                                         |
+| :-------------------------- | :------------------------------------------------------------------------------------------------------------------ |
+| **Hospital Portal**         | Dedicated control center with tabs: Inventory, Blood Requests, Appointments, Blood Drives, Analytics, Notifications |
+| **Blood Requests**          | Create urgent, high-priority, or routine requisitions for specific blood types                                      |
+| **Inventory Management**    | Track available blood units in real-time; see per-blood-type unit counts and status badges                          |
+| **Low Stock Alert**         | Red alert banner automatically fires when any blood type falls critically low                                       |
+| **Blood Inventory Chart**   | Analytics tab contains a Recharts PieChart showing inventory distribution by blood type                             |
+| **Drive Management**        | View blood drives assigned to the hospital with capacity progress bars                                              |
+| **Drive Attendance Report** | Download a CSV attendance report for any specific drive directly from the Drives tab                                |
+| **Request Status Tracker**  | 4-step inline stepper per request (Pending → Approved → Processing → Fulfilled)                                     |
+| **Print Blood Request**     | Opens a formatted print slip for any blood request in a new browser window                                          |
+| **Hospital Profile Page**   | Public-facing `/hospital/:id` page showing hospital info, contact details, and services                             |
+| **Urgent Notifications**    | Alert donors about urgent blood needs with targeted messaging                                                       |
+| **Input Validation**        | Credential validation with email format checking and password strength requirements                                 |
 
 ---
 
 ### For Administrators
 
-| Feature | Description |
-| :--- | :--- |
-| **Admin Dashboard** | 8-tab oversight dashboard with dynamic, real-time analytics fetching |
-| **User Management** | View, add, edit, and manage all donors and hospital accounts with full CRUD |
-| **Drive & Request Approval** | Review, approve, or reject blood drive requests and hospital blood requisitions |
-| **Dynamic Analytics** | Real-time Recharts: Donors by Blood Type (Full Distribution), Blood Request Status (PieChart), Active Drive Capacity vs Registrations (Filtered BarChart) |
-| **Real-time Statistics** | Accurate, database-driven metrics: Total Donors, Total Donations, Active Drives, and Lives Impacted (calculated as Donations × 3) |
-| **Top Donors Leaderboard** | Ranked list of top 20 donors sorted by points — shows name, blood type, pts & level badge |
-| **Export Full Report** | 4-section comprehensive CSV: Platform Summary, Top Donors, Blood Drives, Blood Requests |
-| **Export User List** | Download all donor data as a CSV from the Donors tab |
-| **System Activity Log** | Recent activity table populated live from DB appointments and blood requests |
-| **Announcement Banner** | Create and activate a prominent banner visible sitewide; managed via Supabase `announcements` table |
-| **Blood Drive Calendar** | Monthly calendar grid in the Drives tab — highlights days with scheduled drives, hover shows drive names |
-| **Broadcast Notifications** | Send notifications to all donors or filtered by blood type with customizable priority |
+| Feature                      | Description                                                                                                                                               |
+| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin Dashboard**          | 8-tab oversight dashboard with dynamic, real-time analytics fetching                                                                                      |
+| **User Management**          | View, add, edit, and manage all donors and hospital accounts with full CRUD                                                                               |
+| **Drive & Request Approval** | Review, approve, or reject blood drive requests and hospital blood requisitions                                                                           |
+| **Dynamic Analytics**        | Real-time Recharts: Donors by Blood Type (Full Distribution), Blood Request Status (PieChart), Active Drive Capacity vs Registrations (Filtered BarChart) |
+| **Real-time Statistics**     | Accurate, database-driven metrics: Total Donors, Total Donations, Active Drives, and Lives Impacted (calculated as Donations × 3)                         |
+| **Top Donors Leaderboard**   | Ranked list of top 20 donors sorted by points — shows name, blood type, pts & level badge                                                                 |
+| **Export Full Report**       | 4-section comprehensive CSV: Platform Summary, Top Donors, Blood Drives, Blood Requests                                                                   |
+| **Export User List**         | Download all donor data as a CSV from the Donors tab                                                                                                      |
+| **System Activity Log**      | Recent activity table populated live from DB appointments and blood requests                                                                              |
+| **Announcement Banner**      | Create and activate a prominent banner visible sitewide; managed via Supabase `announcements` table                                                       |
+| **Blood Drive Calendar**     | Monthly calendar grid in the Drives tab — highlights days with scheduled drives, hover shows drive names                                                  |
+| **Broadcast Notifications**  | Send notifications to all donors or filtered by blood type with customizable priority                                                                     |
 
 ---
 
 ### General & UI/UX Features
 
-| Feature | Description |
-| :--- | :--- |
-| **AI Chatbot Assistant** | Built-in floating chatbot with keyword matching, quick-action suggestion buttons on every page |
-| **Notification Center** | Dedicated notification bell icon with notification dropdown, mark as read/delete functionality |
-| **Contact Us Form** | Contact form wired to Supabase `contacts` table — messages stored and accessible to admins |
-| **Dark Mode Toggle** | Navbar toggle button switches between light and dark themes with localStorage persistence |
-| **Responsive Design** | Mobile-first TailwindCSS layouts with `md:` and `lg:` breakpoints throughout |
-| **Global Error Boundary** | Catches unhandled React component errors and displays user-friendly fallback UI |
-| **Accessibility Optimizations** | High-contrast chart tooltips and grid visibility tuned specifically for dark mode readability |
-| **Standardized Error Handling** | Centralized error handling utility with consistent logging and user notifications |
+| Feature                         | Description                                                                                    |
+| :------------------------------ | :--------------------------------------------------------------------------------------------- |
+| **AI Chatbot Assistant**        | Built-in floating chatbot with keyword matching, quick-action suggestion buttons on every page |
+| **Notification Center**         | Dedicated notification bell icon with notification dropdown, mark as read/delete functionality |
+| **Contact Us Form**             | Contact form wired to Supabase `contacts` table — messages stored and accessible to admins     |
+| **Dark Mode Toggle**            | Navbar toggle button switches between light and dark themes with localStorage persistence      |
+| **Responsive Design**           | Mobile-first TailwindCSS layouts with `md:` and `lg:` breakpoints throughout                   |
+| **Global Error Boundary**       | Catches unhandled React component errors and displays user-friendly fallback UI                |
+| **Accessibility Optimizations** | High-contrast chart tooltips and grid visibility tuned specifically for dark mode readability  |
+| **Standardized Error Handling** | Centralized error handling utility with consistent logging and user notifications              |
 
 ---
 
@@ -114,11 +114,12 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 - **Tooling:** Vite (lightning-fast dev server and bundler)
 - **Styling:** TailwindCSS with dark mode support
 - **UI Components:** shadcn/ui & Radix UI
-- **Routing:** React Router DOM
+- **Routing:** React Router DOM (with dynamic code-splitting lazy load boundaries)
 - **State Management:** TanStack Query (React Query)
 - **Data Visualization:** Recharts
 - **Icons:** Lucide React
 - **Date Utilities:** date-fns
+- **Offline Shell:** Progressive Web App (PWA) with registered cache service worker (`sw.js`)
 - **Error Handling:** Centralized error handler utility + Global Error Boundary
 
 ### Backend & Auth
@@ -127,7 +128,9 @@ By gamifying the donor experience and providing powerful oversight tools to admi
 - **Donor Authentication:** Clerk (social logins, session management)
 - **Admin/Hospital Auth:** Direct Supabase authentication with input validation
 - **API Framing:** Express (Node.js)
-- **Notifications:** Real-time notification system with Supabase
+- **AI Chatbot:** OpenRouter API (using poolside/laguna-xs-2.1:free)
+- **Notifications:** Real-time system notifications & background reminders job scheduler
+- **Email Delivery:** SMTP via Nodemailer (for confirming appointments and sending reminder alerts)
 
 ---
 
@@ -200,33 +203,52 @@ drop-of-hope/
 │   │   ├── error-handler.ts        # Centralized error handling utility
 │   │   ├── validation.ts           # Input validation utilities
 │   │   └── utils.ts                # General utility functions
-│   ├── pages/              # Application views (complete feature implementations)
-│   │   ├── AdminDashboard.tsx      # 8-tab admin panel with leaderboard + reports
-│   │   ├── HospitalPortal.tsx      # Hospital management center
-│   │   ├── Profile.tsx             # Donor profile + emergency contacts + CSV export
-│   │   ├── DonorDashboard.tsx      # Donor home with days-since-donation widget
-│   │   ├── BloodDrives.tsx         # Drive discovery + feedback form
-│   │   ├── BookAppointment.tsx     # Drive slot booking with validation
-│   │   ├── MyAppointments.tsx      # Booking management + print slip
-│   │   ├── Rewards.tsx             # Gamification + badge sharing
-│   │   ├── Community.tsx           # Social feed
-│   │   ├── BloodTypes.tsx          # Blood type compatibility info page
-│   │   ├── DonationTips.tsx        # Tips & FAQs page
-│   │   ├── HospitalProfile.tsx     # Public hospital profile
-│   │   ├── ForgotPassword.tsx      # Password reset with email
-│   │   └── Contact.tsx             # Contact form
-│   └── App.tsx             # Root component with ErrorBoundary + routing
+│   ├── pages/              # Domain-categorized application views
+│   │   ├── admin/                 # Administrator views
+│   │   │   ├── AdminDashboard.tsx      # 8-tab admin panel with leaderboard + reports
+│   │   │   └── AdminLogin.tsx          # Administrator secure portal login
+│   │   ├── auth/                  # Authentication views
+│   │   │   ├── Login.tsx               # Login page
+│   │   │   ├── Register.tsx            # Register page
+│   │   │   ├── ForgotPassword.tsx      # Request password reset link
+│   │   │   ├── ResetPassword.tsx       # Password recovery completion
+│   │   │   └── ClerkSetup.tsx          # Custom Clerk verification page
+│   │   ├── donor/                 # Donor views
+│   │   │   ├── DonorDashboard.tsx      # Donor home with days-since-donation widget
+│   │   │   ├── DonorLogin.tsx          # Donor credentials login page
+│   │   │   ├── DonorRegister.tsx       # Donor sign up registration page
+│   │   │   ├── Profile.tsx             # Profile + emergency contacts + CSV export
+│   │   │   ├── BloodDrives.tsx         # Drive discovery + feedback form
+│   │   │   ├── BookAppointment.tsx     # Drive slot booking with validation
+│   │   │   ├── MyAppointments.tsx      # Booking management + print slip
+│   │   │   ├── Rewards.tsx             # Gamification + badge sharing
+│   │   │   └── Community.tsx           # Social community feed
+│   │   ├── hospital/              # Hospital views
+│   │   │   ├── HospitalPortal.tsx      # Hospital management portal
+│   │   │   ├── HospitalLogin.tsx       # Hospital staff login portal
+│   │   │   └── HospitalProfile.tsx     # Public hospital profile view
+│   │   └── public/                # Static public-facing views
+│   │       ├── Index.tsx               # Homepage and landing details
+│   │       ├── About.tsx               # Platform overview and medical details
+│   │       ├── Contact.tsx             # Contact form
+│   │       ├── Terms.tsx               # Terms of Service
+│   │       ├── Privacy.tsx             # Privacy Policy page
+│   │       ├── BloodTypes.tsx          # Blood compatibility page
+│   │       ├── DonationTips.tsx        # Pre/Post care tips page
+│   │       └── NotFound.tsx            # 404 handler page
+│   └── App.tsx             # Root component with ErrorBoundary + lazy-loaded routing
 ├── server/                 # Backend Node/Express
-│   ├── index.ts            # Server entry point
-│   └── routes/             # API routing configurations
-│       └── notifications.ts        # Notification sending with pagination
+│   ├── index.ts            # Server entry point with background cron guard
+│   ├── routes/             # API routing configurations (notifications, chatbot, etc.)
+│   ├── jobs/               # Background task scheduler jobs (reminders, expirations)
+│   └── services/           # Service interfaces and controllers
 ├── shared/                 # Shared TypeScript interfaces and types
 ├── FEATURES.csv            # Complete feature tracking (55+ features)
 ├── ISSUES.md               # Issue tracking and resolution log
 ├── README.md               # This file
 ├── tsconfig.json           # TypeScript configuration (strict mode enabled)
 ├── tailwind.config.ts      # Tailwind CSS configuration
-└── public/                 # Static assets
+└── public/                 # Static assets and PWA service worker
 ```
 
 ---
@@ -251,9 +273,20 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_KEY=your-service-key
 
-# Server Configuration (optional)
+# Server Configuration & Ports (optional)
 NODE_ENV=development
 PORT=3000
+
+# Email SMTP Notification Config
+EMAIL_USER="your-email@example.com"
+EMAIL_PASS="your-smtp-app-password"
+EMAIL_FROM_NAME="Drop of Hope"
+
+# Background Job Configuration
+APPOINTMENT_REMINDER_JOB_ENABLED=true
+
+# OpenRouter API Key for Chatbot
+OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
 ### Installation & Execution
@@ -297,20 +330,20 @@ PORT=3000
 
 The PostgreSQL database relies on these core tables:
 
-| Table | Purpose |
-| :--- | :--- |
-| `donors` | Donor profiles synced from Clerk (id, name, blood_type, points, level, is_verified, city, email, phone, address) |
-| `admins` / `hospitals` | Internal secure access credentials with email + password |
-| `drives` | Blood drive events (location, times, capacity, registered_count, is_active) |
-| `appointments` | Links donors to specific drives (date, time, status) |
-| `donations` | Verified records of completed donations (donor_id, drive_id, units_collected, date) |
-| `blood_requests` | Hospital requisitions for blood types (blood_type, units_needed, priority, status) |
-| `blood_inventory` | Real-time hospital blood stock per type (units_available, last_updated) |
-| `rewards` | Gamification points and badge thresholds (donor_id, points, level, badges_earned) |
-| `community_posts` / `community_comments` / `community_likes` | Social feed relational tables |
-| `notifications` | User notifications with read/unread status (donor_id, type, title, message, is_read) |
-| `announcements` | Sitewide announcement banners managed by admins (title, message, is_active) |
-| `contacts` | Messages submitted via Contact Us form (name, email, message, created_at) |
+| Table                                                        | Purpose                                                                                                          |
+| :----------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| `donors`                                                     | Donor profiles synced from Clerk (id, name, blood_type, points, level, is_verified, city, email, phone, address) |
+| `admins` / `hospitals`                                       | Internal secure access credentials with email + password                                                         |
+| `drives`                                                     | Blood drive events (location, times, capacity, registered_count, is_active)                                      |
+| `appointments`                                               | Links donors to specific drives (date, time, status)                                                             |
+| `donations`                                                  | Verified records of completed donations (donor_id, drive_id, units_collected, date)                              |
+| `blood_requests`                                             | Hospital requisitions for blood types (blood_type, units_needed, priority, status)                               |
+| `blood_inventory`                                            | Real-time hospital blood stock per type (units_available, last_updated)                                          |
+| `rewards`                                                    | Gamification points and badge thresholds (donor_id, points, level, badges_earned)                                |
+| `community_posts` / `community_comments` / `community_likes` | Social feed relational tables                                                                                    |
+| `notifications`                                              | User notifications with read/unread status (donor_id, type, title, message, is_read)                             |
+| `announcements`                                              | Sitewide announcement banners managed by admins (title, message, is_active)                                      |
+| `contacts`                                                   | Messages submitted via Contact Us form (name, email, message, created_at)                                        |
 
 ---
 
@@ -380,6 +413,15 @@ The build output is in the `dist/` directory.
 - ✅ **Pagination Stability** - Fixed list indexing and mapping errors in paginated views
 - ✅ **TypeScript Stability** - Resolved all remaining complex type errors in Dashboard and Portal forms
 
+### Restructuring, PWA & Optimization (Latest Update)
+
+- ✅ **Clean File Classification** - Re-organized the flat `client/pages` structure into domain-specific subdirectories (`admin`, `auth`, `donor`, `hospital`, `public`) to optimize code organization.
+- ✅ **Route-based Code Splitting** - Configured route boundaries using React `lazy` and `Suspense`, dropping the entry bundle size from `1.56 MB` to `685 KB` for ultra-fast startup performance.
+- ✅ **PWA Service Worker** - Registered a local Service Worker (`public/sw.js`) to cache application shell assets, enabling offline performance.
+- ✅ **Unit Testing Suite** - Added comprehensive input validation tests for profile inputs and cron triggers.
+- ✅ **Database Enum Fallbacks** - Resolved critical PostgREST enum `22P02` syntax errors during automated email reminder jobs.
+- ✅ **Contrast Accessibility Fixes** - Enhanced visual clarity for disabled forms and profile stats blocks in dark mode.
+
 ---
 
 ## Contact
@@ -391,5 +433,6 @@ Have questions or want to collaborate?
 - **Repository**: [Drop of Hope GitHub](https://github.com/JainamKhara/drop-of-hope)
 
 ---
-**Last Updated:** May 1, 2026  
-**Status:** ✅ Production Ready with Real-time Analytics & Advanced Error Handling
+
+**Last Updated:** July 19, 2026  
+**Status:** ✅ Production Ready with Restructured Architecture, PWA Offline Support & Ultra-Fast Code Splitting

@@ -154,15 +154,17 @@ const expireAppointments = async (): Promise<{
     // Grace period: mark as no_show only 2 hours AFTER the appointment time
     const gracePeriodMs = 2 * 60 * 60 * 1000;
 
+    const appointmentFields = `
+      id, donor_id, appointment_date, appointment_time, status,
+      donors (id, name, email),
+      drives (name)
+    `;
+
     // Fetch scheduled and confirmed appointments with retry
     let { data: appointments, error: fetchErr } = await withRetry(() => 
       getSupabase()
         .from("appointments")
-        .select(
-          `id, donor_id, appointment_date, appointment_time, status,
-           donors (id, name, email),
-           drives (name)`,
-        )
+        .select(appointmentFields)
         .in("status", ["scheduled", "confirmed"])
     );
 
@@ -171,11 +173,7 @@ const expireAppointments = async (): Promise<{
       const fallback = await withRetry(() => 
         getSupabase()
           .from("appointments")
-          .select(
-            `id, donor_id, appointment_date, appointment_time, status,
-             donors (id, name, email),
-             drives (name)`,
-          )
+          .select(appointmentFields)
           .eq("status", "scheduled")
       );
       
