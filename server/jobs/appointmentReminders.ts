@@ -89,7 +89,7 @@ const sendReminderNotifications = async () => {
     const inOneHourEnd = new Date(inOneHour.getTime() + 60 * 60 * 1000);
 
     // Fetch scheduled appointments with related data
-    const { data: appointments, error } = await getSupabase()
+    let { data: appointments, error } = await getSupabase()
       .from("appointments")
       .select(
         `
@@ -107,6 +107,31 @@ const sendReminderNotifications = async () => {
       `,
       )
       .in("status", ["scheduled", "confirmed"]);
+
+    // If the enum doesn't support 'confirmed' yet, PostgREST returns a 22P02 error
+    if (error && error.code === "22P02") {
+      const fallback = await getSupabase()
+        .from("appointments")
+        .select(
+          `
+          id,
+          donor_id,
+          drive_id,
+          appointment_date,
+          appointment_time,
+          status,
+          confirmation_email_sent_at,
+          reminder_1day_sent_at,
+          reminder_1hour_sent_at,
+          donors (id, name, email),
+          drives (name, location)
+        `,
+        )
+        .eq("status", "scheduled");
+      
+      appointments = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error("Error fetching appointments:", error);

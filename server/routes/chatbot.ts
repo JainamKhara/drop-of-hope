@@ -33,7 +33,7 @@ Platform Data: Whole blood (100 pts), Platelets (150 pts). Age 17+, Weight 110lb
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "poolside/laguna-xs.2:free",
+        "model": "poolside/laguna-xs-2.1:free",
         "messages": [
           { "role": "system", "content": systemPrompt },
           ...(history || []).map((h: any) => ({

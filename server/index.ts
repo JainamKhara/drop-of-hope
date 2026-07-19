@@ -56,8 +56,10 @@ export function createServer() {
 
 
   // Initialize background jobs
-  startAppointmentReminderJob();
-  startExpirationJob();
+  if (process.env.NODE_ENV !== "test") {
+    startAppointmentReminderJob();
+    startExpirationJob();
+  }
 
   return app;
 }

@@ -528,7 +528,7 @@ export default function Profile() {
 
                   {/* Quick Stats */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,12%)] border dark:border-[hsl(0,80%,50%)]/30 rounded-sm">
                       <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {formData?.level || 1}
                       </div>
@@ -536,7 +536,7 @@ export default function Profile() {
                         Donor Level
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,12%)] border dark:border-[hsl(0,80%,50%)]/30 rounded-sm">
                       <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {formData?.points || 0}
                       </div>
@@ -544,7 +544,7 @@ export default function Profile() {
                         Points Earned
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,12%)] border dark:border-[hsl(0,80%,50%)]/30 rounded-sm">
                       <div className="text-2xl font-bold text-[hsl(0,80%,50%)]">
                         {donations.length * 3}
                       </div>
@@ -552,7 +552,7 @@ export default function Profile() {
                         Lives Saved
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(14,100%,50%)] rounded-sm">
+                    <div className="text-center p-3 bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,12%)] border dark:border-[hsl(0,80%,50%)]/30 rounded-sm">
                       <Badge
                         className={
                           canDonate()

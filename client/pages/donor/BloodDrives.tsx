@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHybridAuth } from "@/contexts/HybridAuthContext";
-import { Drive } from "../lib/supabase";
+import { Drive } from "@/lib/supabase";
 import { driveService, feedbackService } from "@/lib/db-services";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
