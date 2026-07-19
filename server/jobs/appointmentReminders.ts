@@ -70,9 +70,9 @@ const createNotificationInDB = async (
     return true;
   } catch (error) {
     console.error("Error creating notification:", error);
-    return false;
   }
 };
+
 
 const sendReminderNotifications = async () => {
   try {
@@ -103,21 +103,11 @@ const sendReminderNotifications = async () => {
     `;
 
     // Fetch scheduled appointments with related data
-    let { data: appointments, error } = await getSupabase()
+    // Note: DB enum only supports "scheduled" — "confirmed" is not a valid status
+    const { data: appointments, error } = await getSupabase()
       .from("appointments")
       .select(appointmentFields)
-      .in("status", ["scheduled", "confirmed"]);
-
-    // If the enum doesn't support 'confirmed' yet, PostgREST returns a 22P02 error
-    if (error && error.code === "22P02") {
-      const fallback = await getSupabase()
-        .from("appointments")
-        .select(appointmentFields)
-        .eq("status", "scheduled");
-      
-      appointments = fallback.data;
-      error = fallback.error;
-    }
+      .eq("status", "scheduled");
 
     if (error) {
       console.error("Error fetching appointments:", error);
@@ -125,7 +115,7 @@ const sendReminderNotifications = async () => {
     }
 
     if (!appointments || appointments.length === 0) {
-      console.log("No scheduled or confirmed appointments found");
+      console.log("No scheduled appointments found");
       return { processed: 0, error: null };
     }
 

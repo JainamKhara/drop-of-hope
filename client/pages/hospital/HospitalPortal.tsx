@@ -55,7 +55,7 @@ import {
   Droplets,
   Printer,
 } from "lucide-react";
-import { format, addDays } from "date-fns";
+import { format, addDays, isPast, parseISO } from "date-fns";
 import {
   BarChart,
   Bar,
@@ -757,176 +757,187 @@ export default function HospitalPortal() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {paginatedAppointments.map((appointment: any) => (
-                      <div
-                        key={appointment.id}
-                        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-sm border border-blue-200 dark:border-blue-800"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-semibold">
-                            {appointment.donors?.name
-                              ?.substring(0, 2)
-                              .toUpperCase() || "DN"}
+                    {paginatedAppointments.map((appointment: any) => {
+                      // Derive appointment state
+                      const aptDateTime = (() => {
+                        try {
+                          const [h, m] = (appointment.appointment_time || "00:00").split(":");
+                          const d = new Date(appointment.appointment_date);
+                          d.setHours(parseInt(h, 10), parseInt(m, 10), 0, 0);
+                          return d;
+                        } catch { return new Date(appointment.appointment_date); }
+                      })();
+                      const slotPast = isPast(aptDateTime);
+                      const isAccepted = !!appointment.acceptance_email_sent_at;
+                      const status = appointment.status as string;
+
+                      // Zone determination
+                      const isPending   = status === "scheduled" && !isAccepted;
+                      const isConfirmed = status === "scheduled" && isAccepted && !slotPast;
+                      const isAwaitingOutcome = status === "scheduled" && slotPast;
+                      const isDone      = status === "completed" || status === "no_show" || status === "cancelled";
+
+                      // Badge config per zone
+                      const zoneBadge = (() => {
+                        if (isDone) {
+                          if (status === "completed")  return { label: "Completed",          cls: "bg-success/15 text-success border-success/30" };
+                          if (status === "no_show")    return { label: "No Show",             cls: "bg-gray-100 text-gray-500 border-gray-300 dark:bg-gray-800 dark:text-gray-400" };
+                          return                              { label: "Cancelled",           cls: "bg-destructive/10 text-destructive border-destructive/30" };
+                        }
+                        if (isAwaitingOutcome) return { label: "⏳ Awaiting Outcome",     cls: "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-950 dark:text-blue-300" };
+                        if (isConfirmed)       return { label: "✅ Accepted",             cls: "bg-success/15 text-success border-success/30" };
+                        return                        { label: "🕐 Pending Confirmation", cls: "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-950 dark:text-orange-300" };
+                      })();
+
+                      return (
+                        <div
+                          key={appointment.id}
+                          className={`rounded-sm border p-4 transition-all ${
+                            isPending        ? "bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-800" :
+                            isConfirmed      ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" :
+                            isAwaitingOutcome? "bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800" :
+                                              "bg-muted/30 border-border"
+                          }`}
+                        >
+                          {/* Top row: donor info + status badge */}
+                          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="w-12 h-12 bg-[hsl(0,80%,50%)] rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                {appointment.donors?.name?.substring(0, 2).toUpperCase() || "DN"}
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-semibold truncate">{appointment.donors?.name || "Unknown Donor"}</h4>
+                                <p className="text-sm text-muted-foreground truncate">{appointment.drives?.name || "Unknown Drive"}</p>
+                                <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    {format(new Date(appointment.appointment_date), "MMM d, yyyy")}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {appointment.appointment_time}
+                                  </span>
+                                  {appointment.donors?.blood_type && (
+                                    <Badge variant="outline" className="text-xs px-1.5">
+                                      {appointment.donors.blood_type}
+                                    </Badge>
+                                  )}
+                                  {appointment.donors?.phone && (
+                                    <span>📞 {appointment.donors.phone}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {/* Status badge */}
+                            <Badge className={`shrink-0 border text-xs px-2 py-0.5 font-medium ${zoneBadge.cls}`}>
+                              {zoneBadge.label}
+                            </Badge>
                           </div>
-                          <div>
-                            <h4 className="font-semibold">
-                              {appointment.donors?.name || "Unknown Donor"}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {appointment.drives?.name || "Unknown Drive"}
-                            </p>
-                            <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {format(
-                                  new Date(appointment.appointment_date),
-                                  "MMM d, yyyy",
-                                )}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {appointment.appointment_time}
-                              </span>
-                              {appointment.donors?.blood_type && (
-                                <Badge variant="outline" className="text-xs">
-                                  {appointment.donors.blood_type}
-                                </Badge>
+
+                          {/* Action buttons row */}
+                          {!isDone && (
+                            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/50">
+
+                              {/* Zone 1 — Pending: Accept / Reject */}
+                              {isPending && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    className="bg-success hover:bg-success/90 text-white"
+                                    onClick={async () => {
+                                      const { error } = await appointmentService.acceptWithEmail(
+                                        appointment.id,
+                                        hospitalProfile.name,
+                                      );
+                                      if (!error) {
+                                        toast({ title: "✅ Appointment Accepted", description: "The donor has been notified by email and in-app notification." });
+                                        loadHospitalData();
+                                      } else {
+                                        toast({ title: "Error", description: "Failed to accept appointment.", variant: "destructive" });
+                                      }
+                                    }}
+                                  >
+                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={async () => {
+                                      if (!window.confirm("Reject this appointment request?")) return;
+                                      const { error } = await appointmentService.cancel(appointment.id);
+                                      if (!error) {
+                                        toast({ title: "Appointment Rejected", description: "The donor has been notified.", variant: "destructive" });
+                                        loadHospitalData();
+                                      }
+                                    }}
+                                  >
+                                    <Ban className="w-4 h-4 mr-1" />
+                                    Reject
+                                  </Button>
+                                </>
                               )}
-                              {appointment.donors?.phone && (
-                                <span>📞 {appointment.donors.phone}</span>
+
+                              {/* Zone 2 — Confirmed, donation not yet due */}
+                              {isConfirmed && (
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  Donation slot on {format(aptDateTime, "MMM d 'at' h:mm a")} — outcome options appear after that time.
+                                </p>
+                              )}
+
+                              {/* Zone 3 — Awaiting outcome (time has passed) */}
+                              {isAwaitingOutcome && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
+                                    onClick={async () => {
+                                      if (!window.confirm(`Mark ${appointment.donors?.name || "this donor"}'s donation as COMPLETE?\nThis will award 100 points and send a completion email.`)) return;
+                                      const { error } = await appointmentService.markComplete(appointment.id);
+                                      if (!error) {
+                                        toast({
+                                          title: "🌟 Donation Complete!",
+                                          description: `100 points awarded to ${appointment.donors?.name || "donor"}. Completion email sent.`,
+                                        });
+                                        loadHospitalData();
+                                      } else {
+                                        toast({ title: "Error", description: "Failed to mark as complete.", variant: "destructive" });
+                                      }
+                                    }}
+                                  >
+                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                    Mark Complete
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-orange-400 text-orange-600 hover:bg-orange-50"
+                                    onClick={async () => {
+                                      if (!window.confirm(`Mark ${appointment.donors?.name || "this donor"} as NO SHOW?`)) return;
+                                      const { error } = await appointmentService.markNoShow(appointment.id);
+                                      if (!error) {
+                                        toast({ title: "No Show Recorded", description: "The donor has been notified.", variant: "destructive" });
+                                        loadHospitalData();
+                                      } else {
+                                        toast({ title: "Error", description: "Failed to mark no-show.", variant: "destructive" });
+                                      }
+                                    }}
+                                  >
+                                    <XCircle className="w-4 h-4 mr-1" />
+                                    No Show
+                                  </Button>
+                                </>
                               )}
                             </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 pt-2 sm:border-l-2 sm:pl-3">
-                          <Badge
-                            className={
-                              appointment.status === "scheduled"
-                                ? "bg-warning/10 text-warning"
-                                : appointment.status === "completed"
-                                  ? "bg-success/10 text-success"
-                                  : appointment.status === "cancelled"
-                                    ? "bg-destructive/10 text-destructive"
-                                    : "bg-muted"
-                            }
-                          >
-                            {appointment.status}
-                          </Badge>
-                          {appointment.status === "scheduled" && !appointment.acceptance_email_sent_at && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-success hover:bg-success/90"
-                                onClick={async () => {
-                                  const { data, error } =
-                                    await appointmentService.acceptWithEmail(
-                                      appointment.id,
-                                      hospitalProfile.name,
-                                    );
-                                  if (!error) {
-                                    toast({
-                                      title: "✅ Appointment Accepted",
-                                      description:
-                                        "The donor has been notified by email and in-app notification.",
-                                    });
-                                    loadHospitalData();
-                                  } else {
-                                    toast({
-                                      title: "Error",
-                                      description: "Failed to accept appointment.",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Accept
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={async () => {
-                                  const { error } =
-                                    await appointmentService.cancel(
-                                      appointment.id,
-                                    );
-                                  if (!error) {
-                                    toast({
-                                      title: "Appointment Rejected",
-                                      description:
-                                        "The appointment has been cancelled.",
-                                      variant: "destructive",
-                                    });
-                                    loadHospitalData();
-                                  }
-                                }}
-                              >
-                                <Ban className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                          {(appointment.status === "confirmed" || (appointment.status === "scheduled" && appointment.acceptance_email_sent_at)) && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-[hsl(0,80%,50%)] hover:bg-[hsl(0,80%,50%)]/90 text-white"
-                                onClick={async () => {
-                                  if (!window.confirm(`Mark ${appointment.donors?.name || "this donor"}'s donation as COMPLETE? This will award 100 points and send a completion email.`)) return;
-                                  const { data, error } =
-                                    await appointmentService.markComplete(
-                                      appointment.id,
-                                    );
-                                  if (!error) {
-                                    toast({
-                                      title: "🌟 Donation Marked Complete!",
-                                      description:
-                                        `100 points awarded to ${appointment.donors?.name || "donor"}. Completion email sent.`,
-                                    });
-                                    loadHospitalData();
-                                  } else {
-                                    toast({
-                                      title: "Error",
-                                      description: "Failed to mark as complete.",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Mark Complete
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={async () => {
-                                  const { error } =
-                                    await appointmentService.cancel(
-                                      appointment.id,
-                                    );
-                                  if (!error) {
-                                    toast({
-                                      title: "Appointment Cancelled",
-                                      description:
-                                        "The appointment has been cancelled.",
-                                      variant: "destructive",
-                                    });
-                                    loadHospitalData();
-                                  }
-                                }}
-                              >
-                                <Ban className="w-4 h-4 mr-1" />
-                                Cancel
-                              </Button>
-                            </>
                           )}
                         </div>
-                      </div>
-                    ))}
-                    <PaginationControls 
-                      currentPage={appointmentsPage} 
-                      totalPages={appointmentsTotalPages} 
-                      onPageChange={setAppointmentsPage} 
+                      );
+                    })}
+                    <PaginationControls
+                      currentPage={appointmentsPage}
+                      totalPages={appointmentsTotalPages}
+                      onPageChange={setAppointmentsPage}
                     />
                   </div>
                 )}

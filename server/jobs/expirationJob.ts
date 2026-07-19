@@ -142,8 +142,6 @@ const expireDrives = async (): Promise<{ expired: number; error: any }> => {
   }
 };
 
-// ─── 2. Expire Appointments (no_show) ─────────────────────────────────────────
-
 const expireAppointments = async (): Promise<{
   expired: number;
   error: any;
@@ -160,26 +158,14 @@ const expireAppointments = async (): Promise<{
       drives (name)
     `;
 
-    // Fetch scheduled and confirmed appointments with retry
-    let { data: appointments, error: fetchErr } = await withRetry(() => 
+    // Fetch scheduled appointments with retry
+    // Note: DB enum only supports "scheduled" — "confirmed" is not a valid status
+    const { data: appointments, error: fetchErr } = await withRetry(() =>
       getSupabase()
         .from("appointments")
         .select(appointmentFields)
-        .in("status", ["scheduled", "confirmed"])
+        .eq("status", "scheduled")
     );
-
-    // If the enum doesn't support 'confirmed' yet, PostgREST returns a 22P02 error
-    if (fetchErr && fetchErr.code === "22P02") {
-      const fallback = await withRetry(() => 
-        getSupabase()
-          .from("appointments")
-          .select(appointmentFields)
-          .eq("status", "scheduled")
-      );
-      
-      appointments = fallback.data;
-      fetchErr = fallback.error;
-    }
 
     if (fetchErr) {
       console.error(

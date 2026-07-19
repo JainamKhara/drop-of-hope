@@ -342,10 +342,11 @@ export const appointmentService = {
    * Approve/Accept an appointment (hospital confirms scheduling)
    */
   approve: async (id: string, notes?: string) => {
+    // Note: DB enum does not include "confirmed" — use acceptance_email_sent_at to track acceptance
     const { data, error } = await supabase
       .from("appointments")
       .update({
-        status: "confirmed",
+        acceptance_email_sent_at: new Date().toISOString(),
         notes: notes || undefined,
         updated_at: new Date().toISOString(),
       })
@@ -403,6 +404,22 @@ export const appointmentService = {
       .select()
       .single();
     return { data, error };
+  },
+
+  /**
+   * Mark appointment as no-show via server route (notifies donor)
+   */
+  markNoShow: async (id: string) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/no-show`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await response.json();
+      return { data: result, error: result.error || null };
+    } catch (err) {
+      return { data: null, error: err };
+    }
   },
 
   /**

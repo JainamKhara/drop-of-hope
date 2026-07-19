@@ -11,7 +11,7 @@ export interface Appointment {
   address: string;
   city?: string;
   state?: string;
-  status: "confirmed" | "completed" | "cancelled" | "no_show";
+  status: "scheduled" | "completed" | "cancelled" | "no_show";
   notes?: string;
   donorName: string;
   donorEmail: string;

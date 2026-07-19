@@ -62,34 +62,21 @@ export const handleAcceptAppointment = async (
       return res.status(404).json({ error: "Appointment not found" });
     }
 
-    if (apt.status === "confirmed" || apt.status === "completed") {
+    if (apt.status === "completed") {
       return res.status(400).json({ error: "Appointment already processed" });
     }
 
-    // Update status to confirmed (try-catch or check error to handle missing enum value)
+    // Mark as accepted: set acceptance_email_sent_at timestamp
+    // Note: DB enum does not include "confirmed" — use acceptance_email_sent_at to track acceptance
     const { error: updateErr } = await getSupabase()
       .from("appointments")
       .update({
-        status: "confirmed",
         acceptance_email_sent_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq("id", id);
 
-    if (updateErr) {
-      console.warn("Failed to update status to 'confirmed', falling back to updating timestamp only. Error:", updateErr.message);
-      
-      // Fallback: update timestamp only if 'confirmed' enum value is missing
-      const { error: fallbackErr } = await getSupabase()
-        .from("appointments")
-        .update({
-          acceptance_email_sent_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", id);
-        
-      if (fallbackErr) throw fallbackErr;
-    }
+    if (updateErr) throw updateErr;
 
     const donor = Array.isArray(apt.donors) ? apt.donors[0] : apt.donors;
     const drive = Array.isArray(apt.drives) ? apt.drives[0] : apt.drives;
