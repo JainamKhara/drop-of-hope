@@ -24,7 +24,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
-import { format, isAfter, isBefore, addDays, isSameDay } from "date-fns";
+import { format, isAfter, isBefore, addDays, isSameDay, isPast } from "date-fns";
 import { useHybridAuth, DonorProfile } from "@/contexts/HybridAuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { generateGoogleCalendarUrl as getGoogleCalendarUrl, parseAppointmentDateTime } from "@/lib/calendar";
@@ -37,7 +37,7 @@ interface AppointmentDisplay {
   time: string;
   location: string;
   address: string;
-  status: "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";
+  status: "scheduled" | "completed" | "cancelled" | "no_show";
   isAccepted: boolean;
   notes?: string;
 }
@@ -62,7 +62,7 @@ export default function MyAppointments() {
     (apt) => {
       const aptDate = new Date(apt.date);
       aptDate.setHours(0, 0, 0, 0);
-      return !isBefore(aptDate, today) && (apt.status === "scheduled" || apt.status === "confirmed");
+      return !isBefore(aptDate, today) && (apt.status === "scheduled");
     },
   );
 
@@ -376,47 +376,39 @@ export default function MyAppointments() {
   };
 
   const getStatusLabel = (appointment: AppointmentDisplay) => {
-    if (appointment.isAccepted && appointment.status === "scheduled") return "Accepted";
-    switch (appointment.status) {
-      case "no_show": return "No Show";
-      case "confirmed": return "Accepted";
-      case "completed": return "Completed";
-      case "cancelled": return "Cancelled";
-      case "scheduled": return "Scheduled";
-      default: return appointment.status;
-    }
+    if (appointment.status === "no_show") return "No Show";
+    if (appointment.status === "completed") return "Completed";
+    if (appointment.status === "cancelled") return "Cancelled";
+
+    // For scheduled — determine sub-state
+    const aptDate = new Date(appointment.date);
+    const slotPast = isPast(aptDate);
+
+    if (slotPast) return "Awaiting Outcome";
+    if (appointment.isAccepted) return "Confirmed";
+    return "Pending Confirmation";
   };
 
-  const getStatusIcon = (status: string, isAccepted?: boolean) => {
-    if (isAccepted && status === "scheduled") return <CheckCircle className="w-4 h-4 text-success" />;
-    switch (status) {
-      case "confirmed":
-        return <CheckCircle className="w-4 h-4 text-success" />;
-      case "completed":
-        return <CheckCircle className="w-4 h-4 text-success" />;
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-destructive" />;
-      case "no_show":
-        return <XCircle className="w-4 h-4 text-gray-400" />;
-      default:
-        return <AlertCircle className="w-4 h-4 text-warning" />;
-    }
+  const getStatusIcon = (status: string, isAccepted?: boolean, date?: string) => {
+    if (status === "completed") return <CheckCircle className="w-4 h-4 text-success" />;
+    if (status === "cancelled") return <XCircle className="w-4 h-4 text-destructive" />;
+    if (status === "no_show")   return <XCircle className="w-4 h-4 text-gray-400" />;
+    // scheduled sub-states
+    const slotPast = date ? isPast(new Date(date)) : false;
+    if (slotPast)    return <AlertCircle className="w-4 h-4 text-blue-500" />;
+    if (isAccepted)  return <CheckCircle className="w-4 h-4 text-success" />;
+    return               <AlertCircle className="w-4 h-4 text-orange-500" />;
   };
 
-  const getStatusColor = (status: string, isAccepted?: boolean) => {
-    if (isAccepted && status === "scheduled") return "bg-success/10 text-success border-success/20";
-    switch (status) {
-      case "confirmed":
-        return "bg-success/10 text-success border-success/20";
-      case "completed":
-        return "bg-success/10 text-success border-success/20";
-      case "cancelled":
-        return "bg-destructive/10 text-destructive border-destructive/20";
-      case "no_show":
-        return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400";
-      default:
-        return "bg-warning/10 text-warning border-warning/20";
-    }
+  const getStatusColor = (status: string, isAccepted?: boolean, date?: string) => {
+    if (status === "completed") return "bg-success/10 text-success border-success/20";
+    if (status === "cancelled") return "bg-destructive/10 text-destructive border-destructive/20";
+    if (status === "no_show")   return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400";
+    // scheduled sub-states
+    const slotPast = date ? isPast(new Date(date)) : false;
+    if (slotPast)    return "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-950 dark:text-blue-300";
+    if (isAccepted)  return "bg-success/10 text-success border-success/20";
+    return               "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-950 dark:text-orange-300";
   };
 
   // Get dates with appointments for calendar highlighting
@@ -424,7 +416,7 @@ export default function MyAppointments() {
   // Get dates with active appointments for calendar highlighting
   // Only highlight scheduled or confirmed appointments to avoid confusion with cancelled ones
   const activeAppointmentDates = appointments
-    .filter(apt => apt.status === "scheduled" || apt.status === "confirmed")
+    .filter(apt => apt.status === "scheduled")
     .map((apt) => {
       const date = new Date(apt.date);
       date.setHours(0, 0, 0, 0);
@@ -432,7 +424,7 @@ export default function MyAppointments() {
     });
 
   const otherAppointmentDates = appointments
-    .filter(apt => apt.status !== "scheduled" && apt.status !== "confirmed")
+    .filter(apt => !(apt.status === "scheduled" && apt.isAccepted))
     .map((apt) => {
       const date = new Date(apt.date);
       date.setHours(0, 0, 0, 0);
@@ -612,8 +604,8 @@ export default function MyAppointments() {
                               {appointment.organizer}
                             </p>
                           </div>
-                          <Badge className={getStatusColor(appointment.status, appointment.isAccepted)}>
-                            {getStatusIcon(appointment.status, appointment.isAccepted)}
+                          <Badge className={getStatusColor(appointment.status, appointment.isAccepted, appointment.date)}>
+                            {getStatusIcon(appointment.status, appointment.isAccepted, appointment.date)}
                             <span className="ml-1">
                               {getStatusLabel(appointment)}
                             </span>
